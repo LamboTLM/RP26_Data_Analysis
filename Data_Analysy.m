@@ -5,10 +5,11 @@ close all
 
 %% Dateipfade hinzufügen und Loggingdaten auswählen
 addpath("Functions")
+addpath("Functions\GUI_Funcitons\")
 addpath("Logging_data")
 
 %% Read Loggingdata (MDF4 Data)
-Dateiname="RP25e_2025-09-13_18-03-11-driving.mf4";
+Dateiname="RP25e_2025-07-11_07-35-39.mf4";
 disp('Laden der Testdaten '+Dateiname)
 Vehicle='RP24e';
 FileInfo = mdfInfo(Dateiname);
@@ -24,7 +25,8 @@ Data_2   = Data_1;              % only needed in comparison mode
 switch comparison_mode
 
     case 'Single'
-        Time_frame =[0,20000];
+        Time_frame =[0,inf];
+        % Time_frame =[0,inf];
         fahrzeitBereich = timerange(seconds(Time_frame(1)), seconds(Time_frame(2)), 'closed');
         Data=Data_1;
 
@@ -40,7 +42,6 @@ switch comparison_mode
     
     otherwise
         disp('Unkown Comparison mode');
-
 end
 
 %% Analyze data
@@ -55,16 +56,25 @@ disp('Erstellen der Plots')
 
 switch comparison_mode
     case 'Single'
-        [f1, Driverdata_axes]       =       visualizeDriverDataSingle(Data,fahrzeitBereich);
+        [f1, Driverdata_axes, DriverPlaybackData] = visualizeDriverDataSingle(Data,fahrzeitBereich); % <-- Wichtig: Daten & Handles empfangen
+        addPlaybackControls(f1, DriverPlaybackData); % <-- Buttons hinzufuegen
         [f2, VehicleData_axes]      =       visualizeVehicleDataSingle(Data,fahrzeitBereich);
         [f3, DynamicsData_axes]     =       visualizeDynamicsDataSingle(Data,fahrzeitBereich);
         [f4, BatteryData_axes]      =       visualizeBatteryDataSingle(Data,fahrzeitBereich);
         [f5, TemperatureData_axes]  =       visualizeTemperatureDataSingle(Data,fahrzeitBereich);
         [f6, TQVData_axes]          =       visualizeTQVDataSingle(Data,fahrzeitBereich);
+        [f7, all_axes, avg_P_wheel, avg_Eff] = visuelizeMotorpowerSingle(Data,fahrzeitBereich);
+
+% INS_acc_z_can = extractTimetableFromCell(Data,'INS_acc_z_can');
+% plot(INS_acc_z_can.INS_acc_z_can,YDataSource = 'INS_acc_z_can.INS_acc_z_can');
+% linkdata on;
+% ylabel("INS_acc_z_can");
+% title("INS_acc_z_can");
+% legend("show");
 
     case 'H2H'
-        [f1, Driverdata_axes]       =       visualizeDriverDataH2H(Data,fahrzeitBereich);
-        [f2, VehicleData_axes]      =       visualizeVehicleDataH2H(Data, fahrzeitBereich);
+        % [f1, Driverdata_axes]       =       visualizeDriverDataH2H(Data,fahrzeitBereich);
+        % [f2, VehicleData_axes]      =       visualizeVehicleDataH2H(Data, fahrzeitBereich);
 end
 
 % axes=[Driverdata_axes,VehicleData_axes,DynamicsData_axes,BatteryData_axes,TemperatureData_axes];

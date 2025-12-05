@@ -1,5 +1,5 @@
 function [f, all_axes] = visualizeTemperatureDataSingle(Data,fahrzeitBereich)
-% try
+try
 f = figure('Name', '5. Temperatur Analyse', 'NumberTitle', 'off');
 t = tiledlayout(f, 4, 1);
 title(t, 'Bremstemperaturen', 'FontSize', 14);
@@ -81,10 +81,10 @@ ylim(ax2, [0,150]);
 ax3 = nexttile(t);
 if ~(all(isnan(TemperatureData.unitek_fl_igbt_temp_can)) && all(isnan(TemperatureData.unitek_fr_igbt_temp_can)) && all(isnan(TemperatureData.unitek_rl_igbt_temp_can)) && all(isnan(TemperatureData.unitek_rr_igbt_temp_can)))
     hold(ax3, 'on');
-    plot(ax3, TemperatureData.t, TemperatureData.wpmd_brake_temp_fl_can, 'DisplayName', 'FL');
-    plot(ax3, TemperatureData.t, TemperatureData.wpmd_brake_temp_fr_can, 'DisplayName', 'FR');
-    plot(ax3, TemperatureData.t, TemperatureData.wpmd_brake_temp_rl_can, 'DisplayName', 'RL');
-    plot(ax3, TemperatureData.t, TemperatureData.wpmd_brake_temp_rr_can, 'DisplayName', 'RR');
+    % plot(ax3, TemperatureData.t, TemperatureData.wpmd_brake_temp_fl_can, 'DisplayName', 'FL');
+    % plot(ax3, TemperatureData.t, TemperatureData.wpmd_brake_temp_fr_can, 'DisplayName', 'FR');
+    % plot(ax3, TemperatureData.t, TemperatureData.wpmd_brake_temp_rl_can, 'DisplayName', 'RL');
+    % plot(ax3, TemperatureData.t, TemperatureData.wpmd_brake_temp_rr_can, 'DisplayName', 'RR');
     hold(ax3, 'off');
 else
     plotDataMissingBox(ax3);
@@ -117,15 +117,15 @@ hold(ax4, 'off')
 legend ('avg', 'max', 'min','ItemHitFcn',@cb_legend);
 ylim(ax4, [0,70]);
 
-try
-    all_axes = [ax1,ax2,ax3,ax4];
-catch
-    all_axes = [ax1,ax2,ax4];
-end
-linkaxes (all_axes, 'x');
-
+% try
+%     all_axes = [ax1,ax2,ax3,ax4];
 % catch
-%     f=[];
-%     all_axes=[];
+%     all_axes = [ax1,ax2,ax4];
 % end
+% linkaxes (all_axes, 'x');
+
+catch
+end
+    f=[];
+    all_axes=[];
 end
