@@ -14,7 +14,6 @@ try
     Dynamics_Data_=Dynamics_Data_(fahrzeitBereich,:);
 
     % Plot 1: Längs- & Querbeschleunigung über Zeit
-    % Plot 1: Längs- & Querbeschleunigung über Zeit
     ax1 = nexttile(t);
     hold(ax1, 'off');
 
