@@ -1,0 +1,1883 @@
+VERSION "created by canmatrix"
+
+
+NS_ : 
+	NS_DESC_
+	CM_
+	BA_DEF_
+	BA_
+	VAL_
+	CAT_DEF_
+	CAT_
+	FILTER
+	BA_DEF_DEF_
+	EV_DATA_
+	ENVVAR_DATA_
+	SGTYPE_
+	SGTYPE_VAL_
+	BA_DEF_SGTYPE_
+	BA_SGTYPE_
+	SIG_TYPE_REF_
+	VAL_TABLE_
+	SIG_GROUP_
+	SIG_VALTYPE_
+	SIGTYPE_VALTYPE_
+	BO_TX_BU_
+	BA_DEF_REL_
+	BA_REL_
+	BA_DEF_DEF_REL_
+	BU_SG_REL_
+	BU_EV_REL_
+	BU_BO_REL_
+	SG_MUL_VAL_
+
+BS_:
+
+BU_: DataLogger Vector_Logger TTMD PDU EXT LT_RGX WPMD VCU AMS TELEMETRY_SIGNALS Charger IVT_Mod Inverter DASH LVBATT TELEMETRY IMU_COG IMU_RA IMU_FA
+VAL_TABLE_ datatype 2 "float32" 1 "sint32" 0 "uint32" ;
+
+
+BO_ 3221225472 VECTOR__INDEPENDENT_SIG_MSG: 0 Vector__XXX
+ SG_ tqTarget_can : 0|32@1- (1,0) [-3.4E+38|3.4E+38] "Nm" Vector__XXX
+ SG_ drive_tqvLastTqvIdReceived_can : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ drive_currentTqvReqId_can : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ IVT_B1_Trigger_spare : 0|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_B1_07_Trigger_WH : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_B1_06_Trigger_As : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_B1_05_Trigger_W : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_B1_04_Trigger_T : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_B1_03_Trigger_U3 : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_B1_02_Trigger_U2 : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_B1_01_Trigger_U1 : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_B1_00_Trigger_I : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_B2_Resp_Store_Device_SN : 0|32@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_FF_Wrong_Command : 0|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_BF_Restart_Alive_SN : 0|32@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_BF_Restart_Alive_Cmd_ID : 0|16@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_BA_Resp_SW_Ver_Vear : 0|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_BA_Resp_SW_Ver_Revision : 0|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_BA_Resp_SW_Ver_Month : 0|8@1- (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_BA_Resp_SW_Ver_Minor : 0|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_BA_Resp_SW_Ver_Internal : 0|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_BA_Resp_SW_Ver_Day : 0|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_B9_Resp_Device_Com : 0|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_B9_Resp_Device_current : 0|12@0+ (1,0) [0|0] "A" Vector__XXX
+ SG_ IVT_B9_Resp_Device_TOI : 0|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_B9_Resp_Device_V_supply : 0|8@0+ (1,0) [0|0] "V" Vector__XXX
+ SG_ IVT_B9_Resp_Device_Voltage_chan : 0|4@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_80_Resp_MeasError_Item : 0|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_80_Resp_MeasError_Count_Mask : 0|16@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_81_Resp_SystemError_Item : 0|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_81_Resp_SystemError_Count_Ma : 0|16@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_82_Resp_AllLogData_Item : 0|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_82_Resp_AllLogData_Counter : 0|48@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_90_Resp_Can_ID_SN_I : 0|32@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_90_Resp_Can_ID_val_I : 0|16@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_91_Resp_Can_ID_SN_U1 : 0|32@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_91_Resp_Can_ID_val_U1 : 0|16@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_92_Resp_Can_ID_SN_U2 : 0|32@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_92_Resp_Can_ID_val_U2 : 0|16@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_93_Resp_Can_ID_SN_U3 : 0|32@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_93_Resp_Can_ID_val_U3 : 0|16@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_94_Resp_Can_ID_SN_T : 0|32@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_94_Resp_Can_ID_val_T : 0|16@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_95_Resp_Can_ID_SN_W : 0|32@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_95_Resp_Can_ID_val_W : 0|16@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_96_Resp_Can_ID_SN_As : 0|32@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_96_Resp_Can_ID_val_As : 0|16@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_97_Resp_Can_ID_SN_Wh : 0|32@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_97_Resp_Can_ID_val_Wh : 0|16@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_9D_Resp_Can_ID_SN_Command : 0|32@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_9D_Resp_Can_ID_val_Command : 0|16@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_9F_Resp_Can_ID_SN_Response : 0|32@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_9F_Resp_Can_ID_val_Response : 0|16@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_A0_Resp_CycleTime_I : 0|16@0+ (1,0) [0|0] "ms" Vector__XXX
+ SG_ IVT_A0_Resp_Endianess_I : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_A0_Resp_Sign_I : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_A0_Resp_TriggerMode_I : 0|2@0+ (1,0) [0|2] "" Vector__XXX
+ SG_ IVT_A1_Resp_CycleTime_U1 : 0|16@0+ (1,0) [0|0] "ms" Vector__XXX
+ SG_ IVT_A1_Resp_Endianess_U1 : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_A1_Resp_Sign_U1 : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_A1_Resp_TriggerMode_U1 : 0|2@0+ (1,0) [0|2] "" Vector__XXX
+ SG_ IVT_A2_Resp_CycleTime_U2 : 0|16@0+ (1,0) [0|0] "ms" Vector__XXX
+ SG_ IVT_A2_Resp_Endianess_U2 : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_A2_Resp_Sign_U2 : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_A2_Resp_TriggerMode_U2 : 0|2@0+ (1,0) [0|2] "" Vector__XXX
+ SG_ IVT_A3_Resp_CycleTime_U3 : 0|16@0+ (1,0) [0|0] "ms" Vector__XXX
+ SG_ IVT_A3_Resp_Endianess_U3 : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_A3_Resp_Sign_U3 : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_A3_Resp_TriggerMode_U3 : 0|2@0+ (1,0) [0|2] "" Vector__XXX
+ SG_ IVT_A4_Resp_CycleTime_T : 0|16@0+ (1,0) [0|0] "ms" Vector__XXX
+ SG_ IVT_A4_Resp_Endianess_T : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_A4_Resp_Sign_T : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_A4_Resp_TriggerMode_T : 0|2@0+ (1,0) [0|2] "" Vector__XXX
+ SG_ IVT_A5_Resp_CycleTime_W : 0|16@0+ (1,0) [0|0] "ms" Vector__XXX
+ SG_ IVT_A5_Resp_Endianess_W : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_A5_Resp_Sign_W : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_A5_Resp_TriggerMode_W : 0|2@0+ (1,0) [0|2] "" Vector__XXX
+ SG_ IVT_A6_Resp_CycleTime_As : 0|16@0+ (1,0) [0|0] "ms" Vector__XXX
+ SG_ IVT_A6_Resp_Endianess_As : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_A6_Resp_Sign_As : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_A6_Resp_TriggerMode_As : 0|2@0+ (1,0) [0|2] "" Vector__XXX
+ SG_ IVT_A7_Resp_CycleTime_WH : 0|16@0+ (1,0) [0|0] "ms" Vector__XXX
+ SG_ IVT_A7_Resp_Endianess_WH : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_A7_Resp_Sign_WH : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_A7_Resp_TriggerMode_WH : 0|2@0+ (1,0) [0|2] "" Vector__XXX
+ SG_ IVT_B0_Resp_Reset_Item : 0|16@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_B0_Resp_Reset_Device_SN : 0|32@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_B2_Resp_Store_dummy : 0|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_B3_Resp_Oc_Test_Time : 0|16@0+ (1,0) [0|65535] "ms" Vector__XXX
+ SG_ IVT_B4_Resp_Actual_Mode : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_B4_Resp_Code_Level : 0|16@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_B4_Resp_Startup_Mode : 0|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_B5_Resp_OC_Pos_Reset_Thresho : 0|16@0- (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_B5_Resp_OC_Pos_Set_Threshold : 0|16@0- (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_B6_Resp_OC_Neg_Reset_Thresho : 0|16@0- (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_B6_Resp_OC_Neg_Set_Threshold : 0|16@0- (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_B9_Resp_Device_type : 0|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_BA_Resp_SW_Ver_Major_HW : 0|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_BB_Resp_Serien_Nr : 0|32@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_BC_Resp_Art_N : 0|56@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_Response_data : 0|56@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_ID_Response : 0|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ torque_safety_b_can : 0|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ voltage_bat_can : 0|8@1+ (0.05,6) [6|18.75] "V" Vector__XXX
+ SG_ steering_wheel_angle_raw_can : 0|12@1+ (1,0) [0|4095] "" Vector__XXX
+ SG_ New_Signal_1041 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 1872 MAINTENANCE_dash: 2 TELEMETRY
+ SG_ mt_remote_buttons_sw_tl_b_can : 11|1@1+ (1,0) [0|1] ""  DASH
+ SG_ mt_remote_buttons_sw_pr_b_can : 10|1@1+ (1,0) [0|1] ""  DASH
+ SG_ mt_remote_buttons_sw_pl_b_can : 9|1@1+ (1,0) [0|1] ""  DASH
+ SG_ mt_remote_buttons_sw_fr_b_can : 8|1@1+ (1,0) [0|1] ""  DASH
+ SG_ mt_remote_buttons_start_b_can : 7|1@1+ (1,0) [0|1] ""  DASH
+ SG_ mt_remote_buttons_sw_fl_b_can : 6|1@1+ (1,0) [0|1] ""  DASH
+ SG_ mt_remote_buttons_sw_tr_b_can : 5|1@1+ (1,0) [0|1] ""  DASH
+ SG_ mt_remote_buttons_sw_br_b_can : 4|1@1+ (1,0) [0|1] ""  DASH
+ SG_ mt_remote_buttons_sw_mr_b_can : 3|1@1+ (1,0) [0|1] ""  DASH
+ SG_ mt_remote_buttons_sw_bl_b_can : 2|1@1+ (1,0) [0|1] ""  DASH
+ SG_ mt_remote_buttons_sw_ml_b_can : 1|1@1+ (1,0) [0|1] ""  DASH
+ SG_ mt_remote_buttons_enable_b_can : 0|1@1+ (1,0) [0|1] ""  DASH
+
+BO_ 516 AMS_errors: 3 AMS
+ SG_ ams_overcurrent_occured_b_can : 23|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ ams_overcurrent_error_b_can : 22|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ ams_overcurrent_warning_b_can : 21|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ ams_ivt_timeout_occured_b_can : 20|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ ams_ivt_timeout_error_b_can : 19|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ ams_ivt_timeout_warning_b_can : 18|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ ams_cell_undertemperature_occure : 17|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ ams_cell_undertemperature_error_ : 16|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ ams_cell_undertemperature_warnin : 15|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ ams_cell_overtemperature_occured : 14|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ ams_cell_overtemperature_error_b : 13|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ ams_cell_overtemperature_warning : 12|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ ams_cell_undervoltage_occured_b_ : 11|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ ams_cell_undervoltage_error_b_ca : 10|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ ams_cell_undervoltage_warning_b_ : 9|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ ams_cell_overvoltage_occured_b_c : 8|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ ams_cell_overvoltage_error_b_can : 7|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ ams_cell_overvoltage_warning_b_c : 6|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ ams_overall_voltage_occured_b_ca : 5|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ ams_overall_voltage_error_b_can : 4|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ ams_overall_voltage_warning_b_ca : 3|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ ams_slave_timeout_occured_b_can : 2|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ ams_slave_timeout_warning_b_can : 0|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ ams_slave_timeout_error_b_can : 1|1@1+ (1,0) [0|1] "" Vector__XXX
+
+BO_ 515 AMS_stat_2: 1 AMS
+ SG_ ams_pcb_temp_can : 0|5@1+ (3,0) [0|93] "�C" Vector__XXX
+
+BO_ 696 PDU_EWP_Data: 8 PDU
+ SG_ PDU_EWP_Mot_timeout_e_b_can : 46|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ PDU_EWP_Inv_timeout_e_b_can : 30|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ PDU_EWP_Mot_wakeup_can : 63|1@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ PDU_EWP_Mot_temperature_can : 58|5@1+ (9,0) [0|279] "" Vector__XXX
+ SG_ PDU_EWP_Mot_speed_target_can : 53|5@1+ (9,0) [0|279] "" Vector__XXX
+ SG_ PDU_EWP_Mot_sup_voltage_can : 48|5@1+ (0.85,0) [0|26.35] "" Vector__XXX
+ SG_ PDU_EWP_Mot_sup_voltage_e_b_can : 47|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ PDU_EWP_Mot_power_status_can : 45|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ PDU_EWP_Mot_overtemp_e_b_can : 39|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ PDU_EWP_Mot_overcurrent_e_b_can : 38|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ PDU_EWP_Mot_dryrun_e_b_can : 37|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ PDU_EWP_Mot_current_can : 40|5@1+ (2,0) [0|62] "" Vector__XXX
+ SG_ PDU_EWP_Mot_speed_actual_can : 32|5@1+ (9,0) [0|279] "" Vector__XXX
+ SG_ PDU_EWP_Inv_dryrun_e_b_can : 31|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ PDU_EWP_Inv_overcurrent_e_b_can : 28|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ PDU_EWP_Inv_overtemp_e_b_can : 22|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ PDU_EWP_Inv_power_status_can : 29|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ PDU_EWP_Inv_sup_voltage_e_b_can : 15|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ PDU_EWP_Inv_wakeup_can : 21|1@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ PDU_EWP_Inv_current_can : 23|5@1+ (2,0) [0|62] "A" Vector__XXX
+ SG_ PDU_EWP_Inv_temperature_can : 16|5@1+ (9,0) [0|279] "" Vector__XXX
+ SG_ PDU_EWP_Inv_sup_voltage_can : 10|5@1+ (0.85,0) [0|26.35] "" Vector__XXX
+ SG_ PDU_EWP_Inv_speed_actual_can : 5|5@1+ (9,0) [0|279] "" Vector__XXX
+ SG_ PDU_EWP_Inv_speed_target_can : 0|5@1+ (9,0) [0|279] "" Vector__XXX
+
+BO_ 599 VCU_analysisData: 8 VCU
+ SG_ tqTarget_can : 32|11@1- (0.1,0) [-102.4|102.2] "Nm"  DASH
+ SG_ slip_compare_val_rr_can : 24|8@1+ (0.1,0) [0|100] "%"  DASH
+ SG_ slip_compare_val_rl_can : 16|8@1+ (0.1,0) [0|100] "%"  DASH
+ SG_ slip_compare_val_fr_can : 8|8@1+ (0.1,0) [0|100] "%"  DASH
+ SG_ slip_compare_val_fl_can : 0|8@1+ (0.1,0) [0|100] "%"  DASH
+
+BO_ 2032 DataLogger_PeriodicReportMsg: 8 DataLogger
+ SG_ DataLogger_reserved : 58|6@1- (1,0) [-32|31] ""  DASH
+ SG_ DataLogger_powered_resumed : 57|1@1+ (1,0) [0|1] ""  DASH
+ SG_ DataLogger_OP_detected : 56|1@1+ (1,0) [0|1] ""  DASH
+ SG_ DataLogger_storage_used : 52|4@1+ (1,0) [0|15] ""  DASH
+ SG_ DataLogger_counter : 48|4@1+ (1,0) [0|15] ""  DASH
+ SG_ DataLogger_TS_power : 32|16@1- (5,0) [-163840|163835] "W"  DASH
+ SG_ DataLogger_TS_current : 16|16@1- (0.01,0) [-327.68|327.67] "A"  DASH
+ SG_ DataLogger_TS_voltage : 0|16@1+ (0.01,0) [0|655.35] "V"  DASH
+
+BO_ 533 battery_bms_debug: 8 LVBATT
+ SG_ battery_bms_scan_e_b_can : 45|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ battery_bms_plugin_detect_can : 42|3@1+ (1,0) [0|7] "" Vector__XXX
+ SG_ battery_bms_invalid_can : 41|1@1+ (1,0) [0|1] ""  DASH
+ SG_ battery_bms_ft_status2_can : 32|9@1+ (1,0) [0|511] "" Vector__XXX
+ SG_ battery_bms_ft_status1_can : 16|16@1+ (1,0) [0|65535] "" Vector__XXX
+ SG_ battery_bms_pwr_state_can : 11|5@1+ (1,0) [0|31] "" Vector__XXX
+ SG_ battery_bms_pack_status_can : 8|3@1+ (1,0) [0|7] "" Vector__XXX
+ SG_ battery_bms_self_status_can : 0|8@1+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 511 VLogger_CAN1_status: 1 Vector_Logger
+ SG_ vLogger_CAN1_e_b_can : 0|1@1+ (1,0) [0|1] ""  DASH
+
+BO_ 293 VCU_Logging_Unitek_RR_measure_2: 5 VCU
+ SG_ unitek_rr_rfe_fault_b_can : 35|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ unitek_rr_power_fault_b_can : 34|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ unitek_rr_overvoltage_b_can : 33|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ unitek_rr_feedback_b_can : 32|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ unitek_rr_Iq_Actual_can : 16|16@1- (0.093283582,0) [-3056.716414976|3056.623131394] "" Vector__XXX
+ SG_ unitek_rr_Id_Actual_can : 0|16@1- (0.093283582,0) [-3056.716414976|3056.623131394] "" Vector__XXX
+
+BO_ 292 VCU_Logging_Unitek_RL_measure_2: 5 VCU
+ SG_ unitek_rl_rfe_fault_b_can : 35|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ unitek_rl_power_fault_b_can : 34|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ unitek_rl_overvoltage_b_can : 33|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ unitek_rl_feedback_b_can : 32|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ unitek_rl_Iq_Actual_can : 16|16@1- (0.093283582,0) [-3056.716414976|3056.623131394] "" Vector__XXX
+ SG_ unitek_rl_Id_Actual_can : 0|16@1- (0.093283582,0) [-3056.716414976|3056.623131394] "" Vector__XXX
+
+BO_ 291 VCU_Logging_Unitek_FR_measure_2: 5 VCU
+ SG_ unitek_fr_rfe_fault_b_can : 35|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ unitek_fr_power_fault_b_can : 34|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ unitek_fr_overvoltage_b_can : 33|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ unitek_fr_feedback_b_can : 32|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ unitek_fr_Iq_Actual_can : 16|16@1- (0.093283582,0) [-3056.716414976|3056.623131394] "" Vector__XXX
+ SG_ unitek_fr_Id_Actual_can : 0|16@1- (0.093283582,0) [-3056.716414976|3056.623131394] "" Vector__XXX
+
+BO_ 290 VCU_Logging_Unitek_FL_measure_2: 5 VCU
+ SG_ unitek_fl_rfe_fault_b_can : 35|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ unitek_fl_power_fault_b_can : 34|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ unitek_fl_overvoltage_b_can : 33|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ unitek_fl_feedback_b_can : 32|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ unitek_fl_Iq_Actual_can : 16|16@1- (0.093283582,0) [-3056.716414976|3056.623131394] "" Vector__XXX
+ SG_ unitek_fl_Id_Actual_can : 0|16@1- (0.093283582,0) [-3056.716414976|3056.623131394] "" Vector__XXX
+
+BO_ 691 PDU_DCDC_vin: 7 PDU
+ SG_ PDU_DCDC_Fan_Motor_vin_can : 48|8@1+ (0.1,12) [12|37.5] "V"  DASH
+ SG_ PDU_DCDC_Fan_Inv_vin_can : 40|8@1+ (0.1,12) [12|37.5] "V"  DASH
+ SG_ PDU_DCDC_Ewp_Mot_2_vin_can : 32|8@1+ (0.1,12) [12|37.5] "V"  DASH
+ SG_ PDU_DCDC_Ewp_Mot_1_vin_can : 24|8@1+ (0.1,12) [12|37.5] "V"  DASH
+ SG_ PDU_DCDC_DV_vin_can : 16|8@1+ (0.1,12) [12|37.5] "V"  DASH
+ SG_ PDU_DCDC_24V_Gen_vin_can : 8|8@1+ (0.1,12) [12|37.5] "V"  DASH
+ SG_ PDU_DCDC_12V_Gen_vin_can : 0|8@1+ (0.1,12) [12|37.5] "V"  DASH
+
+BO_ 692 PDU_DCDC_vout: 7 PDU
+ SG_ PDU_DCDC_Fan_Motor_vout_can : 48|8@1+ (0.125,0) [0|31.875] "V"  DASH
+ SG_ PDU_DCDC_Fan_Inv_vout_can : 40|8@1+ (0.125,0) [0|31.875] "V"  DASH
+ SG_ PDU_DCDC_Ewp_Mot_2_vout_can : 32|8@1+ (0.125,0) [0|31.875] "V"  DASH
+ SG_ PDU_DCDC_Ewp_Mot_1_vout_can : 24|8@1+ (0.125,0) [0|31.875] "V"  DASH
+ SG_ PDU_DCDC_DV_vout_can : 16|8@1+ (0.125,0) [0|31.875] "V"  DASH
+ SG_ PDU_DCDC_24V_Gen_vout_can : 8|8@1+ (0.125,0) [0|31.875] "V"  DASH
+ SG_ PDU_DCDC_12V_Gen_vout_can : 0|8@1+ (0.125,0) [0|31.875] "V"  DASH
+
+BO_ 704 PDU_Ewp_speed_req: 3 Vector__XXX
+ SG_ PDU_Ewp_speed_req_en_b_can : 16|1@1+ (1,0) [0|1] ""  PDU
+ SG_ PDU_Ewp_Mot_tSpeed_Req : 8|8@1+ (0.4,0) [0|102] "%"  PDU
+ SG_ PDU_Ewp_Inv_tSpeed_Req : 0|8@1+ (0.4,0) [0|102] "%"  PDU
+
+BO_ 1031 WPMD_RL_data: 8 WPMD
+ SG_ wpmd_trans_temp_rl_can : 21|8@1+ (1,0) [0|255] "�C"  DASH,VCU
+ SG_ wpmd_trans_temp_e_b_rl_can : 2|1@1+ (1,0) [0|1] ""  DASH,VCU
+ SG_ wpmd_rotor_temp_rl_can : 13|8@1+ (1,0) [0|255] "�C"  DASH,VCU
+ SG_ wpmd_rotor_temp_e_b_rl_can : 1|1@1+ (1,0) [0|1] ""  DASH,VCU
+ SG_ wpmd_brake_temp_rl_can : 3|10@1+ (1,0) [0|1023] "�C"  DASH,VCU
+ SG_ wpmd_brake_temp_e_b_rl_can : 0|1@1+ (1,0) [0|1] ""  DASH,VCU
+
+BO_ 1030 WPMD_FR_data: 8 WPMD
+ SG_ wpmd_trans_temp_fr_can : 21|8@1+ (1,0) [0|255] "�C"  DASH,VCU
+ SG_ wpmd_trans_temp_e_b_fr_can : 2|1@1+ (1,0) [0|1] ""  DASH,VCU
+ SG_ wpmd_rotor_temp_fr_can : 13|8@1+ (1,0) [0|255] "�C"  DASH,VCU
+ SG_ wpmd_rotor_temp_e_b_fr_can : 1|1@1+ (1,0) [0|1] ""  DASH,VCU
+ SG_ wpmd_brake_temp_fr_can : 3|10@1+ (1,0) [0|1023] "�C"  DASH,VCU
+ SG_ wpmd_brake_temp_e_b_fr_can : 0|1@1+ (1,0) [0|1] ""  DASH,VCU
+
+BO_ 1029 WPMD_RR_data: 5 WPMD
+ SG_ wpmd_trans_temp_rr_can : 21|8@1+ (1,0) [0|255] "�C"  DASH,VCU
+ SG_ wpmd_trans_temp_e_b_rr_can : 2|1@1+ (1,0) [0|1] ""  DASH,VCU
+ SG_ wpmd_rotor_temp_rr_can : 13|8@1+ (1,0) [0|255] "�C"  DASH,VCU
+ SG_ wpmd_rotor_temp_e_b_rr_can : 1|1@1+ (1,0) [0|1] ""  DASH,VCU
+ SG_ wpmd_brake_temp_rr_can : 3|10@1+ (1,0) [0|1023] "�C"  DASH,VCU
+ SG_ wpmd_brake_temp_e_b_rr_can : 0|1@1+ (1,0) [0|1] ""  DASH,VCU
+
+BO_ 1028 WPMD_FL_data: 8 WPMD
+ SG_ wpmd_trans_temp_fl_can : 21|8@1+ (1,0) [0|255] "�C"  DASH,VCU
+ SG_ wpmd_trans_temp_e_b_fl_can : 2|1@1+ (1,0) [0|1] ""  DASH,VCU
+ SG_ wpmd_rotor_temp_fl_can : 13|8@1+ (1,0) [0|255] "�C"  DASH,VCU
+ SG_ wpmd_rotor_temp_e_b_fl_can : 1|1@1+ (1,0) [0|1] ""  DASH,VCU
+ SG_ wpmd_brake_temp_fl_can : 3|10@1+ (1,0) [0|1023] "�C"  DASH,VCU
+ SG_ wpmd_brake_temp_e_b_fl_can : 0|1@1+ (1,0) [0|1] ""  DASH,VCU
+
+BO_ 772 EXT_strain_gauge_tierod: 8 EXT
+ SG_ EXT_DMS_voltage_rl_tierod_can : 12|12@1+ (1.3,0) [0|5323.5] "mV"  DASH
+ SG_ EXT_DMS_voltage_fl_tierod_can : 0|12@1+ (1.3,0) [0|5323.5] "mV"  DASH
+ SG_ EXT_DMS_force_rl_tierod_can : 52|8@1- (0.128,0) [-16.384|16.256] "kN"  DASH
+ SG_ EXT_DMS_force_fl_tierod_can : 44|8@1- (0.128,0) [-16.384|16.256] "kN"  DASH
+ SG_ EXT_DMS_epsilon_fl_tierod_can : 24|10@1- (2E-06,0) [-0.001024|0.001022] ""  DASH
+ SG_ EXT_DMS_epsilon_rl_tierod_can : 34|10@1- (2E-06,0) [-0.001024|0.001022] ""  DASH
+ SG_ EXT_DMS_e_b_rl_tierod_can : 61|1@1+ (1,0) [0|1] ""  DASH
+ SG_ EXT_DMS_e_b_fl_tierod_can : 60|1@1+ (1,0) [0|1] ""  DASH
+
+BO_ 771 EXT_strain_gauge_rl_upper: 8 EXT
+ SG_ EXT_DMS_voltage_rl_ur_can : 12|12@1+ (1.3,0) [0|5323.5] "mV"  DASH
+ SG_ EXT_DMS_voltage_rl_uf_can : 0|12@1+ (1.3,0) [0|5323.5] "mV"  DASH
+ SG_ EXT_DMS_force_rl_ur_can : 52|8@1- (0.128,0) [-16.384|16.256] "kN"  DASH
+ SG_ EXT_DMS_force_rl_uf_can : 44|8@1- (0.128,0) [-16.384|16.256] "kN"  DASH
+ SG_ EXT_DMS_epsilon_rl_ur_can : 34|10@1- (2E-06,0) [-0.001024|0.001022] ""  DASH
+ SG_ EXT_DMS_epsilon_rl_uf_can : 24|10@1- (2E-06,0) [-0.001024|0.001022] ""  DASH
+ SG_ EXT_DMS_e_b_rl_ur_can : 61|1@1+ (1,0) [0|1] ""  DASH
+ SG_ EXT_DMS_e_b_rl_uf_can : 60|1@1+ (1,0) [0|1] ""  DASH
+
+BO_ 770 EXT_strain_gauge_rl_lower: 8 EXT
+ SG_ EXT_DMS_voltage_rl_lr_can : 12|12@1+ (1.3,0) [0|5323.5] "mV"  DASH
+ SG_ EXT_DMS_voltage_rl_lf_can : 0|12@1+ (1.3,0) [0|5323.5] "mV"  DASH
+ SG_ EXT_DMS_epsilon_rl_lf_can : 24|10@1- (2E-06,0) [-0.001024|0.001022] ""  DASH
+ SG_ EXT_DMS_force_rl_lr_can : 52|8@1- (0.128,0) [-16.384|16.256] "kN"  DASH
+ SG_ EXT_DMS_force_rl_lf_can : 44|8@1- (0.128,0) [-16.384|16.256] "kN"  DASH
+ SG_ EXT_DMS_epsilon_rl_lr_can : 34|10@1- (2E-06,0) [-0.001024|0.001022] ""  DASH
+ SG_ EXT_DMS_e_b_rl_lr_can : 61|1@1+ (1,0) [0|1] ""  DASH
+ SG_ EXT_DMS_e_b_rl_lf_can : 60|1@1+ (1,0) [0|1] ""  DASH
+
+BO_ 769 EXT_strain_gauge_fl_upper: 8 EXT
+ SG_ EXT_DMS_voltage_fl_ur_can : 12|12@1+ (1.3,0) [0|5323.5] "mV"  DASH
+ SG_ EXT_DMS_voltage_fl_uf_can : 0|12@1+ (1.3,0) [0|5323.5] "mV"  DASH
+ SG_ EXT_DMS_force_fl_ur_can : 52|8@1- (0.128,0) [-16.384|16.256] "kN"  DASH
+ SG_ EXT_DMS_force_fl_uf_can : 44|8@1- (0.128,0) [-16.384|16.256] "kN"  DASH
+ SG_ EXT_DMS_epsilon_fl_ur_can : 34|10@1- (2E-06,0) [-0.001024|0.001022] ""  DASH
+ SG_ EXT_DMS_epsilon_fl_uf_can : 24|10@1- (2E-06,0) [-0.001024|0.001022] ""  DASH
+ SG_ EXT_DMS_e_b_fl_ur_can : 61|1@1+ (1,0) [0|1] ""  DASH
+ SG_ EXT_DMS_e_b_fl_uf_can : 60|1@1+ (1,0) [0|1] ""  DASH
+
+BO_ 768 EXT_strain_gauge_fl_lower: 8 EXT
+ SG_ EXT_DMS_force_fl_lf_can : 44|8@1- (0.128,0) [-16.384|16.256] "kN"  DASH
+ SG_ EXT_DMS_force_fl_lr_can : 52|8@1- (0.128,0) [-16.384|16.256] "kN"  DASH
+ SG_ EXT_DMS_voltage_fl_lf_can : 0|12@1+ (1.3,0) [0|5323.5] "mV"  DASH
+ SG_ EXT_DMS_voltage_fl_lr_can : 12|12@1+ (1.3,0) [0|5323.5] "mV"  DASH
+ SG_ EXT_DMS_epsilon_fl_lr_can : 34|10@1- (2E-06,0) [-0.001024|0.001022] ""  DASH
+ SG_ EXT_DMS_epsilon_fl_lf_can : 24|10@1- (2E-06,0) [-0.001024|0.001022] ""  DASH
+ SG_ EXT_DMS_e_b_fl_lr_can : 61|1@1+ (1,0) [0|1] ""  DASH
+ SG_ EXT_DMS_e_b_fl_lf_can : 60|1@1+ (1,0) [0|1] ""  DASH
+
+BO_ 289 VCU_Logging_Unitek_RR_measure_1: 8 VCU
+ SG_ unitek_rr_motor_temp_can : 48|16@1- (1,-35) [-35|220] "C"  PDU,DASH,TELEMETRY_SIGNALS
+ SG_ unitek_rr_igbt_temp_can : 32|16@1- (1,-35) [-35|220] "C"  PDU,DASH,TELEMETRY_SIGNALS
+ SG_ unitek_rr_i_ist_can : 0|32@1- (0.1,0) [-214748364.8|214748364.7] "Arms"  TELEMETRY_SIGNALS
+
+BO_ 288 VCU_Logging_Unitek_RL_measure_1: 8 VCU
+ SG_ unitek_rl_motor_temp_can : 48|16@1- (1,-35) [-35|220] "C"  PDU,DASH,TELEMETRY_SIGNALS
+ SG_ unitek_rl_igbt_temp_can : 32|16@1- (1,-35) [-35|220] "C"  PDU,DASH,TELEMETRY_SIGNALS
+ SG_ unitek_rl_i_ist_can : 0|32@1- (0.1,0) [-214748364.8|214748364.7] "Arms"  TELEMETRY_SIGNALS
+
+BO_ 281 VCU_Logging_Unitek_FR_measure_1: 8 VCU
+ SG_ unitek_fr_motor_temp_can : 48|16@1- (1,-35) [-35|220] "C"  PDU,DASH,TELEMETRY_SIGNALS
+ SG_ unitek_fr_igbt_temp_can : 32|16@1- (1,-35) [-35|220] "C"  PDU,DASH,TELEMETRY_SIGNALS
+ SG_ unitek_fr_i_ist_can : 0|32@1- (0.1,0) [-214748364.8|214748364.7] "Arms"  TELEMETRY_SIGNALS
+
+BO_ 280 VCU_Logging_Unitek_FL_measure_1: 8 VCU
+ SG_ unitek_fl_igbt_temp_can : 48|16@1- (1,-35) [-35|220] "C"  PDU,DASH,TELEMETRY_SIGNALS
+ SG_ unitek_fl_motor_temp_can : 32|16@1- (1,-35) [-35|220] "C"  PDU,DASH,TELEMETRY_SIGNALS
+ SG_ unitek_fl_i_ist_can : 0|32@1- (0.1,0) [-214748364.8|214748364.7] "Arms"  TELEMETRY_SIGNALS
+
+BO_ 674 LT_stats: 3 LT_RGX
+ SG_ LT_wvdial_status_b_can : 14|1@1+ (1,0) [0|1] ""  DASH
+ SG_ LT_network_coverage_can : 16|7@1+ (1,0) [0|100] ""  DASH
+ SG_ LT_messages_per_second_can : 0|14@1+ (1,0) [0|16383] ""  DASH
+
+BO_ 695 PDU_actuatorsData: 7 PDU
+ SG_ drs_state_can : 36|1@1+ (1,0) [0|1] ""  DASH
+ SG_ brake_pressed_b_can : 35|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ PDU_Ewp_Mot_e_b_can : 34|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ PDU_Ewp_Inv_e_b_can : 33|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ PDU_calibrationReq_success_b_can : 32|1@1+ (1,0) [0|1] ""  DASH
+ SG_ ewpMotorDuty_can : 24|8@1+ (0.5,0) [0|100] "%"  DASH
+ SG_ ewpInverterDuty_can : 16|8@1+ (0.5,0) [0|100] "%"  DASH
+ SG_ fanMotorDuty_can : 8|8@1+ (0.5,0) [0|100] "%"  VCU,DASH
+ SG_ fanInverterDuty_can : 0|8@1+ (0.5,0) [0|100] "%"  VCU,DASH
+
+BO_ 694 PDU_DCDC_status: 4 PDU
+ SG_ PDU_DCDC_Fan_Motor_e_occu_b_can : 19|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ PDU_DCDC_Fan_Motor_e_b_can : 18|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ PDU_DCDC_Fan_Inv_e_occu_b_can : 16|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ PDU_DCDC_Fan_Inv_e_b_can : 15|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ PDU_DCDC_Ewp_Mot_2_e_occu_b_can : 13|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ PDU_DCDC_Ewp_Mot_2_e_b_can : 12|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ PDU_DCDC_Ewp_Mot_1_e_occu_b_can : 10|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ PDU_DCDC_Ewp_Mot_1_e_b_can : 9|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ PDU_DCDC_DV_e_occu_b_can : 7|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ PDU_DCDC_DV_e_b_can : 6|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ PDU_DCDC_24V_Gen_e_occu_b_can : 4|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ PDU_DCDC_24V_Gen_e_b_can : 3|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ PDU_DCDC_12V_Gen_e_occu_b_can : 1|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ PDU_DCDC_12V_Gen_e_b_can : 0|1@1+ (1,0) [0|1] "" Vector__XXX
+
+BO_ 693 PDU_DCDC_iout: 7 PDU
+ SG_ PDU_DCDC_Fan_Motor_iout_can : 48|8@1+ (32,0) [0|8160] "mA"  DASH
+ SG_ PDU_DCDC_Fan_Inv_iout_can : 40|8@1+ (32,0) [0|8160] "mA"  DASH
+ SG_ PDU_DCDC_Ewp_Mot_2_iout_can : 32|8@1+ (32,0) [0|8160] "mA"  DASH
+ SG_ PDU_DCDC_Ewp_Mot_1_iout_can : 24|8@1+ (32,0) [0|8160] "mA"  DASH
+ SG_ PDU_DCDC_DV_iout_can : 16|8@1+ (32,0) [0|8160] "mA"  DASH
+ SG_ PDU_DCDC_24V_Gen_iout_can : 8|8@1+ (32,0) [0|8160] "mA"  DASH
+ SG_ PDU_DCDC_12V_Gen_iout_can : 0|8@1+ (32,0) [0|8160] "mA"  DASH
+
+BO_ 690 PDU_DCDC_temps: 8 PDU
+ SG_ PDU_DCDC_Inv_temp_e_b_can : 61|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ PDU_DCDC_Ewp_Inv_temp_e_b_can : 62|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ PDU_DCDC_Inv_temp_can : 55|6@1+ (3,0) [0|189] "�C" Vector__XXX
+ SG_ PDU_DCDC_Ewp_Inv_temp_can : 49|6@1+ (3,0) [0|189] "�C" Vector__XXX
+ SG_ PDU_DCDC_Fan_Motor_temp_can : 42|7@1+ (2,0) [0|254] "�C" Vector__XXX
+ SG_ PDU_DCDC_Fan_Inv_temp_can : 35|7@1+ (2,0) [0|254] "�C" Vector__XXX
+ SG_ PDU_DCDC_Ewp_Mot_2_temp_can : 28|7@1+ (2,0) [0|254] "�C" Vector__XXX
+ SG_ PDU_DCDC_Ewp_Mot_1_temp_can : 21|7@1+ (2,0) [0|254] "�C" Vector__XXX
+ SG_ PDU_DCDC_DV_temp_can : 14|7@1+ (2,0) [0|255] "�C" Vector__XXX
+ SG_ PDU_DCDC_24V_Gen_temp_can : 7|7@1+ (2,0) [0|254] "�C" Vector__XXX
+ SG_ PDU_DCDC_12V_Gen_temp_can : 0|7@1+ (2,0) [0|254] "�C" Vector__XXX
+
+BO_ 689 PDU_eFuses_2: 6 PDU
+ SG_ PDU_eFuse_SDC_IMON_e_b_can : 44|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ PDU_eFuse_SDC_e_b_can : 37|1@1+ (1,0) [0|1] ""  DASH
+ SG_ PDU_eFuse_Inv_RR_IMON_e_b_can : 35|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ PDU_eFuse_Inv_RR_e_b_can : 28|1@1+ (1,0) [0|1] ""  DASH
+ SG_ PDU_eFuse_Inv_RL_IMON_e_b_can : 26|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ PDU_eFuse_SDC_IMON_can : 38|6@1+ (50,0) [0|3150] "mA" Vector__XXX
+ SG_ PDU_eFuse_Inv_RL_e_b_can : 19|1@1+ (1,0) [0|1] ""  DASH
+ SG_ PDU_eFuse_Inv_RR_IMON_can : 29|6@1+ (75,0) [0|4725] "mA" Vector__XXX
+ SG_ PDU_eFuse_Inv_FR_IMON_e_b_can : 17|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ PDU_eFuse_Inv_RL_IMON_can : 20|6@1+ (75,0) [0|4725] "mA" Vector__XXX
+ SG_ PDU_eFuse_Inv_FR_e_b_can : 10|1@1+ (1,0) [0|1] ""  DASH
+ SG_ PDU_eFuse_Inv_FL_IMON_e_b_can : 8|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ PDU_eFuse_Inv_FR_IMON_can : 11|6@1+ (75,0) [0|4725] "mA" Vector__XXX
+ SG_ PDU_eFuse_Inv_FL_e_b_can : 1|1@1+ (1,0) [0|1] ""  DASH
+ SG_ PDU_eFuse_Inv_FL_IMON_can : 2|6@1+ (75,0) [0|4725] "mA" Vector__XXX
+
+BO_ 688 PDU_eFuses_1: 7 PDU
+ SG_ PDU_eFuse_Ewp_Inv_IMON_e_b_can : 53|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ PDU_eFuse_Ewp_Inv_e_b_can : 46|1@1+ (1,0) [0|1] ""  DASH
+ SG_ PDU_eFuse_Ewp_Inv_IMON_can : 47|6@1+ (200,0) [0|12600] "mA" Vector__XXX
+ SG_ PDU_eFuse_DVSC_IMON_e_b_can : 17|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ PDU_eFuse_AMS_Fans_IMON_e_b_can : 35|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ PDU_eFuse_AMS_IMON_e_b_can : 26|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ PDU_eFuse_DVSC_IMON_can : 11|6@1+ (100,0) [0|6300] "mA" Vector__XXX
+ SG_ PDU_eFuse_AMS_Fans_IMON_can : 29|6@1+ (50,0) [0|3150] "mA" Vector__XXX
+ SG_ PDU_eFuse_ACE_IMON_e_b_can : 8|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ PDU_eFuse_AMS_IMON_can : 20|6@1+ (50,0) [0|3150] "mA" Vector__XXX
+ SG_ PDU_eFuse_12V_Gen_IMON_e_b_can : 44|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ PDU_eFuse_ACE_IMON_can : 2|6@1+ (50,0) [0|3150] "mA" Vector__XXX
+ SG_ PDU_eFuse_12V_Gen_e_b_can : 37|1@1+ (1,0) [0|1] ""  DASH
+ SG_ PDU_eFuse_12V_Gen_IMON_can : 38|6@1+ (50,0) [0|3150] "mA" Vector__XXX
+ SG_ PDU_eFuse_AMS_e_b_can : 19|1@1+ (1,0) [0|1] ""  DASH
+ SG_ PDU_eFuse_DVSC_e_b_can : 10|1@1+ (1,0) [0|1] ""  DASH
+ SG_ PDU_eFuse_AMS_Fans_e_b_can : 28|1@1+ (1,0) [0|1] ""  DASH
+ SG_ PDU_eFuse_ACE_e_b_can : 1|1@1+ (1,0) [0|1] ""  DASH
+
+BO_ 260 DASH_raw_values: 8 DASH
+ SG_ rocker_fr_raw_can : 54|10@1+ (1,0) [0|4095] "" Vector__XXX
+ SG_ rocker_fl_raw_can : 44|10@1+ (1,0) [0|4095] "" Vector__XXX
+ SG_ pbrake_front_raw_can : 33|11@1+ (1,0) [0|4095] "" Vector__XXX
+ SG_ apps3_raw_can : 22|11@1+ (2,2) [2|4096] "" Vector__XXX
+ SG_ apps2_raw_can : 11|11@1+ (2,2) [2|4096] "" Vector__XXX
+ SG_ apps1_raw_can : 0|11@1+ (2,2) [2|4096] "raw" Vector__XXX
+
+BO_ 531 battery_cell_voltages: 8 LVBATT
+ SG_ battery_cell_voltage_8_can : 56|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ battery_cell_voltage_7_can : 48|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ battery_cell_voltage_6_can : 40|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ battery_cell_voltage_5_can : 32|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ battery_cell_voltage_4_can : 24|8@1+ (20,0) [0|5100] "mV"  DASH
+ SG_ battery_cell_voltage_3_can : 16|8@1+ (20,0) [0|5100] "mV"  DASH
+ SG_ battery_cell_voltage_2_can : 8|8@1+ (20,0) [0|5100] "mV"  DASH
+ SG_ battery_cell_voltage_1_can : 0|8@1+ (20,0) [0|5100] "mV"  DASH
+
+BO_ 532 battery_cell_temps2: 5 LVBATT
+ SG_ battery_cell_temp_10_can : 32|8@1+ (0.5,0) [0|107.5] "�C"  DASH
+ SG_ battery_cell_temp_09_can : 24|8@1+ (0.5,0) [0|107.5] "�C"  DASH
+ SG_ battery_cell_temp_08_can : 16|8@1+ (0.5,0) [0|107.5] "�C"  DASH
+ SG_ battery_cell_temp_07_can : 8|8@1+ (0.5,0) [0|107.5] "�C"  DASH
+ SG_ battery_cell_temp_06_can : 0|8@1+ (0.5,-20) [-20|107.5] "�C"  TELEMETRY_SIGNALS,VCU,DASH
+
+BO_ 2047 S32K_Bootloader: 1 Vector__XXX
+ SG_ S32K_stay_in_bootloader_b_can : 0|1@1+ (1,0) [0|1] ""  TTMD,DASH,VCU,WPMD
+
+BO_ 542 battery_overall_temp_data: 3 LVBATT
+ SG_ battery_temp_avg_can : 16|8@1+ (0.5,-20) [-20|107.5] "C"  DASH
+ SG_ battery_temp_max_can : 8|8@1- (0.5,44) [-20|107.5] "C"  DASH
+ SG_ battery_temp_min_can : 0|8@1- (0.5,44) [-20|107.5] "C"  DASH
+
+BO_ 543 battery_overall_cell_data: 6 LVBATT
+ SG_ battery_voltage_overall_can : 32|16@1+ (1,0) [0|65535] "mV"  DASH
+ SG_ battery_voltage_max_can : 16|16@1+ (1,0) [0|65535] "mV"  DASH
+ SG_ battery_voltage_min_can : 0|16@1+ (1,0) [0|65535] "mV"  DASH
+
+BO_ 672 LT_VCU_tqv_status: 8 LT_RGX
+ SG_ tqv_status_tc_mu_factor_can : 8|8@1+ (0.01,0) [0|2.55] ""  VCU,DASH
+ SG_ tqv_status_tc_enabled_b_can : 1|1@1+ (1,0) [0|1] ""  VCU,DASH
+ SG_ tqv_status_gps_fix_aquired_b_can : 0|1@1+ (1,0) [0|1] ""  VCU,DASH
+ SG_ tqv_status_tqv_base_strength_can : 24|8@1+ (0.5,0) [0|100] "%"  VCU,DASH
+ SG_ tqv_status_tqv_strength_can : 32|8@1+ (0.01,0) [0|2.55] ""  VCU,DASH
+ SG_ tqv_status_tqv_enabled_b_can : 2|1@1+ (1,0) [0|1] ""  VCU,DASH
+ SG_ tqv_status_tc_slip_target_can : 16|8@1+ (1,0) [0|255] "%"  VCU,DASH
+
+BO_ 611 VCU_LT_RGX_DASH_tqv_req_data: 8 VCU
+ SG_ tqv_tqLimitNeg_rear_can : 47|11@1+ (-0.02,0) [-40.94|0] "Nm"  LT_RGX,DASH
+ SG_ tqv_tqLimitNeg_front_can : 36|11@1+ (-0.02,0) [-40.94|0] "Nm"  LT_RGX,DASH
+ SG_ tqv_seq_req_can : 58|6@1+ (1,0) [0|63] "otters"  LT_RGX
+ SG_ tqv_tqLimitPos_rear_can : 25|11@1+ (0.02,0) [0|40.94] "Nm"  LT_RGX,DASH
+ SG_ tqv_tqLimitPos_front_can : 14|11@1+ (0.02,0) [0|40.94] "Nm"  LT_RGX,DASH
+ SG_ tqv_wantedTq_req : 0|14@1- (0.02,0) [-163.84|163.82] "Nm"  LT_RGX,DASH
+
+BO_ 612 VCU_LT_RGX_DASH_tqv_req_sensors: 8 VCU
+ SG_ unitek_rr_go_b_can : 62|1@1+ (1,0) [0|1] ""  DASH
+ SG_ unitek_rl_go_b_can : 63|1@1+ (1,0) [0|1] ""  DASH
+ SG_ unitek_fr_go_b_can : 55|1@1+ (1,0) [0|1] ""  DASH
+ SG_ unitek_fl_go_b_can : 54|1@1+ (1,0) [0|1] ""  DASH
+ SG_ tqv_seq_req_can : 56|6@1+ (1,0) [0|63] "otters"  LT_RGX,DASH
+ SG_ tqv_tire_steerangle_can : 40|10@1- (0.1,0) [-45|45] "deg"  LT_RGX,DASH
+ SG_ tqv_rot_spd_rr_can : 30|10@1+ (2,0) [0|2046] "rpm"  LT_RGX,DASH
+ SG_ tqv_rot_spd_rl_can : 20|10@1+ (2,0) [0|2046] "rpm"  LT_RGX,DASH
+ SG_ tqv_rot_spd_fr_can : 10|10@1+ (2,0) [0|2046] "rpm"  LT_RGX,DASH
+ SG_ tqv_rot_spd_fl_can : 0|10@1+ (2,0) [0|2046] "rpm"  LT_RGX,DASH
+
+BO_ 673 LT_VCU_tqv_result: 7 LT_RGX
+ SG_ tqv_seq_resp_can : 48|6@1+ (1,0) [0|63] "otters"  VCU,DASH
+ SG_ tqv_result_fl_can : 0|12@1- (0.02,0) [-40.96|40.94] "Nm"  VCU,DASH
+ SG_ tqv_result_fr_can : 12|12@1- (0.02,0) [-40.96|40.94] "Nm"  VCU,DASH
+ SG_ tqv_result_rl_can : 24|12@1- (0.02,0) [-40.96|40.94] "Nm"  VCU,DASH
+ SG_ tqv_result_rr_can : 36|12@1- (0.02,0) [-40.96|40.94] "Nm"  VCU,DASH
+
+BO_ 1027 TTMD_RR_data: 5 TTMD
+ SG_ ttmd_tire_temp_e_b_rr_outer_can : 2|1@1+ (1,0) [0|1] ""  VCU,DASH
+ SG_ ttmd_tire_temp_e_b_rr_middle_can : 1|1@1+ (1,0) [0|1] ""  VCU,DASH
+ SG_ ttmd_tire_temp_e_b_rr_inner_can : 0|1@1+ (1,0) [0|1] ""  VCU,DASH
+ SG_ ttmd_tire_temp_rr_middle_can : 3|8@1+ (1,0) [0|255] "�C"  VCU,DASH
+ SG_ ttmd_tire_temp_rr_outer_can : 11|8@1+ (1,0) [0|255] "�C"  VCU,DASH
+ SG_ ttmd_tire_temp_rr_inner_can : 19|8@1+ (1,0) [0|255] "�C"  VCU,DASH
+
+BO_ 1025 TTMD_FR_data: 7 TTMD
+ SG_ ttmd_tire_temp_e_b_fr_outer_can : 2|1@1+ (1,0) [0|1] ""  VCU,DASH
+ SG_ ttmd_tire_temp_e_b_fr_middle_can : 1|1@1+ (1,0) [0|1] ""  VCU,DASH
+ SG_ ttmd_tire_temp_e_b_fr_inner_can : 0|1@1+ (1,0) [0|1] ""  VCU,DASH
+ SG_ ttmd_tire_temp_fr_outer_can : 19|8@1+ (1,0) [0|255] "�C"  VCU,DASH
+ SG_ ttmd_tire_temp_fr_middle_can : 11|8@1+ (1,0) [0|255] "�C"  VCU,DASH
+ SG_ ttmd_tire_temp_fr_inner_can : 3|8@1+ (1,0) [0|255] "�C"  VCU,DASH
+
+BO_ 1026 TTMD_RL_data: 6 TTMD
+ SG_ ttmd_tire_temp_e_b_rl_outer_can : 2|1@1+ (1,0) [0|1] ""  VCU,DASH
+ SG_ ttmd_tire_temp_e_b_rl_middle_can : 1|1@1+ (1,0) [0|1] ""  VCU,DASH
+ SG_ ttmd_tire_temp_e_b_rl_inner_can : 0|1@1+ (1,0) [0|1] ""  VCU,DASH
+ SG_ ttmd_tire_temp_rl_outer_can : 3|8@1+ (1,0) [0|255] "�C"  VCU,DASH
+ SG_ ttmd_tire_temp_rl_middle_can : 11|8@1+ (1,0) [0|255] "�C"  VCU,DASH
+ SG_ ttmd_tire_temp_rl_inner_can : 19|8@1+ (1,0) [0|255] "�C"  VCU,DASH
+
+BO_ 1024 TTMD_FL_data: 7 TTMD
+ SG_ ttmd_tire_temp_e_b_fl_outer_can : 2|1@1+ (1,0) [0|1] ""  VCU,DASH
+ SG_ ttmd_tire_temp_e_b_fl_middle_can : 1|1@1+ (1,0) [0|1] ""  VCU,DASH
+ SG_ ttmd_tire_temp_e_b_fl_inner_can : 0|1@1+ (1,0) [0|1] ""  VCU,DASH
+ SG_ ttmd_tire_temp_fl_middle_can : 19|8@1+ (1,0) [0|255] "�C"  VCU,DASH
+ SG_ ttmd_tire_temp_fl_inner_can : 11|8@1+ (1,0) [0|255] "�C"  VCU,DASH
+ SG_ ttmd_tire_temp_fl_outer_can : 3|8@1+ (1,0) [0|255] "�C"  VCU,DASH
+
+BO_ 597 VCU_DRIVE_stats: 7 VCU
+ SG_ vcu_mileage_e_b_can : 46|1@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ drive_pwtrTqTarget_can : 32|14@1- (0.02,0) [-163.84|163.82] "" Vector__XXX
+ SG_ drive_deratingAccuTempRecu_b_can : 28|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ drive_deratingAccuTemp_b_can : 15|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ drive_rtqvFailedCnt_can : 16|12@1+ (1,0) [0|4095] ""  DASH
+ SG_ drive_safetyBspdAvoid_b_can : 14|1@1+ (1,0) [0|1] ""  DASH
+ SG_ drive_tqvRemoteState_can : 0|4@1+ (1,0) [0|15] ""  DASH
+ SG_ drive_stratInvMapLimit_b_can : 13|1@1+ (1,0) [0|1] ""  DASH
+ SG_ drive_stratRecuActive_b_can : 12|1@1+ (1,0) [0|1] ""  PDU,DASH
+ SG_ drive_deratingMotorTemp_b_can : 11|1@1+ (1,0) [0|1] ""  DASH
+ SG_ drive_deratingPeakPerf_b_can : 10|1@1+ (1,0) [0|1] ""  DASH
+ SG_ drive_deratingTransTemp : 9|1@1+ (1,0) [0|1] ""  DASH
+ SG_ drive_deratingAccuSoc_b_can : 8|1@1+ (1,0) [0|1] ""  DASH
+ SG_ drive_deratingMotorCurrent_b_can : 7|1@1+ (1,0) [0|1] ""  DASH
+ SG_ drive_deratingInverterTemp_b_can : 6|1@1+ (1,0) [0|1] ""  DASH
+ SG_ drive_safetyTqSteer_b_can : 5|1@1+ (1,0) [0|1] ""  DASH
+ SG_ drive_powerLimitActive_b_can : 4|1@1+ (1,0) [0|1] ""  DASH
+
+BO_ 1041 IVT_Msg_Command: 8 AMS
+ SG_ IVT_31_01_Trigger_U1 m49 : 17|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_31_07_Trigger_WH m49 : 23|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_31_06_Trigger_As m49 : 22|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_31_05_Trigger_W m49 : 21|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_31_04_Trigger_T m49 : 20|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_31_03_Trigger_U3 m49 : 19|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_31_Trigger_spare m49 : 15|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_31_02_Trigger_U2 m49 : 18|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_10_Set_Can_ID_SN_I m16 : 31|32@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_10_Set_Can_ID_val_I m16 : 15|16@0+ (1,0) [0|2047] ""  IVT_Mod
+ SG_ IVT_11_Set_Can_ID_SN_U1 m17 : 31|32@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_11_Set_Can_ID_val_U1 m17 : 15|16@0+ (1,0) [0|2047] "" Vector__XXX
+ SG_ IVT_12_Set_Can_ID_SN_U2 m18 : 31|32@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_12_Set_Can_ID_val_U2 m18 : 15|16@0+ (1,0) [0|2047] "" Vector__XXX
+ SG_ IVT_13_Set_Can_ID_SN_U3 m19 : 31|32@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_13_Set_Can_ID_val_U3 m19 : 15|16@0+ (1,0) [0|2047] "" Vector__XXX
+ SG_ IVT_14_Set_Can_ID_SN_T m20 : 31|32@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_14_Set_Can_ID_val_T m20 : 15|16@0+ (1,0) [0|2047] "" Vector__XXX
+ SG_ IVT_15_Set_Can_ID_SN_W m21 : 31|32@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_15_Set_Can_ID_val_W m21 : 15|16@0+ (1,0) [0|2047] "" Vector__XXX
+ SG_ IVT_16_Set_Can_ID_SN_As m22 : 31|32@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_16_Set_Can_ID_val_As m22 : 15|16@0+ (1,0) [0|2047] "" Vector__XXX
+ SG_ IVT_17_Set_Can_ID_SN_Wh m23 : 31|32@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_17_Set_Can_ID_val_Wh m23 : 15|16@0+ (1,0) [0|2047] "" Vector__XXX
+ SG_ IVT_1D_Set_Can_ID_SN_Command m29 : 31|32@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_1D_Set_Can_ID_val_Command m29 : 15|16@0+ (1,0) [0|2047] "" Vector__XXX
+ SG_ IVT_1F_Set_Can_ID_SN_Response m31 : 31|32@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_1F_Set_Can_ID_val_Response m31 : 15|16@0+ (1,0) [0|2047] "" Vector__XXX
+ SG_ IVT_20_Conf_CycleTime_I m32 : 23|16@0+ (1,0) [0|0] "ms" Vector__XXX
+ SG_ IVT_20_Conf_Endianess_I m32 : 14|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_20_Conf_Sign_I m32 : 15|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_20_Conf_TriggerMode_I m32 : 9|2@0+ (1,0) [0|2] "" Vector__XXX
+ SG_ IVT_21_Conf_CycleTime_U1 m33 : 23|16@0+ (1,0) [0|0] "ms" Vector__XXX
+ SG_ IVT_21_Conf_Endianess_U1 m33 : 14|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_21_Conf_Sign_U1 m33 : 15|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_21_Conf_TriggerMode_U1 m33 : 9|2@0+ (1,0) [0|2] "" Vector__XXX
+ SG_ IVT_22_Conf_CycleTime_U2 m34 : 23|16@0+ (1,0) [0|0] "ms" Vector__XXX
+ SG_ IVT_22_Conf_Endianess_U2 m34 : 14|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_22_Conf_Sign_U2 m34 : 15|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_22_Conf_TriggerMode_U2 m34 : 9|2@0+ (1,0) [0|2] "" Vector__XXX
+ SG_ IVT_23_Conf_CycleTime_U3 m35 : 23|16@0+ (1,0) [0|0] "ms" Vector__XXX
+ SG_ IVT_23_Conf_Endianess_U3 m35 : 14|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_23_Conf_Sign_U3 m35 : 15|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_23_Conf_TriggerMode_U3 m35 : 9|2@0+ (1,0) [0|2] "" Vector__XXX
+ SG_ IVT_24_Conf_CycleTime_T m36 : 23|16@0+ (1,0) [0|0] "ms" Vector__XXX
+ SG_ IVT_24_Conf_Endianess_T m36 : 14|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_24_Conf_Sign_T m36 : 15|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_24_Conf_TriggerMode_T m36 : 9|2@0+ (1,0) [0|2] "" Vector__XXX
+ SG_ IVT_25_Conf_CycleTime_W m37 : 23|16@0+ (1,0) [0|0] "ms" Vector__XXX
+ SG_ IVT_25_Conf_Endianess_W m37 : 14|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_25_Conf_Sign_W m37 : 15|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_25_Conf_TriggerMode_W m37 : 9|2@0+ (1,0) [0|2] "" Vector__XXX
+ SG_ IVT_26_Conf_CycleTime_As m38 : 23|16@0+ (1,0) [0|0] "ms" Vector__XXX
+ SG_ IVT_26_Conf_Endianess_As m38 : 14|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_26_Conf_Sign_As m38 : 15|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_26_Conf_TriggerMode_As m38 : 9|2@0+ (1,0) [0|2] "" Vector__XXX
+ SG_ IVT_27_Conf_CycleTime_WH m39 : 23|16@0+ (1,0) [0|0] "ms" Vector__XXX
+ SG_ IVT_27_Conf_Endianess_WH m39 : 14|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_27_Conf_Sign_WH m39 : 15|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_27_Conf_TriggerMode_WH m39 : 9|2@0+ (1,0) [0|2] "" Vector__XXX
+ SG_ IVT_30_Reset_Item m48 : 15|16@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_30_Reset_Device_SN m48 : 31|32@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_31_00_Trigger_I m49 : 16|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_32_Store_dummy m50 : 15|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_33_Oc_Test_Time m51 : 15|16@0+ (1,0) [0|65535] "ms" Vector__XXX
+ SG_ IVT_34_Actual_Mode m52 : 8|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_34_Code_Level m52 : 31|16@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_34_Startup_Mode m52 : 16|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_35_OC_Pos_Reset_Threshold m53 : 31|16@0- (1,0) [0|0] "A" Vector__XXX
+ SG_ IVT_35_OC_Pos_Set_Threshold m53 : 15|16@0- (1,0) [0|0] "A" Vector__XXX
+ SG_ IVT_36_OC_Neg_Reset_Threshold m54 : 31|16@0- (1,0) [0|0] "A" Vector__XXX
+ SG_ IVT_36_OC_Neg_Set_Threshold m54 : 15|16@0- (1,0) [0|0] "A" Vector__XXX
+ SG_ IVT_3A_Restart_Prescaler m58 : 15|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_3D_Restart_Default_Dummy m61 : 15|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_3F_Restart_Dummy m63 : 15|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_40_Get_MeasError_Item m64 : 15|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_41_Get_SystemError_Item m65 : 15|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_42_Get_AllLogData_Item m66 : 15|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_43_Get_LogData_Item m67 : 15|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_50_Get_Can_ID_SN_I m80 : 31|32@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_51_Get_Can_ID_SN_U1 m81 : 31|32@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_52_Get_Can_ID_SN_U2 m82 : 31|32@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_53_Get_Can_ID_SN_U3 m83 : 31|32@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_54_Get_Can_ID_SN_T m84 : 31|32@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_55_Get_Can_ID_SN_W m85 : 31|32@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_56_Get_Can_ID_SN_As m86 : 31|32@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_57_Get_Can_ID_SN_Wh m87 : 31|32@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_5D_Get_Can_ID_SN_Command m93 : 31|32@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_5F_Get_Can_ID_SN_Response m95 : 31|32@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_60_Get_Result_dummy_I m96 : 15|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_61_Get_Result_dummy_U1 m97 : 15|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_62_Get_Result_dummy_U2 m98 : 15|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_63_Get_Result_dummy_U3 m99 : 15|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_64_measurementError_id m100 : 15|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_65_systemError_id m101 : 15|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_66_logdataOverall_id m102 : 15|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_67_logdataSinceReset_id m103 : 15|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_73_Get_OC_Test_dummy m115 : 15|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_74_Get_Mode_dummy m116 : 15|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_75_Get_OC_Pos_dummy m117 : 15|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_76_Get_OC_Neg_dummy m118 : 15|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_79_Get_Device_Id_dummy m121 : 15|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_7A_Get_SW_Version_dummy m122 : 15|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_7B_Get_Serien_Nr_dummy m123 : 15|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_7C_Get_Art_Nr_dummy m124 : 15|8@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_ID_Cmd M : 7|8@0+ (1,0) [0|0] ""  IVT_Mod
+ SG_ IVT_Cmd_data m0 : 15|56@0+ (1,0) [0|0] ""  IVT_Mod
+
+BO_ 1296 IVT_Msg_Debug: 8 Vector__XXX
+
+BO_ 1297 IVT_Msg_Response: 8 IVT_Mod
+ SG_ IVT_83_LogData_maxTemp m10627 : 23|48@0+ (1,0) [0|281474976710655] "" Vector__XXX
+ SG_ IVT_83_LogData_maxU2 m9603 : 23|48@0+ (1,0) [0|281474976710655] "" Vector__XXX
+ SG_ IVT_83_LogData_maxU1 m9091 : 23|48@0+ (1,0) [0|281474976710655] "" Vector__XXX
+ SG_ IVT_83_LogData_Wh_overall m1155 : 23|48@0+ (1,0) [0|281474976710655] "" Vector__XXX
+ SG_ IVT_83_LogData_Wh_discharging m1667 : 23|48@0+ (1,0) [0|281474976710655] "" Vector__XXX
+ SG_ IVT_83_LogData_Wh_charging m1411 : 23|48@0+ (1,0) [0|281474976710655] "" Vector__XXX
+ SG_ IVT_83_LogData_As_discharging m899 : 23|48@0+ (1,0) [0|281474976710655] "" Vector__XXX
+ SG_ IVT_83_LogData_As_charging m643 : 23|48@0+ (1,0) [0|281474976710655] "" Vector__XXX
+ SG_ IVT_83_LogData_As_overall m387 : 23|48@0- (1,0) [-140737488355328|140737488355327] ""  AMS
+ SG_ IVT_ID_Response_ID M : 0|16@1+ (1,0) [0|65535] "" Vector__XXX
+
+BO_ 279 VCU_Logging_Unitek_RR_measure_0: 8 VCU
+ SG_ unitek_rr_torque_motor_ist_can : 16|32@1- (0.1,0) [-214748364.8|214748364.7] "Nm" Vector__XXX
+ SG_ unitek_rr_torque_motor_soll_can : 48|10@1- (0.1,0) [-51.2|51.1] "Nm" Vector__XXX
+ SG_ unitek_rr_speed_motor_ist_can : 0|16@1- (0.457777642139958,0) [-15000.4577776421|15000] "rpm" Vector__XXX
+
+BO_ 278 VCU_Logging_Unitek_RL_measure_0: 8 VCU
+ SG_ unitek_rl_torque_motor_soll_can : 48|10@1- (0.1,0) [-51.2|51.1] "Nm" Vector__XXX
+ SG_ unitek_rl_torque_motor_ist_can : 16|32@1- (0.1,0) [-214748364.8|214748364.7] "Nm" Vector__XXX
+ SG_ unitek_rl_speed_motor_ist_can : 0|16@1- (0.457777642139958,0) [-15000.4577776421|15000] "rpm" Vector__XXX
+
+BO_ 1809 AMS_cell_voltage17: 8 AMS
+ SG_ ams_cell_voltage144_can : 56|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage143_can : 48|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage142_can : 40|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage141_can : 32|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage140_can : 24|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage139_can : 16|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage138_can : 8|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage137_can : 0|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+
+BO_ 1808 AMS_cell_voltage16: 8 AMS
+ SG_ ams_cell_voltage136_can : 56|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage135_can : 48|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage134_can : 40|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage133_can : 32|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage132_can : 24|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage131_can : 16|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage130_can : 8|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage129_can : 0|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+
+BO_ 1807 AMS_cell_voltage15: 8 AMS
+ SG_ ams_cell_voltage128_can : 56|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage127_can : 48|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage126_can : 40|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage125_can : 32|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage124_can : 24|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage123_can : 16|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage122_can : 8|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage121_can : 0|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+
+BO_ 1806 AMS_cell_voltage14: 8 AMS
+ SG_ ams_cell_voltage120_can : 56|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage119_can : 48|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage118_can : 40|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage117_can : 32|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage116_can : 24|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage115_can : 16|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage114_can : 8|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage113_can : 0|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+
+BO_ 276 VCU_Logging_Unitek_FL_measure_0: 8 VCU
+ SG_ unitek_fl_torque_motor_soll_can : 48|10@1- (0.1,0) [-51.2|51.1] "Nm"  TELEMETRY_SIGNALS
+ SG_ unitek_fl_torque_motor_ist_can : 16|32@1- (0.1,0) [-214748364.8|214748364.7] "Nm"  TELEMETRY_SIGNALS
+ SG_ unitek_fl_speed_motor_ist_can : 0|16@1- (0.457777642139958,0) [-15000.4577776421|15000] "rpm"  TELEMETRY_SIGNALS
+
+BO_ 277 VCU_Logging_Unitek_FR_measure_0: 8 VCU
+ SG_ unitek_fr_torque_motor_soll_can : 48|10@1- (0.1,0) [-51.2|51.1] "Nm"  TELEMETRY_SIGNALS
+ SG_ unitek_fr_torque_motor_ist_can : 16|32@1- (0.1,0) [-214748364.8|214748364.7] "Nm"  TELEMETRY_SIGNALS
+ SG_ unitek_fr_speed_motor_ist_can : 0|16@1- (0.457777642139958,0) [-15000.4577776421|15000] "rpm"  TELEMETRY_SIGNALS
+
+BO_ 256 DASH_drive_sens_data: 8 DASH
+ SG_ gas_strut_e_b_can : 43|1@1+ (1,0) [0|1] ""  VCU
+ SG_ gas_strut_can : 33|10@1+ (0.1,0) [0|100.1] "%"  VCU
+ SG_ apps3_e_b_can : 32|1@1+ (1,0) [0|1] ""  VCU
+ SG_ apps2_e_b_can : 31|1@1+ (1,0) [0|1] ""  VCU
+ SG_ apps1_e_b_can : 30|1@1+ (1,0) [0|1] ""  VCU
+ SG_ apps3_can : 20|10@1+ (0.1,0) [0|100.1] "%"  VCU
+ SG_ apps2_can : 10|10@1+ (0.1,0) [0|100.1] "%"  VCU
+ SG_ apps1_can : 0|10@1+ (0.1,0) [0|100.1] "%"  VCU
+
+BO_ 259 DASH_front_sens_data: 7 DASH
+ SG_ rocker_fr_e_b_can : 51|1@1+ (1,0) [0|1] "mm" Vector__XXX
+ SG_ rocker_fl_e_b_can : 40|1@1+ (1,0) [0|1] "mm" Vector__XXX
+ SG_ rocker_fr_can : 41|10@1+ (0.1,-50) [-50|52.3] "mm" Vector__XXX
+ SG_ rocker_fl_can : 30|10@1+ (0.1,-50) [-50|52.3] "mm" Vector__XXX
+ SG_ steering_wheel_angle_e_b_can : 29|1@1+ (1,0) [0|0] ""  VCU
+ SG_ steering_wheel_angle_can : 19|10@1+ (0.25,-100) [-100|155.75] "�"  TELEMETRY_SIGNALS,VCU
+ SG_ brake_balance_front_can : 11|8@1+ (0.2,25) [25|76] "%"  TELEMETRY_SIGNALS
+ SG_ pbrake_front_e_b_can : 10|1@1+ (1,0) [0|0] ""  PDU,VCU
+ SG_ pbrake_front_can : 0|10@1+ (0.1,0) [0|102.3] "bar"  PDU,VCU
+
+BO_ 641 DASH_status: 8 DASH
+ SG_ start_btn_b_can : 7|1@1+ (1,0) [0|1] ""  VCU
+ SG_ bots_b_can : 8|1@1+ (1,0) [0|1] ""  VCU
+ SG_ inertia_b_can : 4|1@1+ (1,0) [0|1] ""  VCU
+ SG_ lap_trigger_b_can : 2|1@1+ (1,0) [0|1] ""  VCU
+
+BO_ 400 Charger: 1 Charger
+ SG_ ts_activate_b_can : 0|1@1+ (1,0) [0|1] ""  AMS
+ SG_ charger_active_b_can : 1|1@1+ (1,0) [0|1] ""  AMS
+
+BO_ 1805 AMS_cell_voltage13: 8 AMS
+ SG_ ams_cell_voltage112_can : 56|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage111_can : 48|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage110_can : 40|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage109_can : 32|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage108_can : 24|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage107_can : 16|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage106_can : 8|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage105_can : 0|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+
+BO_ 1804 AMS_cell_voltage12: 8 AMS
+ SG_ ams_cell_voltage104_can : 56|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage103_can : 48|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage102_can : 40|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage101_can : 32|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage100_can : 24|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage099_can : 16|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage098_can : 8|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage097_can : 0|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+
+BO_ 1803 AMS_cell_voltage11: 8 AMS
+ SG_ ams_cell_voltage096_can : 56|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage095_can : 48|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage094_can : 40|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage093_can : 32|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage092_can : 24|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage091_can : 16|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage090_can : 8|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage089_can : 0|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+
+BO_ 1802 AMS_cell_voltage10: 8 AMS
+ SG_ ams_cell_voltage088_can : 56|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage087_can : 48|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage086_can : 40|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage085_can : 32|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage084_can : 24|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage083_can : 16|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage082_can : 8|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage081_can : 0|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+
+BO_ 1801 AMS_cell_voltage09: 8 AMS
+ SG_ ams_cell_voltage080_can : 56|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage079_can : 48|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage078_can : 40|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage077_can : 32|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage076_can : 24|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage075_can : 16|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage074_can : 8|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage073_can : 0|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+
+BO_ 1800 AMS_cell_voltage08: 8 AMS
+ SG_ ams_cell_voltage072_can : 56|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage071_can : 48|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage070_can : 40|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage069_can : 32|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage068_can : 24|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage067_can : 16|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage066_can : 8|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage065_can : 0|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+
+BO_ 1799 AMS_cell_voltage07: 8 AMS
+ SG_ ams_cell_voltage064_can : 56|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage063_can : 48|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage062_can : 40|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage061_can : 32|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage060_can : 24|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage059_can : 16|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage058_can : 8|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage057_can : 0|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+
+BO_ 1798 AMS_cell_voltage06: 8 AMS
+ SG_ ams_cell_voltage056_can : 56|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage055_can : 48|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage054_can : 40|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage053_can : 32|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage052_can : 24|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage051_can : 16|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage050_can : 8|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage049_can : 0|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+
+BO_ 1797 AMS_cell_voltage05: 8 AMS
+ SG_ ams_cell_voltage048_can : 56|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage047_can : 48|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage046_can : 40|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage045_can : 32|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage044_can : 24|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage043_can : 16|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage042_can : 8|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage041_can : 0|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+
+BO_ 1796 AMS_cell_voltage04: 8 AMS
+ SG_ ams_cell_voltage040_can : 56|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage039_can : 48|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage038_can : 40|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage037_can : 32|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage036_can : 24|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage035_can : 16|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage034_can : 8|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage033_can : 0|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+
+BO_ 1795 AMS_cell_voltage03: 8 AMS
+ SG_ ams_cell_voltage032_can : 56|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage031_can : 48|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage030_can : 40|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage029_can : 32|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage028_can : 24|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage027_can : 16|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage026_can : 8|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage025_can : 0|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+
+BO_ 1794 AMS_cell_voltage02: 8 AMS
+ SG_ ams_cell_voltage024_can : 56|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage023_can : 48|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage022_can : 40|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage021_can : 32|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage020_can : 24|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage019_can : 16|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage018_can : 8|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage017_can : 0|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+
+BO_ 1793 AMS_cell_voltage01: 8 AMS
+ SG_ ams_cell_voltage016_can : 56|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage015_can : 48|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage014_can : 40|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage013_can : 32|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage012_can : 24|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage011_can : 16|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage010_can : 8|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage009_can : 0|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+
+BO_ 1792 AMS_cell_voltage00: 8 AMS
+ SG_ ams_cell_voltage008_can : 56|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage007_can : 48|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage006_can : 40|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage005_can : 32|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage004_can : 24|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage003_can : 16|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage002_can : 8|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+ SG_ ams_cell_voltage001_can : 0|8@1+ (20,0) [0|5100] "mV" Vector__XXX
+
+BO_ 1829 AMS_cell_temp05: 8 AMS
+ SG_ ams_cell_temp048_can : 56|8@1+ (1,0) [0|120] "C" Vector__XXX
+ SG_ ams_cell_temp047_can : 48|8@1+ (1,0) [0|120] "C" Vector__XXX
+ SG_ ams_cell_temp046_can : 40|8@1+ (1,0) [0|120] "C" Vector__XXX
+ SG_ ams_cell_temp045_can : 32|8@1+ (1,0) [0|120] "C" Vector__XXX
+ SG_ ams_cell_temp044_can : 24|8@1+ (1,0) [0|120] "C" Vector__XXX
+ SG_ ams_cell_temp043_can : 16|8@1+ (1,0) [0|120] "C" Vector__XXX
+ SG_ ams_cell_temp042_can : 8|8@1+ (1,0) [0|120] "C" Vector__XXX
+ SG_ ams_cell_temp041_can : 0|8@1+ (1,0) [0|120] "C" Vector__XXX
+
+BO_ 1828 AMS_cell_temp04: 8 AMS
+ SG_ ams_cell_temp040_can : 56|8@1+ (1,0) [0|120] "C" Vector__XXX
+ SG_ ams_cell_temp039_can : 48|8@1+ (1,0) [0|120] "C" Vector__XXX
+ SG_ ams_cell_temp038_can : 40|8@1+ (1,0) [0|120] "C" Vector__XXX
+ SG_ ams_cell_temp037_can : 32|8@1+ (1,0) [0|120] "C" Vector__XXX
+ SG_ ams_cell_temp036_can : 24|8@1+ (1,0) [0|120] "C" Vector__XXX
+ SG_ ams_cell_temp035_can : 16|8@1+ (1,0) [0|120] "C" Vector__XXX
+ SG_ ams_cell_temp034_can : 8|8@1+ (1,0) [0|120] "C" Vector__XXX
+ SG_ ams_cell_temp033_can : 0|8@1+ (1,0) [0|120] "C" Vector__XXX
+
+BO_ 1827 AMS_cell_temp03: 8 AMS
+ SG_ ams_cell_temp032_can : 56|8@1+ (1,0) [0|120] "C" Vector__XXX
+ SG_ ams_cell_temp031_can : 48|8@1+ (1,0) [0|120] "C" Vector__XXX
+ SG_ ams_cell_temp030_can : 40|8@1+ (1,0) [0|120] "C" Vector__XXX
+ SG_ ams_cell_temp029_can : 32|8@1+ (1,0) [0|120] "C" Vector__XXX
+ SG_ ams_cell_temp028_can : 24|8@1+ (1,0) [0|120] "C" Vector__XXX
+ SG_ ams_cell_temp027_can : 16|8@1+ (1,0) [0|120] "C" Vector__XXX
+ SG_ ams_cell_temp026_can : 8|8@1+ (1,0) [0|120] "C" Vector__XXX
+ SG_ ams_cell_temp025_can : 0|8@1+ (1,0) [0|120] "C" Vector__XXX
+
+BO_ 1826 AMS_cell_temp02: 8 AMS
+ SG_ ams_cell_temp024_can : 56|8@1+ (1,0) [0|120] "C" Vector__XXX
+ SG_ ams_cell_temp023_can : 48|8@1+ (1,0) [0|120] "C" Vector__XXX
+ SG_ ams_cell_temp022_can : 40|8@1+ (1,0) [0|120] "C" Vector__XXX
+ SG_ ams_cell_temp021_can : 32|8@1+ (1,0) [0|120] "C" Vector__XXX
+ SG_ ams_cell_temp020_can : 24|8@1+ (1,0) [0|120] "C" Vector__XXX
+ SG_ ams_cell_temp019_can : 16|8@1+ (1,0) [0|120] "C" Vector__XXX
+ SG_ ams_cell_temp018_can : 8|8@1+ (1,0) [0|120] "C" Vector__XXX
+ SG_ ams_cell_temp017_can : 0|8@1+ (1,0) [0|120] "C" Vector__XXX
+
+BO_ 1825 AMS_cell_temp01: 8 AMS
+ SG_ ams_cell_temp016_can : 56|8@1+ (1,0) [0|120] "C" Vector__XXX
+ SG_ ams_cell_temp015_can : 48|8@1+ (1,0) [0|120] "C" Vector__XXX
+ SG_ ams_cell_temp014_can : 40|8@1+ (1,0) [0|120] "C" Vector__XXX
+ SG_ ams_cell_temp013_can : 32|8@1+ (1,0) [0|120] "C" Vector__XXX
+ SG_ ams_cell_temp012_can : 24|8@1+ (1,0) [0|120] "C" Vector__XXX
+ SG_ ams_cell_temp011_can : 16|8@1+ (1,0) [0|120] "C" Vector__XXX
+ SG_ ams_cell_temp010_can : 8|8@1+ (1,0) [0|120] "C" Vector__XXX
+ SG_ ams_cell_temp009_can : 0|8@1+ (1,0) [0|120] "C" Vector__XXX
+
+BO_ 1824 AMS_cell_temp00: 8 AMS
+ SG_ ams_cell_temp008_can : 56|8@1+ (1,0) [0|120] "C" Vector__XXX
+ SG_ ams_cell_temp007_can : 48|8@1+ (1,0) [0|120] "C" Vector__XXX
+ SG_ ams_cell_temp006_can : 40|8@1+ (1,0) [0|120] "C" Vector__XXX
+ SG_ ams_cell_temp005_can : 32|8@1+ (1,0) [0|120] "C" Vector__XXX
+ SG_ ams_cell_temp004_can : 24|8@1+ (1,0) [0|120] "C" Vector__XXX
+ SG_ ams_cell_temp003_can : 16|8@1+ (1,0) [0|120] "C" Vector__XXX
+ SG_ ams_cell_temp002_can : 8|8@1+ (1,0) [0|120] "C" Vector__XXX
+ SG_ ams_cell_temp001_can : 0|8@1+ (1,0) [0|120] "C" Vector__XXX
+
+BO_ 1320 IVT_Msg_Result_Wh: 6 IVT_Mod
+ SG_ IVT_Result_Measurement_Err_b_can : 14|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_Result_OCS_b_can : 12|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_Result_System_Error_b_can : 15|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_Result_Wh_Channel_Err_b_can : 13|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_Result_Wh_can : 23|32@0- (1,0) [0|0] "Wh"  TELEMETRY_SIGNALS,Charger
+
+BO_ 1319 IVT_Msg_Result_As: 6 IVT_Mod
+ SG_ IVT_Result_Measurement_Err_b_can : 14|1@0+ (1,0) [0|0] ""  AMS
+ SG_ IVT_Result_OCS_b_can : 12|1@0+ (1,0) [0|0] ""  AMS
+ SG_ IVT_Result_System_Error_b_can : 15|1@0+ (1,0) [0|0] ""  AMS
+ SG_ IVT_Result_As_Channel_Err_b_can : 13|1@0+ (1,0) [0|0] ""  AMS
+ SG_ IVT_Result_As_can : 23|32@0- (1,0) [0|0] "As"  AMS
+
+BO_ 1318 IVT_Msg_Result_W: 6 IVT_Mod
+ SG_ IVT_Result_Measurement_Err_b_can : 14|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_Result_OCS_b_can : 12|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_Result_System_Error_b_can : 15|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_Result_W_Channel_Error_b_can : 13|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_Result_W_can : 23|32@0- (1,0) [0|0] "W"  TELEMETRY_SIGNALS,VCU,Charger
+
+BO_ 1317 IVT_Msg_Result_T: 6 IVT_Mod
+ SG_ IVT_Result_Measurement_Err_b_can : 14|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_Result_OCS_b_can : 12|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_Result_System_Error_b_can : 15|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_Result_T_Channel_Error_b_can : 13|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_Result_T_can : 23|32@0- (1,0) [-32767|32768] "C" Vector__XXX
+
+BO_ 1316 IVT_Msg_Result_U3: 6 IVT_Mod
+ SG_ IVT_Result_Measurement_Err_b_can : 14|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_Result_OCS_b_can : 12|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_Result_System_Error_b_can : 15|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_Result_U3_Channel_Err_b_can : 13|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_Result_U3_can : 23|32@0- (1,0) [0|0] "mV"  TELEMETRY_SIGNALS
+
+BO_ 1315 IVT_Msg_Result_U2: 6 IVT_Mod
+ SG_ IVT_Result_Measurement_Err_b_can : 14|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_Result_OCS_b_can : 12|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_Result_System_Error_b_can : 15|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_Result_U2_Channel_Err_b_can : 13|1@0+ (1,0) [0|0] ""  AMS,Inverter
+ SG_ IVT_Result_U2_Post_Airs_can : 23|32@0- (1,0) [0|0] "mV"  Inverter,TELEMETRY_SIGNALS,AMS
+
+BO_ 1314 IVT_Msg_Result_U1: 6 IVT_Mod
+ SG_ IVT_Result_Measurement_Err_b_can : 14|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_Result_OCS_b_can : 12|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_Result_System_Error_b_can : 15|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_Result_U1_Channel_Err_b_can : 13|1@0+ (1,0) [0|0] ""  AMS,VCU
+ SG_ IVT_Result_U1_Pre_Airs_can : 23|32@0- (1,0) [0|0] "mV"  AMS,TELEMETRY_SIGNALS,VCU
+
+BO_ 1313 IVT_Msg_Result_I: 6 IVT_Mod
+ SG_ IVT_Result_System_Error_b_can : 15|1@0+ (1,0) [0|0] ""  AMS,VCU
+ SG_ IVT_Result_OCS_b_can : 12|1@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ IVT_Result_Measurement_Err_b_can : 14|1@0+ (1,0) [0|0] ""  AMS,VCU
+ SG_ IVT_Result_I_Channel_Error_b_can : 13|1@0+ (1,0) [0|0] ""  AMS,VCU
+ SG_ IVT_Result_I_can : 23|32@0- (1,0) [0|0] "mA"  AMS,VCU,Charger
+
+BO_ 657 DASH_500ms: 3 DASH
+ SG_ driver_id_can : 16|8@1+ (1,0) [0|32] "" Vector__XXX
+ SG_ odometer_can : 0|16@1+ (50,0) [0|3276750] "m"  TELEMETRY_SIGNALS,VCU
+
+BO_ 514 AMS_overall_temp_data: 8 AMS
+ SG_ ams_slaveIdxPEC_can : 34|4@1+ (1,0) [0|15] "" Vector__XXX
+ SG_ ams_lastValid_can : 24|10@1+ (2,0) [0|2046] "ms"  DASH
+ SG_ ams_pecErrors_can : 48|16@1+ (10,0) [0|655350] "" Vector__XXX
+ SG_ ams_cell_min_temp_can : 16|8@1+ (0.5,-20) [-20|107.5] "C"  TELEMETRY_SIGNALS,VCU,DASH,Charger
+ SG_ ams_cell_max_temp_can : 8|8@1+ (0.5,-20) [-20|107.5] "C"  TELEMETRY_SIGNALS,VCU,DASH,Charger
+ SG_ ams_cell_avg_temp_can : 0|8@1+ (0.5,-20) [-20|107.5] "C"  VCU,DASH
+
+BO_ 513 AMS_overall_cell_data: 8 AMS
+ SG_ ams_overall_voltage_can : 40|16@1+ (10,0) [0|655350] "mV"  VCU,TELEMETRY_SIGNALS,DASH,Charger
+ SG_ ams_capacity_fl_can : 32|8@1+ (0.5,0) [0|100] "%"  TELEMETRY_SIGNALS,VCU,DASH,Charger
+ SG_ ams_cell_min_voltage_can : 16|16@1+ (1,0) [0|65535] "mV"  TELEMETRY_SIGNALS,VCU,DASH,Charger
+ SG_ ams_cell_max_voltage_can : 0|16@1+ (1,0) [0|65535] "mV"  TELEMETRY_SIGNALS,VCU,DASH,Charger
+
+BO_ 512 AMS_stat_1: 8 AMS
+ SG_ ams_sdc_voltage_can : 58|5@1+ (0.85,0) [0|26.35] "V" Vector__XXX
+ SG_ ts_precharge_progress_can : 53|5@1- (5,60) [-20|135] "%"  DASH,VCU,TELEMETRY_SIGNALS
+ SG_ tsal_error_b_can : 29|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ precharge_aux_b_can : 19|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ kl15_b_can : 26|1@1+ (1,0) [0|1] ""  TELEMETRY_SIGNALS,VCU,DASH,Charger
+ SG_ precharge_closed_b_can : 23|1@1+ (1,0) [0|1] ""  TELEMETRY_SIGNALS,VCU,DASH
+ SG_ tsal_state_can : 44|4@1+ (1,0) [0|0] ""  TELEMETRY_SIGNALS,DASH,Charger
+ SG_ ams_fan_duty_can : 32|4@1+ (10,0) [0|150] "%"  TELEMETRY_SIGNALS
+ SG_ as_vcu_sdc_b_can : 10|1@1+ (1,0) [0|1] ""  TELEMETRY_SIGNALS,DASH
+ SG_ ams_ok_pst_b_can : 4|1@1+ (1,0) [0|1] ""  TELEMETRY_SIGNALS,DASH,Charger
+ SG_ tsal_hv_bat_b_can : 20|1@1+ (1,0) [0|1] ""  TELEMETRY_SIGNALS
+ SG_ air_plus_aux_b_can : 16|1@1+ (1,0) [0|1] ""  TELEMETRY_SIGNALS,VCU
+ SG_ air_minus_aux_b_can : 17|1@1+ (1,0) [0|1] ""  TELEMETRY_SIGNALS,VCU
+ SG_ ts_active_b_can : 8|1@1+ (1,0) [0|1] ""  TELEMETRY_SIGNALS,VCU,DASH,Charger
+ SG_ imd_insulation_can : 48|5@1+ (60,0) [0|1860] "kOhm"  TELEMETRY_SIGNALS
+ SG_ imd_ok_pst_b_can : 7|1@1+ (1,0) [0|1] ""  TELEMETRY_SIGNALS,DASH,Charger
+ SG_ imd_ok_b_can : 6|1@1+ (1,0) [0|1] ""  TELEMETRY_SIGNALS
+ SG_ imd_state_can : 40|4@1+ (1,0) [0|15] ""  TELEMETRY_SIGNALS,VCU
+ SG_ ams_ok_b_can : 5|1@1+ (1,0) [0|1] ""  VCU,TELEMETRY_SIGNALS,Charger
+ SG_ air_plus_closed_b_can : 21|1@1+ (1,0) [0|1] ""  TELEMETRY_SIGNALS,VCU
+ SG_ air_minus_closed_b_can : 22|1@1+ (1,0) [0|1] ""  TELEMETRY_SIGNALS,VCU
+
+BO_ 528 battery_info: 7 LVBATT
+ SG_ battery_bms_temp_can : 26|6@1+ (2.5,0) [0|157.5] "�C" Vector__XXX
+ SG_ battery_capacity_percent_can : 48|8@1+ (1,0) [0|255] "%" Vector__XXX
+ SG_ battery_capacity_discharged_can : 32|16@1+ (1,0) [0|65535] "mAh" Vector__XXX
+ SG_ battery_cell_temp_warning_b_can : 24|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ battery_cell_uv_warning_b_can : 23|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ battery_cell_ov_warning_b_can : 25|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ battery_shutdown_indicator_b_can : 22|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ battery_safety_error_b_can : 21|1@1+ (1,0) [0|1] ""  PDU,VCU,TELEMETRY_SIGNALS
+ SG_ battery_current_internal_can : 8|10@1- (0.25,0) [-32|60] "A"  VCU,TELEMETRY_SIGNALS
+ SG_ battery_cell_voltage_crit_b_can : 19|1@1+ (1,0) [0|1] ""  VCU,TELEMETRY_SIGNALS
+ SG_ battery_cell_temp_critical_b_can : 18|1@1+ (1,0) [0|1] ""  VCU,TELEMETRY_SIGNALS
+ SG_ battery_pack_id_can : 0|8@1+ (1,0) [0|255] ""  DASH,VCU,TELEMETRY_SIGNALS
+
+BO_ 530 battery_cell_temps: 5 LVBATT
+ SG_ battery_cell_temp_05_can : 32|8@1+ (0.5,-20) [-20|107.5] "�C"  DASH
+ SG_ battery_cell_temp_04_can : 24|8@1+ (0.5,-20) [-20|107.5] "�C"  DASH
+ SG_ battery_cell_temp_03_can : 16|8@1+ (0.5,-20) [-20|107.5] "�C"  DASH
+ SG_ battery_cell_temp_02_can : 8|8@1+ (0.5,-20) [-20|107.5] "�C"  DASH
+ SG_ battery_cell_temp_01_can : 0|8@1+ (0.5,-20) [-20|107.5] "�C"  DASH
+
+BO_ 576 VCU_EBS_sens: 6 VCU
+ SG_ ebs_preasure_cyl_front_e_b_can : 12|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ ebs_preasure_cyl_front_can : 40|8@1+ (0.1,0) [0|25.5] "bar" Vector__XXX
+ SG_ ebs_preasure_cyl_back_e_b_can : 11|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ ebs_preasure_cyl_back_can : 32|8@1+ (0.1,0) [0|25.5] "bar" Vector__XXX
+ SG_ ebs_preasure_storage_e_b_can : 10|1@1+ (1,0) [0|1] ""  DASH
+ SG_ ebs_preasure_storage_can : 14|10@1+ (0.5,0) [0|511.5] "bar"  DASH
+ SG_ ebs_preasure_rear_e_b_can : 9|1@1+ (1,0) [0|1] ""  TELEMETRY_SIGNALS
+ SG_ ebs_preasure_rear_can : 24|8@1+ (0.1,0) [0|25.5] "bar"  DASH,TELEMETRY_SIGNALS
+ SG_ ebs_preasure_front_e_b_can : 8|1@1+ (1,0) [0|1] ""  TELEMETRY_SIGNALS
+ SG_ ebs_preasure_front_can : 0|8@1+ (0.1,0) [0|25.5] "bar"  DASH,TELEMETRY_SIGNALS
+
+BO_ 592 VCU_DRIVE_limits: 5 VCU
+ SG_ tq_vehicle_pos_limit_can : 32|8@1+ (0.5,0) [0|127.5] "Nm"  DASH
+ SG_ tq_vehicle_neg_limit_can : 24|8@1+ (0.5,-127.5) [-127.5|0] "Nm"  DASH
+ SG_ recuLimit_can : 10|10@1+ (100,-102300) [-102300|0] "mA"  DASH
+ SG_ powerLimit_can : 0|10@1+ (100,0) [0|102300] "W"  DASH
+
+BO_ 646 DASH_CalibrationReq: 6 DASH
+ SG_ calibrationValue_s32_can m2 : 0|32@1- (1,0) [-2147483648|2147483647] ""  VCU
+ SG_ datatypeSelection_can M : 40|4@1+ (1,0) [0|15] ""  VCU
+ SG_ calibrationValue_f_can m3 : 0|32@1- (1,0) [-3.4E+38|3.4E+38] ""  VCU
+ SG_ calibrationValue_u32_can m1 : 0|32@1+ (1,0) [-2147483648|2147483647] ""  VCU
+ SG_ calibrationId_can : 32|8@1+ (1,0) [0|255] ""  PDU,VCU
+
+BO_ 601 VCU_DV_stats_2: 8 VCU
+ SG_ VCU_Reg_Steering_Angle_Tire_can : 50|10@1- (0.1,0) [-51.2|51.1] "�" Vector__XXX
+ SG_ VCU_steering_angle_tire_can : 40|10@1- (0.1,0) [-51.2|51.1] "�" Vector__XXX
+ SG_ ACE_ready_for_driving_b_can : 38|1@1+ (1,0) [0|0] ""  DASH
+ SG_ VCU_Statemachine_can : 32|6@1+ (1,0) [0|63] ""  TELEMETRY_SIGNALS,DASH
+ SG_ DVSC_Position_actual_can : 0|32@1+ (1,-2147483648) [-2147483648|2147483647] "inc" Vector__XXX
+
+BO_ 600 VCU_DV_stats: 8 VCU
+ SG_ vcu_ebs_check_state_can : 60|4@1+ (1,0) [0|15] "" Vector__XXX
+ SG_ ASB_failure_b_can : 53|1@1+ (1,0) [0|1] ""  DASH
+ SG_ EBS_check_error_message_can : 56|4@1+ (1,0) [0|15] ""  DASH,TELEMETRY_SIGNALS
+ SG_ Watchdog_oke_b_can : 52|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ Reset_btn_vcu_b_can : 51|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ ASR_start_btn_b_can : 50|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ SDC_Latch_Ready_b_can : 49|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ SDC_AS_closed_b_can : 48|1@1+ (1,0) [0|1] ""  DASH
+ SG_ AS_close_SDC_b_can : 47|1@1+ (1,0) [0|1] ""  DASH
+ SG_ ASMS_open_b_can : 46|1@1+ (1,0) [0|1] ""  PDU,DASH
+ SG_ DV_Emergency_can : 45|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ DVSC_warning_b_can : 44|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ DVSC_voltage_error_b_can : 43|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ DVSC_motion_error_b_can : 42|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ DVSC_generic_error_b_can : 41|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ DVSC_current_error_b_can : 40|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ DVSC_com_error_b_can : 39|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ DVSC_temp_error_b_can : 38|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ DVSC_Homing_Target_reached_b_can : 31|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ DVSC_fault_b_can : 30|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ DV_Emergency_Reason_can : 32|6@1+ (1,0) [0|63] ""  TELEMETRY_SIGNALS,DASH
+ SG_ ACE_OK_b_can : 7|1@1+ (1,0) [0|1] ""  TELEMETRY_SIGNALS,DASH
+ SG_ DL_AS_state_can : 4|3@1+ (1,0) [0|7] ""  PDU
+ SG_ ACE_Steering_Angle_Tire_can : 20|10@1+ (0.1,-50) [-50|52.3] "�"  TELEMETRY_SIGNALS
+ SG_ ACE_Motor_Torque_target_can : 8|12@1+ (0.1,-128) [-128|281.5] "%"  TELEMETRY_SIGNALS
+ SG_ VCU_AMI_state_can : 0|4@1+ (1,0) [0|15] ""  DASH
+
+BO_ 598 VCU_vehicleData: 6 VCU
+ SG_ VCU_Result_W_moving_avg_can : 34|12@1- (50,0) [-102400|102350] "W" Vector__XXX
+ SG_ INS_vel_x_can : 24|10@1- (0.1,0) [-51.2|51.1] "m/s"  DASH
+ SG_ vehicleId_can : 3|4@1+ (1,0) [0|15] "" Vector__XXX
+ SG_ VCU_calibrationReq_success_b_can : 2|1@1+ (1,0) [0|1] ""  DASH
+ SG_ tmot_can : 16|8@1+ (0.5,-20) [-20|107.5] "�C"  TELEMETRY_SIGNALS,DASH
+ SG_ tinverter_can : 8|8@1+ (1,-40) [-40|215] "�C"  TELEMETRY_SIGNALS,DASH
+ SG_ act_ErrorStatus_can : 0|2@1- (1,0) [0|0] ""  DASH
+
+BO_ 596 VCU_DRIVE_ctrl: 7 VCU
+ SG_ r2ds_enable_can : 1|1@1+ (1,0) [0|1] ""  PDU
+ SG_ unitek_fr_go_b_can : 3|1@1+ (1,0) [0|1] ""  TELEMETRY_SIGNALS
+ SG_ unitek_rl_go_b_can : 34|1@1+ (1,0) [0|1] ""  TELEMETRY_SIGNALS
+ SG_ ts_activate_b_can : 0|1@1+ (1,0) [0|1] ""  DASH,AMS
+ SG_ unitek_state_rr_can : 52|4@1+ (1,0) [0|15] ""  PDU,DASH
+ SG_ unitek_state_rl_can : 48|4@1+ (1,0) [0|15] ""  PDU,DASH
+ SG_ unitek_state_fr_can : 44|4@1+ (1,0) [0|15] ""  PDU,DASH
+ SG_ unitek_state_fl_can : 40|4@1+ (1,0) [0|15] ""  PDU,DASH
+ SG_ ts_state_can : 36|4@1+ (1,0) [0|15] ""  PDU,DASH,TELEMETRY_SIGNALS
+ SG_ unitek_rr_go_b_can : 35|1@1+ (1,0) [0|1] ""  TELEMETRY_SIGNALS
+ SG_ unitek_fl_go_b_can : 2|1@1+ (1,0) [0|1] ""  TELEMETRY_SIGNALS
+ SG_ apps_res_can : 24|10@1+ (0.1,0) [0|100] "%"  TELEMETRY_SIGNALS,DASH
+
+BO_ 595 VCU_accel_sens: 8 VCU
+ SG_ hv_current_bspd_High_can : 40|10@1- (0.5,0) [-256|255.5] "A"  DASH
+ SG_ hv_current_bspd_e_b_can : 60|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ hv_current_bspd_can : 30|10@1- (0.5,0) [-256|255.5] "A"  DASH
+ SG_ apps_state_can : 56|4@1+ (1,0) [0|0] ""  DASH
+
+BO_ 642 DASH_20ms: 4 DASH
+ SG_ batt_rst_rq_b_can : 1|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ drs_toggle_b_can : 31|1@1+ (1,0) [0|1] ""  PDU
+ SG_ efuse_reset_b_can : 30|1@1+ (1,0) [0|1] ""  PDU
+ SG_ ace_supply_enable_b_can : 29|1@1+ (1,0) [0|1] ""  PDU
+ SG_ assi_test_req_b_can : 4|1@1+ (1,0) [0|1] ""  PDU,VCU
+ SG_ assi_exhibit_state_can : 5|2@1+ (1,0) [0|1] ""  PDU,VCU
+ SG_ swc_inverter_reset_b_can : 3|1@1+ (1,0) [0|1] ""  VCU
+ SG_ swc_enable_b_can : 2|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ ewp_req_b_can : 0|1@1+ (1,0) [0|1] ""  PDU,VCU
+ SG_ fans_req_b_can : 28|1@1+ (1,0) [0|1] ""  PDU,VCU
+ SG_ lap_rst_req_b_can : 7|1@1+ (1,0) [0|1] ""  VCU
+ SG_ lapmode_can : 8|8@1+ (1,0) [0|255] ""  VCU
+ SG_ marker_req_can : 16|12@1+ (1,0) [0|4095] "" Vector__XXX
+
+BO_ 625 IMU_cog_gyro: 8 IMU_COG
+ SG_ IMU_cog_yaw_can : 32|16@1+ (0.005,-163.84) [-163.84|163.835] "�/s"  VCU
+ SG_ IMU_cog_pitch_can : 16|16@1+ (0.005,-163.84) [-163.84|163.835] "�/s"  VCU
+ SG_ IMU_cog_roll_can : 0|16@1+ (0.005,-163.84) [-163.84|163.835] "�/s"  VCU
+
+BO_ 624 IMU_cog_acc: 6 IMU_COG
+ SG_ IMU_cog_acc_z_can : 32|16@1+ (0.0001274,-4.1746432) [-4.1746432|4.1745158] "g"  VCU
+ SG_ IMU_cog_acc_x_can : 0|16@1+ (0.0001274,-4.1746432) [-4.1746432|4.1745158] "g"  VCU
+ SG_ IMU_cog_acc_y_can : 16|16@1+ (0.0001274,-4.1746432) [-4.1746432|4.1745158] "g"  VCU
+
+BO_ 628 IMU_rear_acc: 6 IMU_RA
+ SG_ IMU_rear_acc_z_can : 32|16@1+ (0.0001274,-4.1746432) [-4.1746432|4.1745158] "g" Vector__XXX
+ SG_ IMU_rear_acc_y_can : 16|16@1+ (0.0001274,-4.1746432) [-4.1746432|4.1745158] "g" Vector__XXX
+ SG_ IMU_rear_acc_x_can : 0|16@1+ (0.0001274,-4.1746432) [-4.1746432|4.1745158] "g" Vector__XXX
+
+BO_ 626 IMU_front_acc: 6 IMU_FA
+ SG_ IMU_front_acc_z_can : 32|16@1+ (0.0001274,-4.1746432) [-4.1746432|4.1745158] "g" Vector__XXX
+ SG_ IMU_front_acc_x_can : 0|16@1+ (0.0001274,-4.1746432) [-4.1746432|4.1745158] "g" Vector__XXX
+ SG_ IMU_front_acc_y_can : 16|16@1+ (0.0001274,-4.1746432) [-4.1746432|4.1745158] "g" Vector__XXX
+
+BO_ 640 DASH_gLapinfo: 8 DASH
+ SG_ lap_cnt_can : 0|8@1+ (1,0) [0|255] ""  TELEMETRY_SIGNALS
+ SG_ lap_time_best_can : 50|14@1+ (0.01,0) [0|163.83] "s"  TELEMETRY_SIGNALS
+ SG_ laptime_can : 38|12@1+ (0.05,0) [0|204.75] "s"  TELEMETRY_SIGNALS
+ SG_ lap_time_last_can : 24|14@1+ (0.01,0) [0|163.83] "s"  TELEMETRY_SIGNALS
+ SG_ lap_dist_can : 10|14@1+ (0.2,0) [0|3276.6] "m"  TELEMETRY_SIGNALS
+
+BO_ 580 VCU_Susp_pots: 3 VCU
+ SG_ rocker_rr_e_b_can : 21|1@1+ (1,-0) [0|1] "mm" Vector__XXX
+ SG_ rocker_rl_e_b_can : 20|1@1+ (1,0) [0|1] "mm" Vector__XXX
+ SG_ rocker_rr_can : 10|10@1+ (0.1,-50) [-50|52.3] "mm"  DASH
+ SG_ rocker_rl_can : 0|10@1+ (0.1,-50) [-50|52.3] "mm"  DASH
+
+BO_ 590 VCU_rp_stats: 6 VCU
+ SG_ vLogger_CAN3_e_b_can : 5|1@1+ (1,0) [0|1] ""  DASH
+ SG_ vLogger_CAN2_e_b_can : 2|1@1+ (1,0) [0|1] ""  DASH
+ SG_ t_ext_can : 16|8@1+ (0.5,-20) [-20|107.5] "" Vector__XXX
+ SG_ sdc_res_b_can : 15|1@1+ (1,0) [0|1] ""  DASH
+ SG_ sc_interlocks_b_can : 9|1@1+ (1,0) [0|1] ""  DASH
+ SG_ sc_ks_hoops_b_can : 40|1@1+ (1,0) [0|1] ""  DASH
+ SG_ bspd_sensor_err_b_can : 32|1@1+ (1,0) [0|1] ""  TELEMETRY_SIGNALS,DASH
+ SG_ sw_bspd_b_can : 7|1@1+ (1,0) [0|1] ""  TELEMETRY_SIGNALS,DASH
+ SG_ bspd_avoid_b_can : 13|1@1+ (1,0) [0|1] ""  DASH,TELEMETRY_SIGNALS
+ SG_ apps_bse_impl_b_can : 12|1@1+ (1,0) [0|0] ""  TELEMETRY_SIGNALS,DASH
+ SG_ VCU_sc_b_can : 1|1@1+ (1,0) [0|1] ""  TELEMETRY_SIGNALS,DASH
+ SG_ fs_event_b_can : 0|1@1+ (1,0) [0|1] ""  DASH
+ SG_ bspd_b_can : 3|1@1+ (1,0) [0|1] ""  TELEMETRY_SIGNALS,DASH
+ SG_ sc_cmks_b_can : 4|1@1+ (1,0) [0|1] ""  TELEMETRY_SIGNALS,DASH
+
+BO_ 589 VCU_gSpeed_brake: 7 VCU
+ SG_ speedCoeff_can : 48|8@1+ (0.1,0) [0|1] "" Vector__XXX
+ SG_ speedTargetval_can : 40|8@1+ (1,0) [0|18000] "rpm" Vector__XXX
+ SG_ speedlimit_can : 32|8@1+ (5,0) [0|100] "km/h"  DASH
+ SG_ pbrake_rear_e_b_can : 21|1@1+ (1,0) [0|0] ""  PDU,DASH
+ SG_ speed_safety_b_can : 20|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ pBrake_for_maxRecu_can : 22|8@1+ (1,0) [0|255] "bar"  DASH
+ SG_ speed_can : 10|10@1+ (0.15,0) [0|153.45] "kph"  TELEMETRY_SIGNALS,DASH
+ SG_ pbrake_rear_can : 0|10@1+ (0.1,0) [0|102.3] "bar"  PDU,TELEMETRY_SIGNALS,DASH
+
+
+
+CM_ BO_ 3221225472 "This is a message for not used signals, created by Vector CANdb++ DBC OLE DB Provider.";
+CM_ SG_ 3221225472 drive_tqvLastTqvIdReceived_can "Id of the last tqv message received";
+CM_ SG_ 3221225472 drive_currentTqvReqId_can "Id of the last Tqv Request message";
+CM_ SG_ 3221225472 torque_safety_b_can "Will be set to 1 if vcu disables tourqe due to a inverter shutdown.";
+CM_ BO_ 1872 "This is used to send commands to the dash during maintainence";
+CM_ SG_ 1872 mt_remote_buttons_sw_tl_b_can "This signal emulates the top left button on the steering wheel beeing pressed";
+CM_ SG_ 1872 mt_remote_buttons_sw_pr_b_can "This signal emulates the middle right pedal on the steering wheel beeing pressed";
+CM_ SG_ 1872 mt_remote_buttons_sw_pl_b_can "This signal emulates the middle left peddal on the steering wheel beeing pressed";
+CM_ SG_ 1872 mt_remote_buttons_sw_fr_b_can "This signal emulates the right function button (top right corner) on the steering wheel beeing pressed";
+CM_ SG_ 1872 mt_remote_buttons_start_b_can "This signal emulates the start button beeing pressed";
+CM_ SG_ 1872 mt_remote_buttons_sw_fl_b_can "This signal emulates the left function button (left upper corner) on the steering wheel beeing pressed";
+CM_ SG_ 1872 mt_remote_buttons_sw_tr_b_can "This signal emulates the top right button on the steering wheel beeing pressed";
+CM_ SG_ 1872 mt_remote_buttons_sw_br_b_can "This signal emulates the bottom right button on the steering wheel beeing pressed";
+CM_ SG_ 1872 mt_remote_buttons_sw_mr_b_can "This signal emulates the middle right button on the steering wheel beeing pressed";
+CM_ SG_ 1872 mt_remote_buttons_sw_bl_b_can "This signal emulates the bottom left button on the steering wheel beeing pressed";
+CM_ SG_ 1872 mt_remote_buttons_sw_ml_b_can "This signal emulates the middle left button on the steering wheel beeing pressed";
+CM_ SG_ 1872 mt_remote_buttons_enable_b_can "This bit enables button input via CAN";
+CM_ SG_ 515 ams_pcb_temp_can "The temperature inside the accumulator container, measured on the ams pcb";
+CM_ BO_ 533 "Message for Debugging the MP2791 BMS IC. 
+This msg and its signals should be removed when the MP2791 
+is not used anymore or the IC has no more problems!";
+CM_ SG_ 533 battery_bms_scan_e_b_can "1 if either the scan resulted in an error in the BMS IC or when the scan ran into a timeout";
+CM_ SG_ 533 battery_bms_invalid_can "1 when BMS IC doesn't update it's voltage registers for a defined invalidation period";
+CM_ BO_ 511 "This message is sent by the vector logger so that we can detect, if it is connected";
+CM_ SG_ 704 PDU_Ewp_Mot_tSpeed_Req "Target speed request for motor EWP to set speed";
+CM_ SG_ 704 PDU_Ewp_Inv_tSpeed_Req "Target speed of inverter ewp to set speed";
+CM_ SG_ 1031 wpmd_trans_temp_rl_can "temperatur of transmission oil";
+CM_ SG_ 1031 wpmd_trans_temp_e_b_rl_can "temperatur of transmission oil";
+CM_ SG_ 1031 wpmd_rotor_temp_rl_can "temperatur of the motors rotor";
+CM_ SG_ 1030 wpmd_trans_temp_fr_can "temperatur of transmission oil";
+CM_ SG_ 1030 wpmd_trans_temp_e_b_fr_can "temperatur of transmission oil";
+CM_ SG_ 1030 wpmd_rotor_temp_fr_can "temperatur of the motors rotor";
+CM_ SG_ 1029 wpmd_trans_temp_rr_can "temperatur of transmission oil";
+CM_ SG_ 1029 wpmd_trans_temp_e_b_rr_can "temperatur of transmission oil";
+CM_ SG_ 1029 wpmd_rotor_temp_rr_can "temperatur of the motors rotor";
+CM_ SG_ 1028 wpmd_trans_temp_fl_can "temperatur of transmission oil";
+CM_ SG_ 1028 wpmd_trans_temp_e_b_fl_can "temperatur of transmission oil";
+CM_ SG_ 1028 wpmd_rotor_temp_fl_can "temperatur of the motors rotor";
+CM_ SG_ 695 brake_pressed_b_can "Set to 1 when brake pressure is high enough to activate the brakelight";
+CM_ SG_ 260 apps3_raw_can "raw value for apps3
+";
+CM_ SG_ 260 apps2_raw_can "raw value for apps2
+";
+CM_ SG_ 2047 S32K_stay_in_bootloader_b_can "Intentional state of air minus lowsider";
+CM_ SG_ 672 tqv_status_tc_mu_factor_can "friction coefficient between tire and surface";
+CM_ SG_ 672 tqv_status_gps_fix_aquired_b_can "if GPS is used or not";
+CM_ SG_ 672 tqv_status_tqv_base_strength_can "usually: 0 wanted tq equals to 0 tq applied to each tire
+whith this option: it is possible to apply -5 and +5 which results in 0 overall tq while improving cornering";
+CM_ SG_ 672 tqv_status_tc_slip_target_can "wanted slip for traction control";
+CM_ SG_ 611 tqv_seq_req_can "incrementing sequence number for request";
+CM_ SG_ 612 tqv_seq_req_can "incrementing sequence number for request";
+CM_ SG_ 612 tqv_tire_steerangle_can "steering angle of tires, not steeringwheel";
+CM_ SG_ 612 tqv_rot_spd_rr_can "rotational speed of tire, as computed in DRIVE pipeline";
+CM_ SG_ 612 tqv_rot_spd_rl_can "rotational speed of tire, as computed in DRIVE pipeline";
+CM_ SG_ 612 tqv_rot_spd_fr_can "rotational speed of tire, as computed in DRIVE pipeline";
+CM_ SG_ 612 tqv_rot_spd_fl_can "rotational speed of tire, as computed in DRIVE pipeline";
+CM_ SG_ 673 tqv_seq_resp_can "incrementing sequence number for response message";
+CM_ BO_ 1027 "Data from RR WPMD";
+CM_ BO_ 1025 "Data from FR WPMD";
+CM_ BO_ 1026 "Data from RL WPMD";
+CM_ BO_ 1024 "Data from FL WPMD";
+CM_ SG_ 597 vcu_mileage_e_b_can "Sent if the VCU tries to save a mileage value to the flash that is smaller than the currently stored value";
+CM_ SG_ 597 drive_deratingAccuTempRecu_b_can "Indicates that the derating module 'accuSoc' is active and influencing the output";
+CM_ SG_ 597 drive_deratingAccuTemp_b_can "Indicates that the derating module 'accuSoc' is active and influencing the output";
+CM_ SG_ 597 drive_safetyBspdAvoid_b_can "Indicates that the Safety module 'AxisCutOff' is active and influencing the output";
+CM_ SG_ 597 drive_tqvRemoteState_can "Shows the state in which the remote TQV system is.
+
+Value table is built with the following scheme in mind:
+<tqv_used>_<remote_state>";
+CM_ SG_ 597 drive_stratInvMapLimit_b_can "Indicates that the driveStrat module 'inverterMapManager' is active and influencing the output.
+This means the limits of the configured inverter Map are exceeded and speed/torque get limited.";
+CM_ SG_ 597 drive_stratRecuActive_b_can "Indicates that recuperation is active";
+CM_ SG_ 597 drive_deratingMotorTemp_b_can "Indicates that the derating module 'motorTemp' is active and influencing the output";
+CM_ SG_ 597 drive_deratingPeakPerf_b_can "Indicates that the derating module 'peakPerfWindow' is active and influencing the output.
+After an peakPerfWindow time duration is exceeded.";
+CM_ SG_ 597 drive_deratingTransTemp "Indicates that the derating module 'transTemp is active and influencing the output";
+CM_ SG_ 597 drive_deratingAccuSoc_b_can "Indicates that the derating module 'accuSoc' is active and influencing the output";
+CM_ SG_ 597 drive_deratingMotorCurrent_b_can "Indicates that the derating module 'motorCurrent' is active and influencing the output";
+CM_ SG_ 597 drive_deratingInverterTemp_b_can "Indicates that the derating module 'inverterTemp' is active and influencing the output";
+CM_ SG_ 597 drive_safetyTqSteer_b_can "Indicates that the Safety module 'AxisCutOff' is active and influencing the output";
+CM_ SG_ 597 drive_powerLimitActive_b_can "Indicates that the PowerLimiter is active and influencing the output";
+CM_ SG_ 256 gas_strut_e_b_can "Set if interpolate value is out of boundaries";
+CM_ SG_ 256 gas_strut_can "interpolated sensor value from the gas strut";
+CM_ SG_ 259 brake_balance_front_can "calculated brake balance";
+CM_ SG_ 259 pbrake_front_e_b_can "1 if Brake Preassure Sensor front has a problem.";
+CM_ SG_ 641 start_btn_b_can "1 if start_btn is pressed (pulls voltage up)";
+CM_ SG_ 641 bots_b_can "1 if bots is actived (no voltage present after bots)";
+CM_ SG_ 641 lap_trigger_b_can "Is high for 100ms when RP passed the laptrigger
+";
+CM_ SG_ 400 ts_activate_b_can "VCU sets this bit to high to request TS Activation by AMS.";
+CM_ SG_ 514 ams_lastValid_can "Set to the highest time value of any cell on the ams. time values will be reset individual for every cell if correct value received.  ";
+CM_ SG_ 513 ams_capacity_fl_can "Calculated proportion of remaining capacity in the hv accu";
+CM_ SG_ 512 ams_sdc_voltage_can "Voltage at the end of the SDC";
+CM_ SG_ 512 ts_precharge_progress_can "Proportion of ts condensator voltage / accu voltage";
+CM_ SG_ 512 precharge_closed_b_can "Intentional state of auxiliary contact of air minus. 0 -> precharge open, 1 -> precharge closed/active";
+CM_ SG_ 512 as_vcu_sdc_b_can "1 if AS or VCU opened the SDC ( no voltage present)";
+CM_ SG_ 512 ams_ok_pst_b_can "state of the persistent ams_ok_b output, which will be 0 as long as the failure is not reset at the vehicle";
+CM_ SG_ 512 tsal_hv_bat_b_can "hv measurement board in accu container detected more than 60V at outside connector";
+CM_ SG_ 512 air_plus_aux_b_can "State of auxiliary contact of air minus. 0 -> aux open -> air open, 1 -> aux closed -> air closed";
+CM_ SG_ 512 air_minus_aux_b_can "State of auxiliary contact of air minus. 0 -> aux open -> air open, 1 -> aux closed -> air closed";
+CM_ SG_ 512 ts_active_b_can "ts active state of ams. HV circuit condensators are charged and AIRs are closed";
+CM_ SG_ 512 imd_insulation_can "isolation between hv and lv circuit";
+CM_ SG_ 512 imd_ok_pst_b_can "Persistend IMD_ok signal which will be low, until it is manually reset";
+CM_ SG_ 512 imd_ok_b_can "isolation resistance ok";
+CM_ SG_ 512 ams_ok_b_can "state of ams_ok output which influences the shutdown circuit";
+CM_ SG_ 512 air_plus_closed_b_can "Intentional State of air plus lowsider";
+CM_ SG_ 512 air_minus_closed_b_can "Intentional state of air minus lowsider";
+CM_ SG_ 528 battery_bms_temp_can "Temperature of the BMS IC inside the battery";
+CM_ SG_ 528 battery_capacity_percent_can "Remaining capacity of the battery in %";
+CM_ SG_ 528 battery_capacity_discharged_can "Capaicty that has been discharged since the last time, the battery was fully charged";
+CM_ SG_ 528 battery_cell_temp_warning_b_can "1 if at least one of the cell voltages is above the under- or overvoltage error threshold";
+CM_ SG_ 528 battery_cell_uv_warning_b_can "1 if at least one of the cell voltages is above the undervoltage warning threshold";
+CM_ SG_ 528 battery_cell_ov_warning_b_can "1 if at least one of the cell voltages is above the overvoltage warning threshold";
+CM_ SG_ 528 battery_shutdown_indicator_b_can "1 if battery is (close to) being disabled because of a voltage/temperature error";
+CM_ SG_ 528 battery_safety_error_b_can "Indicates that a safety error in the battery occured previously";
+CM_ SG_ 528 battery_current_internal_can "Internal current of the battery";
+CM_ SG_ 528 battery_cell_voltage_crit_b_can "1 if at least when cell voltage is above/below error threshold";
+CM_ SG_ 528 battery_cell_temp_critical_b_can "1 if at least when cell temperature is above/below error threshold";
+CM_ SG_ 528 battery_pack_id_can "Identifier of the battery pack";
+CM_ BO_ 646 "Calibration Request Message from SWC to VCU
+Contains a requestID and a new value to make it easy and universal to implement additional Calibration Request";
+CM_ SG_ 646 calibrationValue_u32_can "Data to be saved from vcu by request with calibration_req.
+Can also contain the bit pattern of a float-values,";
+CM_ SG_ 646 calibrationId_can "vehicle wide distributed calibration codeword";
+CM_ SG_ 600 ASB_failure_b_can "T 15.3.3 A red indicator light in the cockpit that is easily visible from inside and outside the cockpit
+even in bright sunlight and clearly marked with the lettering �ASB� must light up if the SDC
+is opened due to an ASB failure.";
+CM_ SG_ 598 VCU_calibrationReq_success_b_can "Signals the successfull reception of a SWC_CalibrationReq";
+CM_ SG_ 596 ts_activate_b_can "VCU sets this bit to high to request TS Activation by AMS.";
+CM_ SG_ 596 apps_res_can "resulting apps value which is the output of apps software component";
+CM_ SG_ 642 swc_inverter_reset_b_can "when this singal is high the inverter will be reseted";
+CM_ SG_ 590 bspd_avoid_b_can "If 1 bspd_thres checker decreases torque to avoid bspd shutdown";
+CM_ SG_ 590 VCU_sc_b_can "if 0 shutdown circuit may be opened by brake system plausibility device";
+CM_ SG_ 590 bspd_b_can "if 0 shutdown circuit may be opened by brake system plausibility device";
+CM_ SG_ 590 sc_cmks_b_can "if 0 shutdown circuit may be opened by any killswitch";
+CM_ SG_ 589 pBrake_for_maxRecu_can "This value defines the threshold above which the max possible recuperation is used.";
+BA_DEF_  "BusType" STRING ;
+BA_DEF_  "Baudrate" INT 125 1000;
+BA_DEF_ BO_  "GenMsgCycleTime" INT 0 50000;
+BA_DEF_ BO_  "GenMsgCycleTimeFast" INT 0 50000;
+BA_DEF_ BO_  "GenMsgDelayTime" INT 0 1000;
+BA_DEF_ BO_  "GenMsgILSupport" ENUM  "No","Yes";
+BA_DEF_ BO_  "GenMsgNrOfRepetition" INT 0 999999;
+BA_DEF_ BO_  "GenMsgSendType" ENUM  "Cyclic","CyclicIfActive","NotUsed","NotUsed","NotUsed","NotUsed","NotUsed","IfActive","NoMsgSendType","NotUsed","vector_leerstring";
+BA_DEF_ BO_  "GenMsgStartDelayTime" INT 0 65535;
+BA_DEF_ BO_  "NmMessage" ENUM  "no","yes";
+BA_DEF_ BO_  "Quantisierung" STRING ;
+BA_DEF_ SG_  "GenSigInactiveValue" INT 0 100000;
+BA_DEF_ SG_  "GenSigSendType" ENUM  "Cyclic","OnWrite","OnWriteWithRepetition","OnChange","OnChangeWithRepetition","IfActive","IfActiveWithRepetition","NoSigSendType","NotUsed","NotUsed","NotUsed","NotUsed","NotUsed";
+BA_DEF_ SG_  "GenSigStartValue" FLOAT 0 100000000000;
+BA_DEF_ SG_  "InvalidTime" INT 0 0;
+BA_DEF_ SG_  "InvalidValue" FLOAT 0 0;
+BA_DEF_ SG_  "NWM-WakeupAllowed" ENUM  "No","Yes","vector_leerstring";
+BA_DEF_ BU_  "NmNode" ENUM  "no","yes";
+BA_DEF_ BU_  "NmStationAddress" INT 0 63;
+BA_DEF_ BU_  "NodeLayerModules" STRING ;
+BA_DEF_ SG_  "SystemSignalLongSymbol" STRING ;
+BA_DEF_DEF_  "BusType" "CAN";
+BA_DEF_DEF_  "Baudrate" 1000;
+BA_DEF_DEF_  "GenMsgCycleTime" 0;
+BA_DEF_DEF_  "GenMsgCycleTimeFast" 0;
+BA_DEF_DEF_  "GenMsgDelayTime" 0;
+BA_DEF_DEF_  "GenMsgILSupport" "Yes";
+BA_DEF_DEF_  "GenMsgNrOfRepetition" 0;
+BA_DEF_DEF_  "GenMsgSendType" "Cyclic";
+BA_DEF_DEF_  "GenMsgStartDelayTime" 0;
+BA_DEF_DEF_  "NmMessage" "no";
+BA_DEF_DEF_  "Quantisierung" "CAN";
+BA_DEF_DEF_  "GenSigInactiveValue" 0;
+BA_DEF_DEF_  "GenSigSendType" "Cyclic";
+BA_DEF_DEF_  "GenSigStartValue" 0;
+BA_DEF_DEF_  "InvalidTime" 0;
+BA_DEF_DEF_  "InvalidValue" 0;
+BA_DEF_DEF_  "NWM-WakeupAllowed" "";
+BA_DEF_DEF_  "NmNode" "no";
+BA_DEF_DEF_  "NmStationAddress" 0;
+BA_DEF_DEF_  "NodeLayerModules" "CANoeILNLVector.dll";
+BA_DEF_DEF_  "SystemSignalLongSymbol" "";
+BA_ "GenMsgCycleTime" BO_ 1872 10;
+BA_ "GenMsgCycleTime" BO_ 515 100;
+BA_ "GenMsgSendType" BO_ 515 0;
+BA_ "Quantisierung" BO_ 515 "CAN";
+BA_ "GenMsgCycleTime" BO_ 696 1000;
+BA_ "GenMsgCycleTime" BO_ 533 100;
+BA_ "GenMsgSendType" BO_ 511 0;
+BA_ "GenMsgCycleTime" BO_ 511 100;
+BA_ "GenMsgCycleTime" BO_ 293 20;
+BA_ "GenMsgCycleTime" BO_ 292 20;
+BA_ "GenMsgCycleTime" BO_ 291 20;
+BA_ "GenMsgCycleTime" BO_ 290 20;
+BA_ "GenMsgCycleTime" BO_ 691 1000;
+BA_ "GenMsgCycleTime" BO_ 692 1000;
+BA_ "GenMsgCycleTime" BO_ 1031 1000;
+BA_ "GenMsgSendType" BO_ 1031 1;
+BA_ "GenMsgCycleTime" BO_ 1030 1000;
+BA_ "GenMsgSendType" BO_ 1030 1;
+BA_ "GenMsgCycleTime" BO_ 1029 1000;
+BA_ "GenMsgSendType" BO_ 1029 1;
+BA_ "GenMsgCycleTime" BO_ 1028 1000;
+BA_ "GenMsgSendType" BO_ 1028 1;
+BA_ "GenMsgCycleTime" BO_ 772 20;
+BA_ "GenMsgCycleTime" BO_ 771 20;
+BA_ "GenMsgCycleTime" BO_ 770 20;
+BA_ "GenMsgCycleTime" BO_ 769 20;
+BA_ "GenMsgCycleTime" BO_ 768 20;
+BA_ "GenMsgCycleTime" BO_ 289 20;
+BA_ "GenMsgCycleTime" BO_ 288 20;
+BA_ "GenMsgCycleTime" BO_ 281 20;
+BA_ "GenMsgCycleTime" BO_ 280 20;
+BA_ "GenMsgCycleTimeFast" BO_ 674 100;
+BA_ "GenMsgCycleTime" BO_ 674 100;
+BA_ "GenMsgCycleTime" BO_ 695 1000;
+BA_ "GenMsgCycleTime" BO_ 694 1000;
+BA_ "GenMsgCycleTime" BO_ 693 1000;
+BA_ "GenMsgCycleTime" BO_ 690 1000;
+BA_ "GenMsgCycleTime" BO_ 689 1000;
+BA_ "GenMsgCycleTime" BO_ 688 1000;
+BA_ "GenMsgCycleTime" BO_ 260 100;
+BA_ "GenMsgCycleTime" BO_ 531 100;
+BA_ "GenMsgCycleTime" BO_ 532 100;
+BA_ "GenMsgCycleTime" BO_ 542 1000;
+BA_ "GenMsgCycleTime" BO_ 543 500;
+BA_ "GenMsgDelayTime" BO_ 672 0;
+BA_ "GenMsgSendType" BO_ 672 7;
+BA_ "GenMsgCycleTime" BO_ 611 100;
+BA_ "GenMsgSendType" BO_ 611 7;
+BA_ "GenMsgCycleTime" BO_ 612 100;
+BA_ "GenMsgSendType" BO_ 612 7;
+BA_ "GenMsgSendType" BO_ 673 7;
+BA_ "GenMsgSendType" BO_ 1027 1;
+BA_ "GenMsgCycleTime" BO_ 1027 1000;
+BA_ "GenMsgSendType" BO_ 1025 1;
+BA_ "GenMsgCycleTime" BO_ 1025 1000;
+BA_ "GenMsgSendType" BO_ 1026 1;
+BA_ "GenMsgCycleTime" BO_ 1026 1000;
+BA_ "GenMsgSendType" BO_ 1024 1;
+BA_ "GenMsgCycleTime" BO_ 1024 1000;
+BA_ "GenMsgCycleTime" BO_ 597 50;
+BA_ "GenMsgSendType" BO_ 1041 7;
+BA_ "GenMsgCycleTime" BO_ 279 20;
+BA_ "GenMsgCycleTime" BO_ 278 20;
+BA_ "GenMsgCycleTime" BO_ 1809 500;
+BA_ "GenMsgCycleTime" BO_ 1808 500;
+BA_ "GenMsgCycleTime" BO_ 1807 500;
+BA_ "GenMsgCycleTime" BO_ 1806 500;
+BA_ "GenMsgCycleTime" BO_ 276 20;
+BA_ "GenMsgCycleTime" BO_ 277 20;
+BA_ "GenMsgCycleTime" BO_ 256 5;
+BA_ "GenMsgSendType" BO_ 256 0;
+BA_ "GenMsgCycleTime" BO_ 259 5;
+BA_ "GenMsgSendType" BO_ 259 0;
+BA_ "GenMsgCycleTime" BO_ 641 20;
+BA_ "GenMsgSendType" BO_ 641 0;
+BA_ "GenMsgCycleTime" BO_ 400 200;
+BA_ "GenMsgSendType" BO_ 400 1;
+BA_ "GenMsgCycleTime" BO_ 1805 500;
+BA_ "GenMsgSendType" BO_ 1805 0;
+BA_ "GenMsgCycleTime" BO_ 1804 500;
+BA_ "GenMsgSendType" BO_ 1804 0;
+BA_ "GenMsgCycleTime" BO_ 1803 500;
+BA_ "GenMsgSendType" BO_ 1803 0;
+BA_ "GenMsgCycleTime" BO_ 1802 500;
+BA_ "GenMsgSendType" BO_ 1802 0;
+BA_ "GenMsgCycleTime" BO_ 1801 500;
+BA_ "GenMsgSendType" BO_ 1801 0;
+BA_ "GenMsgCycleTime" BO_ 1800 500;
+BA_ "GenMsgSendType" BO_ 1800 0;
+BA_ "GenMsgCycleTime" BO_ 1799 500;
+BA_ "GenMsgSendType" BO_ 1799 0;
+BA_ "GenMsgCycleTime" BO_ 1798 500;
+BA_ "GenMsgSendType" BO_ 1798 0;
+BA_ "GenMsgCycleTime" BO_ 1797 500;
+BA_ "GenMsgSendType" BO_ 1797 0;
+BA_ "GenMsgCycleTime" BO_ 1796 500;
+BA_ "GenMsgSendType" BO_ 1796 0;
+BA_ "GenMsgCycleTime" BO_ 1795 500;
+BA_ "GenMsgSendType" BO_ 1795 0;
+BA_ "GenMsgCycleTime" BO_ 1794 500;
+BA_ "GenMsgSendType" BO_ 1794 0;
+BA_ "GenMsgCycleTime" BO_ 1793 500;
+BA_ "GenMsgSendType" BO_ 1793 0;
+BA_ "GenMsgCycleTime" BO_ 1792 500;
+BA_ "GenMsgSendType" BO_ 1792 0;
+BA_ "GenMsgCycleTime" BO_ 1829 1000;
+BA_ "GenMsgSendType" BO_ 1829 0;
+BA_ "GenMsgCycleTime" BO_ 1828 1000;
+BA_ "GenMsgSendType" BO_ 1828 0;
+BA_ "GenMsgCycleTime" BO_ 1827 1000;
+BA_ "GenMsgSendType" BO_ 1827 0;
+BA_ "GenMsgCycleTime" BO_ 1826 1000;
+BA_ "GenMsgSendType" BO_ 1826 0;
+BA_ "GenMsgCycleTime" BO_ 1825 1000;
+BA_ "GenMsgSendType" BO_ 1825 0;
+BA_ "GenMsgCycleTime" BO_ 1824 1000;
+BA_ "GenMsgSendType" BO_ 1824 0;
+BA_ "GenMsgCycleTime" BO_ 1319 10;
+BA_ "GenMsgCycleTime" BO_ 1316 50;
+BA_ "GenMsgSendType" BO_ 1316 0;
+BA_ "GenMsgCycleTime" BO_ 1315 20;
+BA_ "GenMsgSendType" BO_ 1315 0;
+BA_ "GenMsgCycleTime" BO_ 1314 10;
+BA_ "GenMsgSendType" BO_ 1314 0;
+BA_ "GenMsgCycleTime" BO_ 1313 5;
+BA_ "GenMsgSendType" BO_ 1313 0;
+BA_ "GenMsgCycleTime" BO_ 657 500;
+BA_ "GenMsgSendType" BO_ 657 0;
+BA_ "GenMsgCycleTime" BO_ 514 10;
+BA_ "GenMsgSendType" BO_ 514 0;
+BA_ "GenMsgCycleTime" BO_ 513 10;
+BA_ "GenMsgSendType" BO_ 513 0;
+BA_ "GenMsgCycleTime" BO_ 512 10;
+BA_ "GenMsgSendType" BO_ 512 0;
+BA_ "GenMsgCycleTime" BO_ 528 100;
+BA_ "GenMsgCycleTime" BO_ 530 100;
+BA_ "GenMsgCycleTime" BO_ 576 10;
+BA_ "GenMsgCycleTime" BO_ 592 20;
+BA_ "GenMsgCycleTime" BO_ 646 100;
+BA_ "GenMsgCycleTime" BO_ 601 100;
+BA_ "GenMsgCycleTime" BO_ 600 100;
+BA_ "GenMsgCycleTime" BO_ 598 20;
+BA_ "GenMsgSendType" BO_ 598 0;
+BA_ "GenMsgCycleTime" BO_ 596 20;
+BA_ "GenMsgSendType" BO_ 596 0;
+BA_ "GenMsgCycleTime" BO_ 595 10;
+BA_ "GenMsgSendType" BO_ 595 0;
+BA_ "GenMsgCycleTime" BO_ 642 20;
+BA_ "GenMsgCycleTime" BO_ 625 5;
+BA_ "GenMsgSendType" BO_ 625 0;
+BA_ "GenMsgCycleTime" BO_ 624 5;
+BA_ "GenMsgSendType" BO_ 624 0;
+BA_ "GenMsgCycleTime" BO_ 628 5;
+BA_ "GenMsgSendType" BO_ 628 0;
+BA_ "GenMsgCycleTime" BO_ 626 5;
+BA_ "GenMsgSendType" BO_ 626 0;
+BA_ "GenMsgCycleTime" BO_ 640 50;
+BA_ "GenMsgSendType" BO_ 640 0;
+BA_ "GenMsgCycleTime" BO_ 580 5;
+BA_ "GenMsgSendType" BO_ 580 0;
+BA_ "GenMsgCycleTime" BO_ 590 10;
+BA_ "GenMsgSendType" BO_ 590 0;
+BA_ "GenMsgSendType" BO_ 589 0;
+BA_ "GenMsgCycleTime" BO_ 589 10;
+BA_ "InvalidTime" SG_ 3221225472 steering_wheel_angle_raw_can 100;
+BA_ "InvalidTime" SG_ 1872 mt_remote_buttons_enable_b_can 1000;
+BA_ "SystemSignalLongSymbol" SG_ 516 ams_cell_undertemperature_occure "ams_cell_undertemperature_occured_b_can";
+BA_ "SystemSignalLongSymbol" SG_ 516 ams_cell_undertemperature_error_ "ams_cell_undertemperature_error_b_can";
+BA_ "SystemSignalLongSymbol" SG_ 516 ams_cell_undertemperature_warnin "ams_cell_undertemperature_warning_b_can";
+BA_ "SystemSignalLongSymbol" SG_ 516 ams_cell_overtemperature_occured "ams_cell_overtemperature_occured_b_can";
+BA_ "SystemSignalLongSymbol" SG_ 516 ams_cell_overtemperature_error_b "ams_cell_overtemperature_error_b_can";
+BA_ "SystemSignalLongSymbol" SG_ 516 ams_cell_overtemperature_warning "ams_cell_overtemperature_warning_b_can";
+BA_ "SystemSignalLongSymbol" SG_ 516 ams_cell_undervoltage_occured_b_ "ams_cell_undervoltage_occured_b_can";
+BA_ "SystemSignalLongSymbol" SG_ 516 ams_cell_undervoltage_error_b_ca "ams_cell_undervoltage_error_b_can";
+BA_ "SystemSignalLongSymbol" SG_ 516 ams_cell_undervoltage_warning_b_ "ams_cell_undervoltage_warning_b_can";
+BA_ "SystemSignalLongSymbol" SG_ 516 ams_cell_overvoltage_occured_b_c "ams_cell_overvoltage_occured_b_can";
+BA_ "SystemSignalLongSymbol" SG_ 516 ams_cell_overvoltage_warning_b_c "ams_cell_overvoltage_warning_b_can";
+BA_ "SystemSignalLongSymbol" SG_ 516 ams_overall_voltage_occured_b_ca "ams_overall_voltage_occured_b_can";
+BA_ "SystemSignalLongSymbol" SG_ 516 ams_overall_voltage_warning_b_ca "ams_overall_voltage_warning_b_can";
+BA_ "InvalidValue" SG_ 511 vLogger_CAN1_e_b_can 1;
+BA_ "InvalidTime" SG_ 511 vLogger_CAN1_e_b_can 1000;
+BA_ "InvalidValue" SG_ 704 PDU_Ewp_speed_req_en_b_can 0;
+BA_ "InvalidTime" SG_ 704 PDU_Ewp_speed_req_en_b_can 1000;
+BA_ "GenSigStartValue" SG_ 704 PDU_Ewp_Mot_tSpeed_Req 0;
+BA_ "GenSigStartValue" SG_ 704 PDU_Ewp_Inv_tSpeed_Req 0;
+BA_ "GenSigStartValue" SG_ 1031 wpmd_trans_temp_e_b_rl_can 1;
+BA_ "InvalidTime" SG_ 1031 wpmd_trans_temp_e_b_rl_can 2000;
+BA_ "InvalidValue" SG_ 1031 wpmd_trans_temp_e_b_rl_can 1;
+BA_ "GenSigStartValue" SG_ 1031 wpmd_rotor_temp_e_b_rl_can 1;
+BA_ "InvalidTime" SG_ 1031 wpmd_rotor_temp_e_b_rl_can 2000;
+BA_ "InvalidValue" SG_ 1031 wpmd_rotor_temp_e_b_rl_can 1;
+BA_ "GenSigStartValue" SG_ 1031 wpmd_brake_temp_rl_can 0;
+BA_ "GenSigStartValue" SG_ 1031 wpmd_brake_temp_e_b_rl_can 1;
+BA_ "InvalidTime" SG_ 1031 wpmd_brake_temp_e_b_rl_can 2000;
+BA_ "InvalidValue" SG_ 1031 wpmd_brake_temp_e_b_rl_can 1;
+BA_ "GenSigStartValue" SG_ 1030 wpmd_trans_temp_e_b_fr_can 1;
+BA_ "InvalidTime" SG_ 1030 wpmd_trans_temp_e_b_fr_can 2000;
+BA_ "InvalidValue" SG_ 1030 wpmd_trans_temp_e_b_fr_can 1;
+BA_ "GenSigStartValue" SG_ 1030 wpmd_rotor_temp_e_b_fr_can 1;
+BA_ "InvalidTime" SG_ 1030 wpmd_rotor_temp_e_b_fr_can 2000;
+BA_ "InvalidValue" SG_ 1030 wpmd_rotor_temp_e_b_fr_can 1;
+BA_ "GenSigStartValue" SG_ 1030 wpmd_brake_temp_fr_can 0;
+BA_ "GenSigStartValue" SG_ 1030 wpmd_brake_temp_e_b_fr_can 1;
+BA_ "InvalidTime" SG_ 1030 wpmd_brake_temp_e_b_fr_can 2000;
+BA_ "InvalidValue" SG_ 1030 wpmd_brake_temp_e_b_fr_can 1;
+BA_ "GenSigStartValue" SG_ 1029 wpmd_trans_temp_e_b_rr_can 1;
+BA_ "InvalidTime" SG_ 1029 wpmd_trans_temp_e_b_rr_can 2000;
+BA_ "InvalidValue" SG_ 1029 wpmd_trans_temp_e_b_rr_can 1;
+BA_ "GenSigStartValue" SG_ 1029 wpmd_rotor_temp_e_b_rr_can 1;
+BA_ "InvalidTime" SG_ 1029 wpmd_rotor_temp_e_b_rr_can 2000;
+BA_ "InvalidValue" SG_ 1029 wpmd_rotor_temp_e_b_rr_can 1;
+BA_ "GenSigStartValue" SG_ 1029 wpmd_brake_temp_rr_can 0;
+BA_ "GenSigStartValue" SG_ 1029 wpmd_brake_temp_e_b_rr_can 1;
+BA_ "InvalidTime" SG_ 1029 wpmd_brake_temp_e_b_rr_can 2000;
+BA_ "InvalidValue" SG_ 1029 wpmd_brake_temp_e_b_rr_can 1;
+BA_ "GenSigStartValue" SG_ 1028 wpmd_trans_temp_fl_can 0;
+BA_ "GenSigStartValue" SG_ 1028 wpmd_trans_temp_e_b_fl_can 1;
+BA_ "InvalidTime" SG_ 1028 wpmd_trans_temp_e_b_fl_can 2000;
+BA_ "InvalidValue" SG_ 1028 wpmd_trans_temp_e_b_fl_can 1;
+BA_ "GenSigStartValue" SG_ 1028 wpmd_rotor_temp_fl_can 0;
+BA_ "GenSigStartValue" SG_ 1028 wpmd_rotor_temp_e_b_fl_can 1;
+BA_ "InvalidTime" SG_ 1028 wpmd_rotor_temp_e_b_fl_can 2000;
+BA_ "InvalidValue" SG_ 1028 wpmd_rotor_temp_e_b_fl_can 1;
+BA_ "GenSigStartValue" SG_ 1028 wpmd_brake_temp_fl_can 0;
+BA_ "GenSigStartValue" SG_ 1028 wpmd_brake_temp_e_b_fl_can 1;
+BA_ "InvalidTime" SG_ 1028 wpmd_brake_temp_e_b_fl_can 2000;
+BA_ "InvalidValue" SG_ 1028 wpmd_brake_temp_e_b_fl_can 1;
+BA_ "GenSigStartValue" SG_ 289 unitek_rr_motor_temp_can 35;
+BA_ "GenSigStartValue" SG_ 289 unitek_rr_igbt_temp_can 35;
+BA_ "GenSigStartValue" SG_ 288 unitek_rl_motor_temp_can 35;
+BA_ "GenSigStartValue" SG_ 288 unitek_rl_igbt_temp_can 35;
+BA_ "GenSigStartValue" SG_ 281 unitek_fr_motor_temp_can 35;
+BA_ "GenSigStartValue" SG_ 281 unitek_fr_igbt_temp_can 35;
+BA_ "GenSigStartValue" SG_ 280 unitek_fl_igbt_temp_can 35;
+BA_ "GenSigStartValue" SG_ 280 unitek_fl_motor_temp_can 35;
+BA_ "GenSigStartValue" SG_ 695 PDU_Ewp_Mot_e_b_can 1;
+BA_ "GenSigStartValue" SG_ 695 PDU_Ewp_Inv_e_b_can 1;
+BA_ "InvalidTime" SG_ 260 pbrake_front_raw_can 100;
+BA_ "InvalidTime" SG_ 260 apps3_raw_can 100;
+BA_ "InvalidTime" SG_ 260 apps2_raw_can 100;
+BA_ "InvalidTime" SG_ 260 apps1_raw_can 100;
+BA_ "GenSigStartValue" SG_ 531 battery_cell_voltage_8_can 0;
+BA_ "GenSigStartValue" SG_ 531 battery_cell_voltage_7_can 0;
+BA_ "GenSigStartValue" SG_ 531 battery_cell_voltage_6_can 0;
+BA_ "GenSigStartValue" SG_ 531 battery_cell_voltage_5_can 0;
+BA_ "GenSigStartValue" SG_ 531 battery_cell_voltage_4_can 0;
+BA_ "GenSigStartValue" SG_ 531 battery_cell_voltage_3_can 0;
+BA_ "GenSigStartValue" SG_ 531 battery_cell_voltage_2_can 0;
+BA_ "GenSigStartValue" SG_ 531 battery_cell_voltage_1_can 0;
+BA_ "GenSigStartValue" SG_ 542 battery_temp_avg_can 40;
+BA_ "InvalidTime" SG_ 672 tqv_status_tc_enabled_b_can 500;
+BA_ "InvalidTime" SG_ 672 tqv_status_tqv_enabled_b_can 500;
+BA_ "GenSigStartValue" SG_ 611 tqv_wantedTq_req 0;
+BA_ "GenSigStartValue" SG_ 1027 ttmd_tire_temp_e_b_rr_outer_can 1;
+BA_ "InvalidTime" SG_ 1027 ttmd_tire_temp_e_b_rr_outer_can 2000;
+BA_ "InvalidValue" SG_ 1027 ttmd_tire_temp_e_b_rr_outer_can 1;
+BA_ "GenSigStartValue" SG_ 1027 ttmd_tire_temp_e_b_rr_middle_can 1;
+BA_ "InvalidTime" SG_ 1027 ttmd_tire_temp_e_b_rr_middle_can 2000;
+BA_ "InvalidValue" SG_ 1027 ttmd_tire_temp_e_b_rr_middle_can 1;
+BA_ "GenSigStartValue" SG_ 1027 ttmd_tire_temp_e_b_rr_inner_can 1;
+BA_ "InvalidTime" SG_ 1027 ttmd_tire_temp_e_b_rr_inner_can 2000;
+BA_ "InvalidValue" SG_ 1027 ttmd_tire_temp_e_b_rr_inner_can 1;
+BA_ "GenSigStartValue" SG_ 1027 ttmd_tire_temp_rr_middle_can 0;
+BA_ "GenSigStartValue" SG_ 1027 ttmd_tire_temp_rr_outer_can 0;
+BA_ "GenSigStartValue" SG_ 1027 ttmd_tire_temp_rr_inner_can 0;
+BA_ "GenSigStartValue" SG_ 1025 ttmd_tire_temp_e_b_fr_outer_can 1;
+BA_ "InvalidTime" SG_ 1025 ttmd_tire_temp_e_b_fr_outer_can 2000;
+BA_ "InvalidValue" SG_ 1025 ttmd_tire_temp_e_b_fr_outer_can 1;
+BA_ "GenSigStartValue" SG_ 1025 ttmd_tire_temp_e_b_fr_middle_can 1;
+BA_ "InvalidTime" SG_ 1025 ttmd_tire_temp_e_b_fr_middle_can 2000;
+BA_ "InvalidValue" SG_ 1025 ttmd_tire_temp_e_b_fr_middle_can 1;
+BA_ "GenSigStartValue" SG_ 1025 ttmd_tire_temp_e_b_fr_inner_can 1;
+BA_ "InvalidTime" SG_ 1025 ttmd_tire_temp_e_b_fr_inner_can 2000;
+BA_ "InvalidValue" SG_ 1025 ttmd_tire_temp_e_b_fr_inner_can 1;
+BA_ "GenSigStartValue" SG_ 1025 ttmd_tire_temp_fr_outer_can 0;
+BA_ "GenSigStartValue" SG_ 1025 ttmd_tire_temp_fr_middle_can 0;
+BA_ "GenSigStartValue" SG_ 1025 ttmd_tire_temp_fr_inner_can 0;
+BA_ "GenSigStartValue" SG_ 1026 ttmd_tire_temp_e_b_rl_outer_can 1;
+BA_ "InvalidTime" SG_ 1026 ttmd_tire_temp_e_b_rl_outer_can 2000;
+BA_ "InvalidValue" SG_ 1026 ttmd_tire_temp_e_b_rl_outer_can 1;
+BA_ "GenSigStartValue" SG_ 1026 ttmd_tire_temp_e_b_rl_middle_can 1;
+BA_ "InvalidTime" SG_ 1026 ttmd_tire_temp_e_b_rl_middle_can 2000;
+BA_ "InvalidValue" SG_ 1026 ttmd_tire_temp_e_b_rl_middle_can 1;
+BA_ "GenSigStartValue" SG_ 1026 ttmd_tire_temp_e_b_rl_inner_can 1;
+BA_ "InvalidTime" SG_ 1026 ttmd_tire_temp_e_b_rl_inner_can 2000;
+BA_ "InvalidValue" SG_ 1026 ttmd_tire_temp_e_b_rl_inner_can 1;
+BA_ "GenSigStartValue" SG_ 1026 ttmd_tire_temp_rl_outer_can 0;
+BA_ "GenSigStartValue" SG_ 1026 ttmd_tire_temp_rl_middle_can 0;
+BA_ "GenSigStartValue" SG_ 1026 ttmd_tire_temp_rl_inner_can 0;
+BA_ "GenSigStartValue" SG_ 1024 ttmd_tire_temp_e_b_fl_outer_can 1;
+BA_ "InvalidTime" SG_ 1024 ttmd_tire_temp_e_b_fl_outer_can 2000;
+BA_ "InvalidValue" SG_ 1024 ttmd_tire_temp_e_b_fl_outer_can 1;
+BA_ "GenSigStartValue" SG_ 1024 ttmd_tire_temp_e_b_fl_middle_can 1;
+BA_ "InvalidTime" SG_ 1024 ttmd_tire_temp_e_b_fl_middle_can 2000;
+BA_ "InvalidValue" SG_ 1024 ttmd_tire_temp_e_b_fl_middle_can 1;
+BA_ "GenSigStartValue" SG_ 1024 ttmd_tire_temp_e_b_fl_inner_can 1;
+BA_ "InvalidTime" SG_ 1024 ttmd_tire_temp_e_b_fl_inner_can 2000;
+BA_ "InvalidValue" SG_ 1024 ttmd_tire_temp_e_b_fl_inner_can 1;
+BA_ "GenSigStartValue" SG_ 1024 ttmd_tire_temp_fl_middle_can 0;
+BA_ "GenSigStartValue" SG_ 1024 ttmd_tire_temp_fl_inner_can 0;
+BA_ "GenSigStartValue" SG_ 1024 ttmd_tire_temp_fl_outer_can 0;
+BA_ "GenSigStartValue" SG_ 279 unitek_rr_torque_motor_ist_can 0;
+BA_ "GenSigStartValue" SG_ 279 unitek_rr_torque_motor_soll_can 0;
+BA_ "GenSigStartValue" SG_ 278 unitek_rl_torque_motor_soll_can 0;
+BA_ "GenSigStartValue" SG_ 278 unitek_rl_torque_motor_ist_can 0;
+BA_ "GenSigStartValue" SG_ 276 unitek_fl_torque_motor_soll_can 0;
+BA_ "GenSigStartValue" SG_ 276 unitek_fl_torque_motor_ist_can 0;
+BA_ "GenSigStartValue" SG_ 277 unitek_fr_torque_motor_soll_can 0;
+BA_ "GenSigStartValue" SG_ 277 unitek_fr_torque_motor_ist_can 0;
+BA_ "InvalidTime" SG_ 256 apps3_e_b_can 100;
+BA_ "InvalidValue" SG_ 256 apps3_e_b_can 1;
+BA_ "InvalidTime" SG_ 256 apps2_e_b_can 100;
+BA_ "InvalidValue" SG_ 256 apps2_e_b_can 1;
+BA_ "InvalidTime" SG_ 256 apps1_e_b_can 100;
+BA_ "InvalidValue" SG_ 256 apps1_e_b_can 1;
+BA_ "GenSigStartValue" SG_ 259 rocker_fr_e_b_can 0;
+BA_ "GenSigStartValue" SG_ 259 rocker_fl_e_b_can 0;
+BA_ "GenSigStartValue" SG_ 259 rocker_fr_can 500;
+BA_ "GenSigStartValue" SG_ 259 rocker_fl_can 500;
+BA_ "InvalidTime" SG_ 259 steering_wheel_angle_e_b_can 100;
+BA_ "InvalidValue" SG_ 259 steering_wheel_angle_e_b_can 1;
+BA_ "GenSigStartValue" SG_ 259 steering_wheel_angle_can 280;
+BA_ "InvalidTime" SG_ 400 ts_activate_b_can 500;
+BA_ "InvalidTime" SG_ 400 charger_active_b_can 1000;
+BA_ "InvalidTime" SG_ 1315 IVT_Result_U2_Post_Airs_can 100;
+BA_ "InvalidTime" SG_ 1314 IVT_Result_U1_Pre_Airs_can 100;
+BA_ "InvalidTime" SG_ 1313 IVT_Result_I_Channel_Error_b_can 500;
+BA_ "InvalidValue" SG_ 1313 IVT_Result_I_Channel_Error_b_can 1;
+BA_ "InvalidTime" SG_ 1313 IVT_Result_I_can 100;
+BA_ "GenSigStartValue" SG_ 513 ams_cell_max_voltage_can 0;
+BA_ "GenSigStartValue" SG_ 512 ts_precharge_progress_can 0;
+BA_ "InvalidTime" SG_ 512 kl15_b_can 1000;
+BA_ "InvalidTime" SG_ 512 tsal_state_can 250;
+BA_ "InvalidTime" SG_ 512 ams_ok_pst_b_can 500;
+BA_ "InvalidTime" SG_ 512 ts_active_b_can 1000;
+BA_ "InvalidTime" SG_ 512 imd_ok_pst_b_can 500;
+BA_ "InvalidTime" SG_ 512 imd_ok_b_can 500;
+BA_ "GenSigStartValue" SG_ 530 battery_cell_temp_01_can 0;
+BA_ "GenSigStartValue" SG_ 576 ebs_preasure_cyl_front_can 1;
+BA_ "GenSigStartValue" SG_ 576 ebs_preasure_cyl_back_can 1;
+BA_ "GenSigStartValue" SG_ 576 ebs_preasure_front_can 1;
+BA_ "GenSigStartValue" SG_ 592 tq_vehicle_neg_limit_can 255;
+BA_ "GenSigStartValue" SG_ 592 recuLimit_can 1023;
+BA_ "InvalidTime" SG_ 646 calibrationValue_u32_can 100;
+BA_ "GenSigStartValue" SG_ 601 DVSC_Position_actual_can 2147483648;
+BA_ "InvalidValue" SG_ 600 ASB_failure_b_can 1;
+BA_ "GenSigStartValue" SG_ 600 ACE_Steering_Angle_Tire_can 500;
+BA_ "GenSigStartValue" SG_ 600 ACE_Motor_Torque_target_can 1280;
+BA_ "InvalidTime" SG_ 596 ts_activate_b_can 500;
+BA_ "GenSigStartValue" SG_ 580 rocker_rr_e_b_can 0;
+BA_ "GenSigStartValue" SG_ 580 rocker_rl_e_b_can 0;
+BA_ "GenSigStartValue" SG_ 580 rocker_rr_can 500;
+BA_ "GenSigStartValue" SG_ 580 rocker_rl_can 500;
+BA_ "InvalidValue" SG_ 590 vLogger_CAN3_e_b_can 1;
+BA_ "InvalidTime" SG_ 590 vLogger_CAN3_e_b_can 1000;
+BA_ "InvalidValue" SG_ 590 vLogger_CAN2_e_b_can 1;
+BA_ "InvalidTime" SG_ 590 vLogger_CAN2_e_b_can 1000;
+BA_ "GenSigStartValue" SG_ 590 t_ext_can 40;
+BA_ "GenSigStartValue" SG_ 590 sw_bspd_b_can 1;
+VAL_ 533 battery_bms_plugin_detect_can 3 "DETECTION_FAILED" 2 "CHARGER_DETECTED" 1 "LOAD_DETECTED" 0 "UNKNOWN" ;
+VAL_ 533 battery_bms_pwr_state_can 16 "RecoveryMode" 8 "FaultMode" 4 "ActiveMode" 2 "StandbyMode" 1 "SafeMode" ;
+VAL_ 533 battery_bms_pack_status_can 3 "BatteryPackCharging" 2 "BatteryPackInStandbyRange" 1 "BatteryPackDischarging" ;
+VAL_ 695 drs_state_can 0 "closed" 1 "open" ;
+VAL_ 597 drive_tqvRemoteState_can 3 "local_fallback" 2 "remote_available" 1 "local_starting" 0 "local_unavailable" ;
+VAL_ 1041 IVT_42_Get_AllLogData_Item 41 "maxTemp" 36 "maxU2" 35 "maxU1" 33 "maxCurrent" 16 "overallRuntime" 6 "dischargingWh" 5 "chargingWh" 4 "overallWh" 3 "dischargingAs" 2 "chargingAs" 1 "overallAs" ;
+VAL_ 1041 IVT_43_Get_LogData_Item 41 "maxTemp" 36 "maxU2" 35 "maxU1" 33 "maxCurrent" 16 "overallRuntime" 6 "dischargingWh" 5 "chargingWh" 4 "overallWh" 3 "dischargingAs" 2 "chargingAs" 1 "overallAs" ;
+VAL_ 1041 IVT_67_logdataSinceReset_id 41 "maxTemp" 36 "maxU2" 35 "maxU1" 33 "maxCurrent" 16 "overallRuntime" 6 "dischargingWh" 5 "chargingWh" 4 "overallWh" 3 "dischargingAs" 2 "chargingAs" 1 "overallAs" ;
+VAL_ 1041 IVT_ID_Cmd 50 "store" 52 "setMode" 49 "getSN" 48 "resetLogData" 67 "logdataSinceReset" 66 "overallLogdata" 65 "systemErrors" 64 "measurementErrors" ;
+VAL_ 1297 IVT_ID_Response_ID 10627 "maxTempSinceReset" 9603 "maxU2SinceReset" 9091 "maxU1SinceReset" 8579 "maxCurrentSinceReset" 1667 "dischargingWhSinceReset" 1411 "chargingWhSinceReset" 1155 "overallWhSinceReset" 899 "dischargingAsSinceReset" 643 "chargingAsSinceReset" 387 "overallAsSinceReset" ;
+VAL_ 657 driver_id_can 6 "Niclas" 5 "Tim" 4 "Michi" 3 "Daniel" 2 "Raphi" 1 "Domi" 0 "default" ;
+VAL_ 512 tsal_state_can 0 "none" 1 "ts_off" 2 "ts_on" 3 "hv_impl" 4 "aux_openwire" 5 "aux_shortgnd" 6 "aux_deviation" ;
+VAL_ 512 imd_state_can 0 "unknown" 1 "short_gnd" 2 "short_ubat" 3 "normal" 4 "undervoltage" 5 "quickstart" 6 "error" 7 "bad_gnd" ;
+VAL_ 646 datatypeSelection_can 3 "float32" 2 "sint32" 1 "uint32" 0 "none" ;
+VAL_ 646 calibrationId_can 107 "cal_recuModeGasStrut" 106 "cal_enableGasStrut" 105 "cal_recuGamma" 104 "reset_Ewps" 103 "cal_DCDC" 102 "reset_eFuse" 101 "tc_muFactor" 100 "cal_tqvBaseStrenght" 99 "cal_tqvStrength" 98 "cal_tcSlipTarget" 97 "cal_tcToggle" 96 "cal_tqvToggle" 69 "cal_rtqvToggle" 44 "cal_drvsTqLimit" 43 "cal_speedLimit" 42 "cal_brakeBalance" 41 "cal_accelGamma" 40 "cal_invMapIdx" 0 "cal_none" 17 "cal_steerangle" 18 "cal_rockers" 20 "cal_apps_lower" 21 "cal_apps_higher" 36 "cal_pBrake_for_maxRecu" 37 "cal_powerLimit" 38 "cal_recuTqLimit" 39 "cal_stratIdx" 48 "cal_drive_mode_selection" 49 "cal_reset_stm" 50 "cal_dv_steering_test" ;
+VAL_ 601 VCU_Statemachine_can 0 "VCU_Statemachine_NOT_INIT" 1 "VCU_Statemachine_INIT" 2 "VCU_Statemachine_AS_INIT" 3 "VCU_Statemachine_AS_WDOG_CHECK" 4 "VCU_Statemachine_AS_EBS_CHECK" 5 "VCU_Statemachine_AS_STEERING" 6 "VCU_Statemachine_AS_WAIT_TS_ON" 7 "VCU_Statemachine_AS_WAIT_READY" 8 "VCU_Statemachine_AS_ACCEPT_GO" 9 "VCU_Statemachine_AS_PREPARE_DRI" 10 "VCU_Statemachine_AS_DRIVING" 11 "VCU_Statemachine_AS_FINISHED" 12 "VCU_Statemachine_AS_EMERGENCY" 13 "VCU_Statemachine_MANUAL_INIT" 14 "VCU_Statemachine_MANUAL_DRIVING" ;
+VAL_ 600 EBS_check_error_message_can 0 "none" 1 "air_preasure_to_high" 2 "air_preasure_to_low" 3 "brake_preasure_to_low" 4 "SDC_Latch_Ready_missing" 5 "KL15_missing" 6 "EBS_front_deactivation_failed" 7 "EBS_rear_deactivation_failed" 8 "EBS_front_reactivation_failed" 9 "EBS_rear_reactivation_failed" 10 "air_to_low_after_checkup" 11 "sensor_lost" ;
+VAL_ 600 DV_Emergency_Reason_can 0 "no_failure" 1 "RES" 2 "kl15_b" 3 "ACE_oke_b" 4 "EBS" 5 "Inverter_failure" 6 "DVSC_Timeout" 7 "Sensor_lost" ;
+VAL_ 600 DL_AS_state_can 5 "AS_state_finish" 4 "AS_state_emergency_brake" 3 "AS_state_driving" 2 "AS_state_ready" 1 "AS_state_off" 0 "AS_state_wait_ts" ;
+VAL_ 600 VCU_AMI_state_can 0 "AMI_state_unselected" 1 "AMI_state_acceleration" 2 "AMI_state_skidpad" 3 "AMI_state_trackdrive" 4 "AMI_state_braketest" 5 "AMI_state_inspection" 6 "AMI_state_autocross" 7 "AMI_state_dynamics_testmode" 15 "AMI_state_manual" ;
+VAL_ 598 vehicleId_can 8 "RP27e" 7 "RP26e" 6 "RP25e" 5 "RP24e" 4 "RP23e" 3 "RP22e" 2 "RP21e" 1 "RP19e" 0 "not_set" ;
+VAL_ 596 unitek_state_rr_can 0 "not_init" 1 "init" 2 "ready" 3 "driving" 4 "fault" ;
+VAL_ 596 unitek_state_rl_can 0 "not_init" 1 "init" 2 "ready" 3 "driving" 4 "fault" ;
+VAL_ 596 unitek_state_fr_can 0 "not_init" 1 "init" 2 "ready" 3 "driving" 4 "fault" ;
+VAL_ 596 unitek_state_fl_can 0 "not_init" 1 "init" 2 "ready" 3 "driving" 4 "fault" ;
+VAL_ 596 ts_state_can 0 "notUsed" 1 "ts_off" 2 "precharge" 3 "ts_on" 4 "r2d" ;
+VAL_ 595 apps_state_can 0 "sensor_init" 1 "sensor_lost_warn" 2 "sensor_ok" 3 "sensors_lost_err" 4 "sensor_impl_warn" 5 "sensor_impl_err" ;
+SIG_VALTYPE_ 3221225472 tqTarget_can : 1;
+SIG_VALTYPE_ 646 calibrationValue_f_can : 1;
+
