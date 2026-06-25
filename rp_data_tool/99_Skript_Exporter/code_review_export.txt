@@ -1,0 +1,71 @@
+============================================================
+  MATLAB CODE REVIEW EXPORT
+============================================================
+Hauptskript : C:\Users\Danie\OneDrive\Desktop\RP26_Data_Analysis\rp_data_tool\rp_data_tool.m
+Exportdatum : 24-Jun-2026 17:58:30
+Anzahl Dateien: 1
+============================================================
+
+--- BENÖTIGTE PRODUKTE / TOOLBOXEN ---
+  [1] MATLAB
+
+
+============================================================
+  DATEI 1 / 1
+  NAME  : rp_data_tool.m
+  PFAD  : C:\Users\Danie\OneDrive\Desktop\RP26_Data_Analysis\rp_data_tool\rp_data_tool.m
+============================================================
+
+%% rp_data_tool.m
+% FSAE Datenanalyse-Tool — Racing Performance Electrical
+% Kompatibilitaet: MATLAB R2023b+
+%
+% Autor:  [Benutzer]
+% Datum:  2026-06-24
+% Changelog:
+%   2026-06-24  Refactoring nach internem Coding-Standard:
+%               - Modulare Struktur mit Packages (+config, +io, +signal, etc.)
+%               - +RP Plot-Design Integration
+%               - Neue Tabs: Bremse-Balance, Efficiency-Map, Compare
+%               - INS Dead-Reckoning Fix (cumtrapz, alpha konfigurierbar)
+%               - Energieberechnung via trapz
+%
+% Eingabe:  Keine (Dateiauswahl per Dialog)
+% Ausgabe:  uifigure mit Analyse-Tabs
+
+function rp_data_tool()
+%% Initialisierung
+clc;
+cfg = config.get_config();
+
+fprintf('============================================\n');
+fprintf('  RP FSAE Datenanalyse-Tool\n');
+fprintf('  Racing Performance — Electrical\n');
+fprintf('============================================\n\n');
+
+%% Dateiauswahl
+[datei_name, datei_pfad] = uigetfile('*.mf4;*.MF4', 'MDF4 Datei auswaehlen');
+if isequal(datei_name, 0)
+    fprintf('Kein File gewaehlt. Tool wird beendet.\n');
+    return;
+end
+datei_pfad_voll = fullfile(datei_pfad, datei_name);
+fprintf('Lade: %s\n', datei_pfad_voll);
+
+%% Laden & Validierung
+roh_daten = io.lade_mdf4(datei_pfad_voll, cfg);
+
+%% Metadaten
+meta = util.parse_dateiname(datei_name, cfg);
+
+%% Signalextraktion
+fprintf('Extrahiere Signale...\n');
+signale = signal.extrahiere_signale(roh_daten, cfg);
+fprintf('Signalextraktion abgeschlossen.\n\n');
+
+%% Abgeleitete Groessen
+signale = signal.berechne_abgeleitete(signale, cfg);
+
+%% GUI
+gui.erstelle_gui(signale, meta, datei_pfad_voll, cfg);
+end

@@ -1,0 +1,183 @@
+function build_runden_tabelle(parent, signale, cfg, position)
+%BUILD_RUNDEN_TABELLE Erstellt eine Uebersichtstabelle fuer Rundenzeiten.
+%
+%   Eingabe:
+%       parent   — UI-Container (Tab oder Panel)
+%       signale  — Struct mit extrahierten Signalen
+%       cfg      — Config-Struct (inkl. farben)
+%       position — [x, y, breite, hoehe] des Panels
+%
+%   Autor:  [Benutzer]
+%   Datum:  2026-06-24
+
+C = farben();
+
+fn_lap = signal_zu_feldname('lap_cnt_can');
+fn_t   = signal_zu_feldname('laptime_can');
+fn_spd = signal_zu_feldname('speed_can');
+fn_soc = signal_zu_feldname('ams_capacity_fl_can');
+
+%% Panel erstellen
+pnl = uipanel(parent, ...
+    'Position',       position, ...
+    'BackgroundColor', C.panel, ...
+    'BorderType',     'none');
+
+uilabel(pnl, ...
+    'Position',   [0, position(4) - 20, position(3), 16], ...
+    'Text',       'Lap Uebersicht', ...
+    'FontSize',   10, ...
+    'FontWeight', 'bold', ...
+    'FontColor',  C.rot, ...
+    'BackgroundColor', 'none');
+
+%% Pruefung: Lap-Daten vorhanden
+if ~isfield(signale, fn_lap) || ~signale.([fn_lap, '_ok'])
+    uilabel(pnl, ...
+        'Position', [10, position(4) / 2 - 10, position(3) - 20, 20], ...
+        'Text',     'Keine Lap-Daten verfuegbar', ...
+        'FontSize', 10, ...
+        'FontColor', C.grau3, ...
+        'BackgroundColor', 'none', ...
+        'HorizontalAlignment', 'center');
+    return;
+end
+
+%% Runden extrahieren
+try
+    lap_ts = signale.(fn_lap);
+    laps   = round(util.extrahiere_rohdaten(lap_ts));
+    u_laps = unique(laps);
+    u_laps = u_laps(u_laps > 0);
+    n_laps = min(numel(u_laps), 8);
+
+    col_w   = floor((position(3) - 10) / 5);
+    headers = {'Lap', 'Zeit (s)', 'V avg', 'SoC', 'Status'};
+
+    %% Header-Zeile
+    for h = 1:5
+        uilabel(pnl, ...
+            'Position', [5 + (h - 1) * col_w, position(4) - 38, col_w - 2, 16], ...
+            'Text',     headers{h}, ...
+            'FontSize', 8, ...
+            'FontWeight', 'bold', ...
+            'FontColor',  C.rot, ...
+            'BackgroundColor', 'none');
+    end
+
+    %% Rundenzeilen
+    for i = 1:n_laps
+        yp = position(4) - 42 - (i * 22);
+        if yp < 5
+            break;
+        end
+
+        mask = laps == u_laps(i);
+        bgc  = util.tern_str(mod(i, 2) == 0, C.panel, C.grau1);
+        bk   = uipanel(pnl, ...
+            'Position', [0, yp, position(3), 20], ...
+            'BackgroundColor', bgc, ...
+            'BorderType', 'none');
+
+        % --- Spalte 1: Rundennummer ---
+        uilabel(bk, ...
+            'Position', [5, 2, col_w - 2, 16], ...
+            'Text',     num2str(u_laps(i)), ...
+            'FontSize', 8, ...
+            'FontColor', C.weiss, ...
+            'BackgroundColor', 'none');
+
+        % --- Spalte 2: Rundenzeit ---
+        t_str = '--';
+        if isfield(signale, fn_t) && signale.([fn_t, '_ok'])
+            try
+                lt = signale.(fn_t).Data(mask);
+                if ~isempty(lt)
+                    t_str = sprintf('%.1f', max(lt));
+                end
+            catch
+                % ignore
+            end
+        end
+        uilabel(bk, ...
+            'Position', [5 + col_w, 2, col_w - 2, 16], ...
+            'Text',     t_str, ...
+            'FontSize', 8, ...
+            'FontColor', C.weiss, ...
+            'BackgroundColor', 'none');
+
+        % --- Spalte 3: Durchschnittsgeschwindigkeit ---
+        spd_str = '--';
+        if isfield(signale, fn_spd) && signale.([fn_spd, '_ok'])
+            try
+                sp = interp1(signale.(fn_spd).Time, signale.(fn_spd).Data, lap_ts.Time(mask), 'linear', 'extrap');
+                spd_str = sprintf('%.0f km/h', mean(sp, 'omitnan'));
+            catch
+                % ignore
+            end
+        end
+        uilabel(bk, ...
+            'Position', [5 + 2 * col_w, 2, col_w - 2, 16], ...
+            'Text',     spd_str, ...
+            'FontSize', 8, ...
+            'FontColor', C.weiss, ...
+            'BackgroundColor', 'none');
+
+        % --- Spalte 4: SoC (State of Charge) ---
+        soc_str = '--';
+        if isfield(signale, fn_soc) && signale.([fn_soc, '_ok'])
+            try
+                soc = signale.(fn_soc).Data(mask);
+                if ~isempty(soc)
+                    soc_str = sprintf('%.1f %%', mean(soc, 'omitnan'));
+                end
+            catch
+                % ignore
+            end
+        end
+        uilabel(bk, ...
+            'Position', [5 + 3 * col_w, 2, col_w - 2, 16], ...
+            'Text',     soc_str, ...
+            'FontSize', 8, ...
+            'FontColor', C.weiss, ...
+            'BackgroundColor', 'none');
+
+        % --- Spalte 5: Status (OK / Warnung) ---
+        status_str = 'OK';
+        status_farbe = C.gruen;
+        uilabel(bk, ...
+            'Position', [5 + 4 * col_w, 2, col_w - 2, 16], ...
+            'Text',     status_str, ...
+            'FontSize', 8, ...
+            'FontColor', status_farbe, ...
+            'BackgroundColor', 'none');
+    end
+
+catch ME
+    uilabel(pnl, ...
+        'Position', [10, position(4) / 2 - 10, position(3) - 20, 20], ...
+        'Text',     ['Fehler: ', ME.message], ...
+        'FontSize', 9, ...
+        'FontColor', C.rot, ...
+        'BackgroundColor', 'none', ...
+        'HorizontalAlignment', 'center');
+end
+end
+
+function out = tern_str(bedingung, wert_wahr, wert_falsch)
+%TERN_STR Ternaerer Operator fuer Strings/Values.
+%
+%   Eingabe:
+%       bedingung  — Logischer Wert
+%       wert_wahr  — Rueckgabe wenn true
+%       wert_falsch — Rueckgabe wenn false
+%
+%   Autor:  [Benutzer]
+%   Datum:  2026-06-24
+
+if bedingung
+    out = wert_wahr;
+else
+    out = wert_falsch;
+end
+end
