@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fahrerprofile</title>
+<style>
+  :root{
+    --bg:#121212; --panel:#1e1e1e; --line:#2c2c2c;
+    --text:#e6e6e0; --muted:#8a8a8a; --rot:#c7222a; --ok:#3fb950; --warn:#d9a441;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,"Segoe UI",Roboto,sans-serif;font-size:13px;}
+  .kopf{display:flex;align-items:center;gap:12px;padding:8px 12px;border-bottom:.5px solid var(--line);}
+  .kopf h1{font-size:14px;margin:0;font-weight:600;border-left:3px solid var(--rot);padding-left:8px;}
+  .kopf .pfad{color:var(--muted);font-size:11px;margin-left:auto;max-width:50%;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  button{background:var(--rot);color:#fff;border:none;border-radius:6px;
+    padding:6px 12px;font-size:12px;cursor:pointer;}
+  button.sek{background:#2a2a2a;color:var(--text);border:.5px solid var(--line);}
+  button:disabled{opacity:.5;cursor:not-allowed;}
+  input[type=text]{background:#171717;color:var(--text);border:.5px solid var(--line);
+    border-radius:6px;padding:6px 8px;font-size:12px;}
+  .grid{display:grid;grid-template-columns:280px 1fr;gap:10px;padding:10px;}
+  .panel{background:var(--panel);border:.5px solid var(--line);border-radius:10px;padding:10px 12px;min-width:0;}
+  .panel h2{font-size:13px;margin:0 0 8px;border-left:3px solid var(--rot);padding-left:8px;}
+  .rechts{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .rechts .voll{grid-column:1 / -1;}
+  .driver{display:flex;align-items:center;gap:8px;padding:5px 4px;border-bottom:.5px solid var(--line);}
+  .driver .sw{width:10px;height:10px;border-radius:2px;flex:0 0 auto;}
+  .driver .nm{flex:1;} .driver .n{color:var(--muted);font-size:11px;}
+  .leer{color:var(--muted);font-size:12px;padding:14px 4px;text-align:center;}
+  .rang{list-style:none;margin:0;padding:0;}
+  .rang li{display:flex;justify-content:space-between;padding:4px 2px;border-bottom:.5px solid var(--line);}
+  .rang li b{color:var(--text);} .rang li.top b{color:var(--ok);}
+  .banner{background:#3a1f22;border:.5px solid var(--rot);border-radius:8px;
+    padding:8px 10px;margin:8px 0;color:#f0c0c4;font-size:12px;}
+  table.mat{border-collapse:collapse;width:100%;font-size:11px;}
+  table.mat th,table.mat td{border:.5px solid var(--line);padding:4px 6px;text-align:center;}
+  table.mat th{color:var(--muted);font-weight:500;}
+  .anlegen{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap;}
+</style>
+<script src="./lib/echarts.min.js"></script>
+</head>
+<body>
+
+<div class="kopf">
+  <h1>Fahrerprofile</h1>
+  <button class="sek" id="btn_laden">Profildatei laden…</button>
+  <span id="pfad" class="pfad">—</span>
+</div>
+
+<div class="grid">
+  <div class="panel">
+    <h2>Fahrer auswählen</h2>
+    <div id="liste"></div>
+    <div class="anlegen">
+      <input type="text" id="neu_name" placeholder="Neuer Fahrername">
+      <button id="btn_anlegen" disabled>Aus aktuellem Run anlegen</button>
+    </div>
+    <div id="anlegen_hint" class="leer" style="text-align:left;padding:6px 2px"></div>
+  </div>
+
+  <div class="rechts">
+    <div class="panel voll">
+      <h2>Kennzahlen-Vergleich (Radar)</h2>
+      <div id="radar" style="height:360px"></div>
+    </div>
+    <div class="panel">
+      <h2>Ähnlichkeit (Abstand)</h2>
+      <div id="matrix"></div>
+    </div>
+    <div class="panel">
+      <h2>Zuordnung aktueller Run</h2>
+      <div id="zuordnung"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+const T={ text:"#e6e6e0", muted:"#8a8a8a", line:"#2c2c2c", rot:"#c7222a" };
+const PALETTE=["#3987e5","#1baf7a","#d9a441","#a371f7","#e08e45","#4bc0c0","#c76bd6","#7a9e3a"];
+const RUN_FARBE="#e6e6e0";
+
+let PL=null, radarChart=null;
+let auswahl=new Set();       // ausgewaehlte Entitaets-Namen
+
+/* ---- uihtml ---- */
+function setup(hc){
+  hc.addEventListener("DataChanged",()=>render(hc.Data));
+  if(hc.Data) render(hc.Data);
+  window.sendToMatlab=(n,d)=>hc.sendEventToMATLAB(n,d);
+  document.getElementById("btn_laden").onclick=()=>window.sendToMatlab("profil_datei_waehlen",{});
+  document.getElementById("btn_anlegen").onclick=anlegen;
+}
+window.setup=setup;
+
+/* ---- Hilfen ---- */
+const asArray=(v)=>Array.isArray(v)?v:(v==null?[]:[v]);   // MATLAB 1-Element-Struct -> Array
+const keys   =()=>asArray(PL.panels.metriken).map(m=>m.key);
+const labels =()=>asArray(PL.panels.metriken).map(m=>m.label);
+const gewichte=()=>asArray(PL.panels.metriken).map(m=>m.gewicht);
+
+function entities(){
+  const e=asArray(PL.panels.profile).map((p,i)=>({
+    name:p.name, werte:asArray(p.werte), n:p.n_runden, istRun:false,
+    color:PALETTE[i%PALETTE.length]
+  }));
+  if(PL.panels.aktueller_run && PL.panels.aktueller_run.vorhanden)
+    e.push({name:"Aktueller Run", werte:asArray(PL.panels.aktueller_run.werte), istRun:true, color:RUN_FARBE});
+  return e;
+}
+const byName=(n)=>entities().find(e=>e.name===n);
+
+/* ---- Haupt-Render ---- */
+function render(pl){
+  if(!pl||!pl.panels) return;
+  PL=pl;
+  document.getElementById("pfad").textContent=pl.panels.profildatei||"—";
+
+  const ent=entities();
+  // Auswahl initialisieren: beim ersten Mal alles waehlen
+  const namen=new Set(ent.map(e=>e.name));
+  auswahl=new Set([...auswahl].filter(n=>namen.has(n)));
+  if(auswahl.size===0) ent.forEach(e=>auswahl.add(e.name));
+
+  renderListe(ent);
+  renderZuordnung();
+  rebuild();
+
+  const run=pl.panels.aktueller_run;
+  document.getElementById("btn_anlegen").disabled=!(run&&run.vorhanden);
+  document.getElementById("anlegen_hint").textContent=
+    (run&&run.vorhanden)?"Legt einen Fahrer aus dem Fingerprint des aktuellen Runs an."
+                        :"Zum Anlegen zuerst einen Run laden.";
+}
+
+function renderListe(ent){
+  const box=document.getElementById("liste"); box.innerHTML="";
+  if(!ent.length){ box.innerHTML=`<div class="leer">Keine Profile geladen.</div>`; return; }
+  ent.forEach(e=>{
+    const row=document.createElement("div"); row.className="driver";
+    const cb=document.createElement("input"); cb.type="checkbox"; cb.checked=auswahl.has(e.name);
+    cb.onchange=()=>{ cb.checked?auswahl.add(e.name):auswahl.delete(e.name); rebuild(); };
+    const sw=document.createElement("span"); sw.className="sw"; sw.style.background=e.color;
+    const nm=document.createElement("span"); nm.className="nm";
+    nm.innerHTML=`${e.name}${e.istRun?' <span class="n">(Run)</span>':` <span class="n">n=${e.n}</span>`}`;
+    row.append(cb,sw,nm); box.appendChild(row);
+  });
+}
+
+function rebuild(){
+  const sel=entities().filter(e=>auswahl.has(e.name));
+  renderRadar(sel);
+  renderMatrix(sel);
+}
+
+/* ---- Radar ---- */
+function renderRadar(sel){
+  const el=document.getElementById("radar");
+  if(radarChart){ radarChart.dispose(); radarChart=null; }
+  sel=sel.filter(e=>Array.isArray(e.werte)&&e.werte.length);
+  if(!sel.length){ el.innerHTML=`<div class="leer">Keine Auswahl.</div>`; return; }
+  el.innerHTML="";
+  radarChart=echarts.init(el,null,{renderer:"canvas"});
+  const indicator=labels().map(l=>({name:l,max:100}));
+  radarChart.setOption({
+    backgroundColor:"transparent",
+    tooltip:{backgroundColor:"#1e1e1e",borderColor:T.line,textStyle:{color:T.text}},
+    legend:{data:sel.map(e=>e.name),textStyle:{color:T.muted},bottom:0,type:"scroll"},
+    radar:{indicator:indicator,splitLine:{lineStyle:{color:T.line}},
+      splitArea:{show:false},axisLine:{lineStyle:{color:T.line}},
+      axisName:{color:T.muted,fontSize:11}},
+    series:[{type:"radar",data:sel.map(e=>({
+      name:e.name,value:e.werte,
+      lineStyle:{color:e.color,width:e.istRun?2.5:1.5,type:e.istRun?"dashed":"solid"},
+      itemStyle:{color:e.color},areaStyle:{opacity:0.05}
+    }))}]
+  });
+}
+
+/* ---- Abstands-Matrix ---- */
+function renderMatrix(sel){
+  const el=document.getElementById("matrix");
+  sel=sel.filter(e=>Array.isArray(e.werte)&&e.werte.length);
+  if(sel.length<2){ el.innerHTML=`<div class="leer">Mind. zwei Fahrer wählen.</div>`; return; }
+  const w=gewichte();
+  let html=`<table class="mat"><tr><th></th>${sel.map(e=>`<th>${kurz(e.name)}</th>`).join("")}</tr>`;
+  sel.forEach(a=>{
+    html+=`<tr><th>${kurz(a.name)}</th>`;
+    sel.forEach(b=>{
+      const d=abstand(a.werte,b.werte,w);
+      const bg=farbeAbstand(d);
+      html+=`<td style="background:${bg}">${a===b?"–":d.toFixed(1)}</td>`;
+    });
+    html+="</tr>";
+  });
+  html+="</table><div class='leer' style='text-align:left;padding-top:6px'>Kleiner = ähnlicher.</div>";
+  el.innerHTML=html;
+}
+
+/* ---- Zuordnung ---- */
+function renderZuordnung(){
+  const el=document.getElementById("zuordnung");
+  const z=PL.panels.zuordnung;
+  if(!PL.panels.aktueller_run||!PL.panels.aktueller_run.vorhanden){
+    el.innerHTML=`<div class="leer">Kein Run geladen.</div>`; return;
+  }
+  let html="";
+  if(z.vorschlag_neu)
+    html+=`<div class="banner">Kein klarer Treffer (unter ${z.schwelle}%). Neuen Fahrer anlegen?</div>`;
+  const rl=asArray(z.rangliste);
+  if(!rl.length){
+    html+=`<div class="leer">Noch keine Profile zum Abgleichen.</div>`;
+  }else{
+    html+=`<ul class="rang">`;
+    rl.forEach((r,i)=>{
+      html+=`<li class="${i===0&&!z.vorschlag_neu?'top':''}"><span>${r.name}</span><b>${r.konfidenz.toFixed(0)} %</b></li>`;
+    });
+    html+=`</ul>`;
+  }
+  el.innerHTML=html;
+}
+
+/* ---- Fahrer anlegen ---- */
+function anlegen(){
+  const run=PL.panels.aktueller_run;
+  if(!run||!run.vorhanden) return;
+  const name=(document.getElementById("neu_name").value||"").trim();
+  if(!name){ document.getElementById("neu_name").focus(); return; }
+  const k={}; keys().forEach((key,i)=>k[key]=run.werte[i]);
+  window.sendToMatlab("fahrer_anlegen",{name:name,kennzahlen:k});
+  document.getElementById("neu_name").value="";
+}
+
+/* ---- Rechen-/Format-Hilfen ---- */
+function abstand(a,b,w){
+  let s=0,sw=0;
+  for(let i=0;i<a.length;i++){ s+=w[i]*Math.pow(a[i]-b[i],2); sw+=w[i]; }
+  return Math.sqrt(s/sw);
+}
+function farbeAbstand(d){
+  const t=Math.max(0,Math.min(1,d/40));   // 0..40 -> grün..rot
+  const r=Math.round(40+t*140), g=Math.round(90-t*40);
+  return `rgb(${r},${g},60)`;
+}
+const kurz=(n)=> n.length>10 ? n.slice(0,9)+"…" : n;
+
+/* ---- Resize ---- */
+let rt;
+function planeResize(){ clearTimeout(rt); rt=setTimeout(()=>radarChart&&radarChart.resize(),120); }
+window.addEventListener("resize", planeResize);
+// Container ist 0px, solange der Tab nicht aktiv ist -> Radar bliebe leer.
+if (window.ResizeObserver) new ResizeObserver(planeResize).observe(document.body);
+</script>
+</body>
+</html>

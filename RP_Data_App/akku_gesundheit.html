@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Akku-Gesundheit</title>
+<link rel="stylesheet" href="./lib/uPlot.min.css">
+<style>
+  :root{
+    --bg:#121212; --panel:#1e1e1e; --panel2:#171717; --line:#2c2c2c;
+    --text:#e6e6e0; --muted:#8a8a8a; --achse:#bdbdb6; --rot:#c7222a; --ok:#3fb950; --warn:#d9a441; --accent:#3987e5;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,"Segoe UI",Roboto,sans-serif;font-size:13px;}
+  .kopf{display:flex;align-items:center;gap:12px;padding:8px 12px;border-bottom:.5px solid var(--line);flex-wrap:wrap;}
+  .kopf h1{font-size:14px;margin:0;font-weight:600;border-left:3px solid var(--rot);padding-left:8px;}
+  .kopf .info{color:var(--muted);font-size:12px;}
+  button{background:var(--panel2);color:var(--text);border:.5px solid var(--line);border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer;}
+  button.prim{background:var(--rot);color:#fff;border:none;}
+  button.an{border-color:var(--rot);color:#fff;background:var(--rot);}
+  button:disabled{opacity:.5;cursor:not-allowed;}
+
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px;align-items:start;}
+  .panel{background:var(--panel);border:.5px solid var(--line);border-radius:10px;padding:10px 12px;min-width:0;}
+  .panel.voll{grid-column:1 / -1;}
+  .panel h2{font-size:13px;margin:0 0 8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .panel h2 .titel{border-left:3px solid var(--rot);padding-left:8px;}
+  .panel h2 .rechts{margin-left:auto;font-weight:400;font-size:11px;color:var(--muted);display:flex;gap:6px;align-items:center;}
+  .leer{color:var(--muted);font-size:12px;padding:22px 4px;text-align:center;}
+  .hinweis{color:var(--muted);font-size:11px;margin-top:6px;}
+  .kpis{display:flex;gap:18px;flex-wrap:wrap;margin:2px 0 8px;}
+  .kpi{font-size:12px;color:var(--muted);} .kpi b{color:var(--text);font-size:15px;margin-right:4px;} .kpi b.bad{color:var(--rot);}
+
+  /* 12x12 Grid */
+  .zellgrid{display:flex;flex-direction:column;gap:3px;overflow:auto;}
+  .zrow{display:flex;gap:3px;align-items:center;}
+  .zrow .slab{width:30px;font-size:10px;color:var(--muted);text-align:right;padding-right:4px;flex:none;}
+  .zcell{flex:1;min-width:16px;aspect-ratio:1/1;border-radius:3px;background:#000;cursor:pointer;border:1px solid transparent;}
+  .zcell.sel{border-color:#fff;}
+  .zhead{display:flex;gap:3px;margin-left:30px;margin-bottom:2px;}
+  .zhead .h{flex:1;min-width:16px;text-align:center;font-size:9px;color:var(--muted);}
+  .legend{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:11px;color:var(--muted);}
+  .legend .bar{height:10px;flex:1;border-radius:5px;background:linear-gradient(90deg,#3fb950,#d9a441,#c7222a);}
+
+  /* Stack-Balken */
+  .stbar{display:grid;grid-template-columns:34px 1fr 44px;gap:8px;align-items:center;margin:3px 0;}
+  .stbar .n{font-size:11px;color:var(--text);}
+  .stbar .track{background:#151515;border:.5px solid var(--line);border-radius:5px;height:12px;overflow:hidden;}
+  .stbar .fill{height:100%;border-radius:5px;}
+  .stbar .v{font-size:11px;color:var(--muted);text-align:right;}
+  .stbar.krit .n{color:var(--rot);font-weight:600;}
+
+  /* Ranking */
+  .rank{list-style:none;margin:0;padding:0;max-height:320px;overflow:auto;}
+  .rank li{display:grid;grid-template-columns:70px 1fr auto;gap:8px;align-items:center;padding:3px 4px;border-radius:6px;cursor:pointer;font-size:12px;}
+  .rank li:hover{background:var(--panel2);} .rank li.sel{background:#2a2020;}
+  .rank .zn{font-variant-numeric:tabular-nums;} .rank .zn.bad{color:var(--rot);font-weight:600;}
+  .rank .bar{height:8px;border-radius:4px;background:var(--panel2);overflow:hidden;}
+  .rank .bar>span{display:block;height:100%;background:var(--accent);} .rank .bar>span.bad{background:var(--rot);}
+
+  select{background:var(--panel2);color:var(--text);border:.5px solid var(--line);border-radius:6px;padding:4px 8px;font-size:11px;}
+  .u-legend{display:none;}
+
+  /* Ladebalken-Overlay */
+  #overlay{position:fixed;inset:0;background:rgba(18,18,18,.86);display:none;align-items:center;justify-content:center;z-index:50;}
+  #overlay.an{display:flex;}
+  .lade{width:min(520px,80vw);background:var(--panel);border:.5px solid var(--line);border-radius:12px;padding:22px 24px;}
+  .lade h3{margin:0 0 14px;font-size:14px;font-weight:600;border-left:3px solid var(--rot);padding-left:8px;}
+  .lade .track{background:#151515;border:.5px solid var(--line);border-radius:7px;height:14px;overflow:hidden;}
+  .lade .fill{height:100%;width:0;background:linear-gradient(90deg,#7a1418,var(--rot));border-radius:7px;transition:width .15s ease;}
+  .lade .zeile{display:flex;justify-content:space-between;margin-top:10px;font-size:12px;color:var(--muted);}
+  .lade .txt{max-width:78%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  @media (max-width:900px){ .grid{grid-template-columns:1fr;} }
+</style>
+<script src="./lib/uPlot.iife.min.js"></script>
+<script src="./lib/echarts.min.js"></script>
+</head>
+<body>
+
+<div class="kopf">
+  <h1>Akku-Gesundheit</h1>
+  <button id="btn_ordner" class="prim">Ordner wählen …</button>
+  <span id="stand" class="info">—</span>
+</div>
+
+<div class="grid" id="inhalt">
+  <div class="panel voll"><div class="leer" id="starthinweis">
+    Wähle einen Ordner. Alle <b>.mf4</b>-Dateien darin und in allen Unterordnern werden geladen und zu Zell- und Stack-Gesundheit ausgewertet.
+  </div></div>
+
+  <div class="panel voll" id="p_grid" style="display:none">
+    <h2><span class="titel">Zellgesundheit — 12 Stacks × 12 Zellen</span>
+      <span class="rechts">
+        <button class="mbtn an" data-m="score">Score</button>
+        <button class="mbtn" data-m="v_min">Min-Spannung</button>
+        <button class="mbtn" data-m="r_innen">Innenwiderstand</button>
+        <button class="mbtn" data-m="temp">Temperatur</button>
+      </span>
+    </h2>
+    <div class="zhead" id="zhead"></div>
+    <div id="zellgrid" class="zellgrid"></div>
+    <div class="legend"><span id="leg_lo">gut</span><span class="bar"></span><span id="leg_hi">kritisch</span></div>
+    <div class="hinweis">Worst-Case je Zelle über alle geladenen Logs. Zeile = Stack, Spalte = Zelle im Stack. Klick öffnet den Zell-Detail.</div>
+  </div>
+
+  <div class="panel" id="p_stacks" style="display:none">
+    <h2><span class="titel">Stack-Übersicht</span><span id="stacks_info" class="rechts"></span></h2>
+    <div id="stacks"></div>
+  </div>
+
+  <div class="panel" id="p_detail" style="display:none">
+    <h2><span class="titel">Zell-Detail</span><span id="detail_titel" class="rechts"></span></h2>
+    <div id="detail_kpis" class="kpis"></div>
+    <div id="detail" class="hinweis">Zelle im Grid oder im Ranking wählen.</div>
+  </div>
+
+  <div class="panel voll" id="p_trend" style="display:none">
+    <h2><span class="titel">Trend über die Logs</span>
+      <span class="rechts">
+        <button class="tbtn an" data-m="v_min">Min-Spannung</button>
+        <button class="tbtn" data-m="spread_max">Zell-Spread</button>
+        <button class="tbtn" data-m="r_innen_max">Innenwiderstand</button>
+        <button class="tbtn" data-m="temp_max">Max-Temperatur</button>
+      </span>
+    </h2>
+    <div id="trend" style="height:260px"></div>
+    <div class="hinweis">Ein Punkt je Log, nach Aufnahmezeit sortiert — steigender Widerstand oder wachsender Spread = Alterung.</div>
+  </div>
+
+  <div class="panel voll" id="p_rank" style="display:none">
+    <h2><span class="titel">Kritische Zellen (Ranking)</span><span id="rank_info" class="rechts"></span></h2>
+    <ul id="rank" class="rank"></ul>
+  </div>
+</div>
+
+<div id="overlay">
+  <div class="lade">
+    <h3>Logs werden geladen &amp; ausgewertet</h3>
+    <div class="track"><div id="lade_fill" class="fill"></div></div>
+    <div class="zeile"><span id="lade_txt" class="txt">…</span><span id="lade_pct">0 %</span></div>
+  </div>
+</div>
+
+<script>
+"use strict";
+const T={text:"#e6e6e0",muted:"#8a8a8a",achse:"#bdbdb6",line:"#2c2c2c",rot:"#c7222a",ok:"#3fb950",warn:"#d9a441",accent:"#3987e5"};
+const asArray=(v)=>Array.isArray(v)?v:(v==null?[]:[v]);
+const fmt=(v,d)=>(v==null||isNaN(v))?"—":Number(v).toFixed(d);
+const lerp=(a,b,t)=>Math.round(a+(b-a)*t);
+let PL=null, GES=null, trendChart=null, gridMetrik="score", trendMetrik="v_min", selCell=null;
+
+const METRIK={
+  score:  {label:"Score",              abs:[0,1], invert:false, fmt:v=>fmt(v,2)},
+  v_min:  {label:"Min-Spannung [V]",   abs:null,  invert:true,  fmt:v=>fmt(v,2)},
+  r_innen:{label:"Innenwiderstand [mΩ]",abs:null, invert:false, fmt:v=>fmt(v*1000,1)},
+  temp:   {label:"Max-Temp [°C]",      abs:null,  invert:false, fmt:v=>fmt(v,0)}
+};
+
+function setup(hc){
+  hc.addEventListener("DataChanged",()=>render(hc.Data));
+  hc.addEventListener("fortschritt",(e)=>fortschritt(e&&e.Data?e.Data:e));
+  if(hc.Data) render(hc.Data);
+  window.sendToMatlab=(n,d)=>hc.sendEventToMATLAB(n,d);
+  document.getElementById("btn_ordner").onclick=()=>{ showOverlay(0,"Ordner wird gewählt …"); window.sendToMatlab("akku_ordner_waehlen",{}); };
+  document.querySelectorAll(".mbtn").forEach(b=>b.onclick=()=>{ gridMetrik=b.dataset.m; markBtn(".mbtn",b); renderGrid(); });
+  document.querySelectorAll(".tbtn").forEach(b=>b.onclick=()=>{ trendMetrik=b.dataset.m; markBtn(".tbtn",b); renderTrend(); });
+}
+window.setup=setup;
+function markBtn(sel,btn){ document.querySelectorAll(sel).forEach(x=>x.classList.remove("an")); btn.classList.add("an"); }
+
+/* ---------- Ladebalken ---------- */
+function showOverlay(p,t){ document.getElementById("overlay").classList.add("an"); setFill(p,t); }
+function hideOverlay(){ document.getElementById("overlay").classList.remove("an"); }
+function setFill(p,t){
+  const pc=Math.max(0,Math.min(100,+p||0));
+  document.getElementById("lade_fill").style.width=pc+"%";
+  document.getElementById("lade_pct").textContent=Math.round(pc)+" %";
+  if(t!=null) document.getElementById("lade_txt").textContent=t;
+}
+function fortschritt(d){
+  d=d||{};
+  if(d.abbruch){ hideOverlay(); return; }
+  showOverlay(d.prozent, d.text);
+  if((+d.prozent||0)>=100) setTimeout(hideOverlay,400);
+}
+
+/* ---------- Render ---------- */
+function render(pl){
+  if(!pl||!pl.panels) return;
+  PL=pl;
+  if(pl.panels.status!=="fertig" || !pl.panels.gesundheit){
+    GES=null; togglePanels(false); document.getElementById("stand").textContent="—";
+    hideOverlay(); return;
+  }
+  GES=pl.panels.gesundheit;
+  hideOverlay(); togglePanels(true);
+  const hin=GES.hinweis;
+  if(hin){ document.getElementById("starthinweis").innerHTML=hin; document.getElementById("starthinweis").parentNode.style.display=""; togglePanels(false); }
+  document.getElementById("stand").textContent =
+    `${GES.n_logs}/${GES.n_dateien} Logs · ${GES.n_kritisch} kritische Zellen · Stand ${GES.stand}`;
+  // Standardauswahl: schlechteste Zelle
+  const worst=asArray(GES.worst);
+  if(selCell==null && worst.length) selCell=worst[0].index;
+  renderGrid(); renderStacks(); renderTrend(); renderRank(); renderDetail();
+}
+function togglePanels(an){
+  ["p_grid","p_stacks","p_detail","p_trend","p_rank"].forEach(id=>document.getElementById(id).style.display=an?"":"none");
+  document.getElementById("starthinweis").parentNode.style.display=an?"none":"";
+}
+
+/* 12x12 Grid */
+function gridMatrix(){ const g=GES.grid||{}; return asArray(g[gridMetrik]).map(r=>asArray(r)); }
+function farbwerte(M){
+  const cfg=METRIK[gridMetrik]; let lo=Infinity,hi=-Infinity;
+  if(cfg.abs){ lo=cfg.abs[0]; hi=cfg.abs[1]; }
+  else{ M.forEach(r=>r.forEach(v=>{ if(v!=null&&isFinite(v)){ if(v<lo)lo=v; if(v>hi)hi=v; }})); }
+  return {lo,hi};
+}
+function ramp(t){ t=Math.max(0,Math.min(1,t));
+  if(t<0.5){const k=t/0.5;return `rgb(${lerp(63,217,k)},${lerp(185,164,k)},${lerp(80,65,k)})`;}
+  const k=(t-0.5)/0.5;return `rgb(${lerp(217,199,k)},${lerp(164,34,k)},${lerp(65,42,k)})`; }
+function renderGrid(){
+  if(!GES) return;
+  const M=gridMatrix(), cfg=METRIK[gridMetrik]; const {lo,hi}=farbwerte(M);
+  const nProz=GES.n_zellen_pro_stack||12;
+  const head=document.getElementById("zhead"); head.innerHTML="";
+  for(let c=0;c<nProz;c++){ const h=document.createElement("div"); h.className="h"; h.textContent=(c+1); head.appendChild(h); }
+  const host=document.getElementById("zellgrid"); host.innerHTML="";
+  M.forEach((row,ri)=>{
+    const rd=document.createElement("div"); rd.className="zrow";
+    const lab=document.createElement("div"); lab.className="slab"; lab.textContent="S"+(ri+1); rd.appendChild(lab);
+    row.forEach((val,ci)=>{
+      const idx=ri*nProz+ci+1;
+      const cell=document.createElement("div"); cell.className="zcell"+(idx===selCell?" sel":"");
+      if(val==null||!isFinite(val)){ cell.style.background="#0a0a0a"; cell.title=`S${ri+1} · Z${ci+1} (#${idx}) — keine Daten`; }
+      else{ let t=(hi>lo)?(val-lo)/(hi-lo):0; if(cfg.invert)t=1-t; cell.style.background=ramp(t);
+        cell.title=`S${ri+1} · Z${ci+1} (#${idx}) — ${cfg.label}: ${cfg.fmt(val)}`; }
+      cell.onclick=()=>{ selCell=idx; renderGrid(); renderRank(); renderDetail(); };
+      rd.appendChild(cell);
+    });
+    host.appendChild(rd);
+  });
+  document.getElementById("leg_lo").textContent = cfg.invert?`${cfg.fmt(hi)} (gut)`:`${cfg.fmt(lo)} (gut)`;
+  document.getElementById("leg_hi").textContent = cfg.invert?`${cfg.fmt(lo)} (kritisch)`:`${cfg.fmt(hi)} (kritisch)`;
+}
+
+/* Stack-Übersicht */
+function renderStacks(){
+  const host=document.getElementById("stacks"); host.innerHTML="";
+  const st=asArray(GES.stacks);
+  document.getElementById("stacks_info").textContent=`${st.filter(s=>s.kritisch).length} kritisch · ${st.length} Stacks`;
+  if(!st.length){ host.innerHTML=`<div class="leer">keine Stack-Daten</div>`; return; }
+  st.forEach(s=>{
+    const row=document.createElement("div"); row.className="stbar"+(s.kritisch?" krit":"");
+    const w=Math.round((s.score||0)*100);
+    row.innerHTML=`<span class="n">S${s.stack}</span>`+
+      `<span class="track"><span class="fill" style="width:${w}%;background:${ramp(s.score||0)}"></span></span>`+
+      `<span class="v">${fmt(s.v_min,2)} V</span>`;
+    row.title=`Stack ${s.stack}: Score ${fmt(s.score,2)} · Imbalance ${fmt(s.imbalance,3)} V · Temp ${fmt(s.temp_max,0)} °C · worst Z${s.worst_zelle}`;
+    row.onclick=()=>{ selCell=s.worst_zelle; renderGrid(); renderRank(); renderDetail(); };
+    host.appendChild(row);
+  });
+}
+
+/* Trend */
+function renderTrend(){
+  const el=document.getElementById("trend");
+  if(typeof echarts==="undefined"){ el.innerHTML=`<div class="leer">ECharts fehlt in ./lib</div>`; return; }
+  const tr=GES&&GES.trend; if(!tr||!tr.zeit){ el.innerHTML=`<div class="leer">kein Trend</div>`; return; }
+  el.innerHTML="";
+  const labels={v_min:"Min-Spannung [V]",spread_max:"Zell-Spread [V]",r_innen_max:"Innenwiderstand [mΩ]",temp_max:"Max-Temp [°C]"};
+  const zeit=asArray(tr.zeit);
+  let y=asArray(tr[trendMetrik]).map(v=>v==null?null:v);
+  if(trendMetrik==="r_innen_max") y=y.map(v=>v==null?null:v*1000);
+  if(trendChart) trendChart.dispose();
+  trendChart=echarts.init(el,null,{renderer:"canvas"});
+  trendChart.setOption({
+    backgroundColor:"transparent",grid:{left:56,right:16,top:16,bottom:52},
+    tooltip:{trigger:"axis",backgroundColor:"#1e1e1e",borderColor:T.line,textStyle:{color:T.text}},
+    xAxis:{type:"category",data:zeit,axisLine:{lineStyle:{color:T.achse}},axisLabel:{color:T.achse,rotate:zeit.length>8?40:0,fontSize:10},splitLine:{show:false}},
+    yAxis:{name:labels[trendMetrik],nameTextStyle:{color:T.achse},scale:true,type:"value",axisLine:{lineStyle:{color:T.achse}},axisLabel:{color:T.achse},splitLine:{lineStyle:{color:T.line}}},
+    series:[{type:"line",data:y,showSymbol:true,symbolSize:6,lineStyle:{color:T.rot,width:1.8},itemStyle:{color:T.rot},connectNulls:true}]
+  });
+}
+
+/* Ranking */
+function renderRank(){
+  const el=document.getElementById("rank"); const w=asArray(GES.worst);
+  document.getElementById("rank_info").textContent=`Top ${w.length}`;
+  if(!w.length){ el.innerHTML=`<li class="leer">keine Zelldaten</li>`; return; }
+  el.innerHTML="";
+  w.forEach(k=>{
+    const li=document.createElement("li"); if(k.index===selCell) li.className="sel";
+    li.innerHTML=`<span class="zn ${k.kritisch?'bad':''}">S${k.stack}·Z${k.pos}</span>`+
+      `<span class="bar"><span class="${k.kritisch?'bad':''}" style="width:${Math.round((k.score||0)*100)}%"></span></span>`+
+      `<span class="zn">${fmt(k.v_min,2)} V</span>`;
+    li.onclick=()=>{ selCell=k.index; renderGrid(); renderRank(); renderDetail(); };
+    el.appendChild(li);
+  });
+}
+
+/* Zell-Detail */
+function renderDetail(){
+  const zellen=asArray(GES.zellen);
+  const z=zellen.find(c=>c.index===selCell);
+  document.getElementById("detail_titel").textContent = z?`Stack ${z.stack} · Zelle ${z.pos} (#${z.index})`:"";
+  const kp=document.getElementById("detail_kpis"), d=document.getElementById("detail");
+  if(!z){ kp.innerHTML=""; d.textContent="Zelle im Grid oder im Ranking wählen."; return; }
+  kp.innerHTML=
+    `<span class="kpi"><b class="${z.kritisch?'bad':''}">${fmt(z.score,2)}</b>Score</span>`+
+    `<span class="kpi"><b>${fmt(z.v_min,3)}</b>V_min</span>`+
+    `<span class="kpi"><b>${fmt(z.r_innen*1000,1)}</b>R_i [mΩ]</span>`+
+    `<span class="kpi"><b>${fmt(z.temp_max,0)}</b>T_max [°C]</span>`+
+    `<span class="kpi"><b>${fmt(z.abweichung,3)}</b>Abw. [V]</span>`;
+  d.innerHTML = z.kritisch
+    ? `<span style="color:var(--rot)">Als kritisch eingestuft</span> — Worst-Case über alle geladenen Logs.`
+    : `Unauffällig — Worst-Case über alle geladenen Logs.`;
+}
+
+/* Resize */
+let rt;
+function resizeAll(){ if(trendChart) trendChart.resize(); }
+function planeResize(){ clearTimeout(rt); rt=setTimeout(resizeAll,150); }
+window.addEventListener("resize", planeResize);
+if(window.ResizeObserver) new ResizeObserver(planeResize).observe(document.body);
+</script>
+</body>
+</html>

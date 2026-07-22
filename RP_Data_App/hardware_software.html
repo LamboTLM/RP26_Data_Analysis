@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hardware/Software</title>
+<link rel="stylesheet" href="./lib/uPlot.min.css">
+<style>
+  :root{
+    --bg:#121212; --panel:#1e1e1e; --panel2:#171717; --line:#2c2c2c;
+    --text:#e6e6e0; --muted:#8a8a8a; --rot:#c7222a; --ok:#3fb950; --warn:#d9a441; --accent:#3987e5;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,"Segoe UI",Roboto,sans-serif;font-size:13px;}
+  .kopf{display:flex;align-items:center;gap:12px;padding:8px 12px;border-bottom:.5px solid var(--line);}
+  .kopf h1{font-size:14px;margin:0;font-weight:600;border-left:3px solid var(--rot);padding-left:8px;}
+  .kopf .x-info{color:var(--muted);font-size:12px;margin-left:auto;}
+  .wrap{padding:10px;display:flex;flex-direction:column;gap:10px;}
+  .panel{background:var(--panel);border:.5px solid var(--line);border-radius:10px;padding:10px 12px;}
+  .panel h2{font-size:13px;margin:0 0 8px;display:flex;align-items:center;gap:8px;}
+  .panel h2 .titel{border-left:3px solid var(--rot);padding-left:8px;}
+  .panel h2 .zaehler{margin-left:auto;color:var(--muted);font-size:11px;font-weight:400;}
+  .stack{display:flex;flex-direction:column;gap:4px;}
+  .leer{color:var(--muted);font-size:12px;padding:14px 4px;text-align:center;}
+  input[type=text]{background:var(--panel2);color:var(--text);border:.5px solid var(--line);
+    border-radius:6px;padding:6px 9px;font-size:12px;width:100%;}
+  input[type=text]:focus{outline:none;border-color:var(--rot);}
+  .explorer{display:grid;grid-template-columns:300px 1fr;gap:12px;align-items:start;}
+  .liste{max-height:360px;overflow:auto;border:.5px solid var(--line);border-radius:8px;padding:6px 8px;}
+  .grp{font-size:11px;color:var(--rot);text-transform:uppercase;letter-spacing:.04em;margin:8px 0 3px;}
+  .item{display:flex;align-items:center;gap:7px;padding:2px 0;font-size:12px;}
+  .item input{accent-color:var(--rot);}
+  .item .nm{font-family:ui-monospace,monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .item .tg{width:7px;height:7px;border-radius:50%;flex:0 0 auto;background:#3a3a3a;}
+  .item .tg.on{background:var(--ok);}
+  .spur{margin-bottom:2px;}
+  .spur .lab{font-family:ui-monospace,monospace;font-size:11px;color:var(--muted);}
+  .feed{list-style:none;margin:0;padding:0;max-height:340px;overflow:auto;}
+  .feed li{display:grid;grid-template-columns:14px 1fr auto auto auto;gap:10px;align-items:center;
+    padding:4px 2px;border-bottom:.5px solid var(--line);font-size:12px;}
+  .feed .dot{width:8px;height:8px;border-radius:50%;}
+  .dot.fehler{background:var(--rot);} .dot.warnung{background:var(--warn);}
+  .feed .nm{font-family:ui-monospace,monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .feed .z{color:var(--muted);font-variant-numeric:tabular-nums;}
+  .kopfzeile{display:grid;grid-template-columns:14px 1fr auto auto auto;gap:10px;color:var(--muted);
+    font-size:11px;padding:2px 2px 6px;border-bottom:.5px solid var(--line);}
+  .banner{background:#3a1f22;border:.5px solid var(--rot);border-radius:8px;padding:8px 10px;margin-bottom:8px;color:#f0c0c4;font-size:12px;}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
+  .chip{font-family:ui-monospace,monospace;font-size:11px;background:var(--panel2);border-radius:6px;padding:3px 8px;color:var(--muted);}
+  .hinweis{color:var(--muted);font-size:11px;margin-top:6px;}
+  .u-legend{display:none;}
+  .toolbar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:6px;}
+  .toolbar .tlabel{font-size:11px;color:var(--muted);margin-right:2px;}
+  .chk{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px;}
+  button{background:var(--rot);color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer;}
+  button.sek,button.preset{background:var(--panel2);color:var(--text);border:.5px solid var(--line);}
+  button.preset:hover{border-color:var(--rot);}
+  select{background:var(--panel2);color:var(--text);border:.5px solid var(--line);border-radius:6px;padding:5px 8px;font-size:12px;}
+  input[type=text].sm{width:120px;}
+  .grphead{display:flex;align-items:center;gap:6px;margin:8px 0 3px;}
+  .grphead input{accent-color:var(--rot);}
+  .grphead .grp{margin:0;}
+  @media (max-width:900px){ .explorer{grid-template-columns:1fr;} }
+</style>
+<script src="./lib/uPlot.iife.min.js"></script>
+</head>
+<body>
+
+<div class="kopf">
+  <h1>Hardware/Software</h1>
+  <span id="x_info" class="x-info">—</span>
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2><span class="titel">Fahrt-Kontext</span></h2>
+    <div id="kontext" class="stack"></div>
+  </div>
+
+  <div class="panel">
+    <h2><span class="titel">Signal-Explorer</span><span id="expl_zaehler" class="zaehler"></span></h2>
+
+    <div class="toolbar">
+      <button class="sek" id="btn_clear">Alle abwählen</button>
+      <button class="sek" id="btn_toggled">Nur getoggelte wählen</button>
+      <button class="sek" id="btn_visible">Sichtbare wählen</button>
+      <label class="chk"><input type="checkbox" id="nur_toggled"> nur getoggelte zeigen</label>
+    </div>
+
+    <div class="toolbar" id="preset_bar"><span class="tlabel">Presets:</span></div>
+
+    <div class="toolbar">
+      <span class="tlabel">Config:</span>
+      <select id="cfg_sel"><option value="">— wählen —</option></select>
+      <button class="sek" id="btn_cfg_load">Laden</button>
+      <input type="text" id="cfg_name" class="sm" placeholder="Name">
+      <button id="btn_cfg_save">Speichern</button>
+      <button class="sek" id="btn_cfg_del">Löschen</button>
+    </div>
+
+    <input type="text" id="suche" placeholder="Signal suchen…" style="margin:2px 0 8px">
+    <div class="explorer">
+      <div id="liste" class="liste"></div>
+      <div id="spuren" class="stack"></div>
+    </div>
+    <div class="hinweis">Ausgewählte Flags als Stufenkurve, alle auf gemeinsamem Cursor mit dem Fahrt-Kontext.</div>
+  </div>
+
+  <div class="panel">
+    <h2><span class="titel">Fehler-Zeitlog</span><span id="feed_zaehler" class="zaehler"></span></h2>
+    <input type="text" id="feed_filter" placeholder="Einträge filtern (Name)…" style="margin-bottom:8px">
+    <div class="kopfzeile"><span></span><span>Signal</span><span>t [s]</span><span>Uhrzeit</span><span>Distanz</span></div>
+    <ul id="feed" class="feed"></ul>
+  </div>
+
+  <div class="panel">
+    <h2><span class="titel">Shutdown Circuit</span></h2>
+    <div id="sdc"></div>
+  </div>
+
+  <div class="panel">
+    <h2><span class="titel">Rails — eFuse-Ströme</span></h2>
+    <div id="rails"></div>
+    <div id="trips" class="chips"></div>
+  </div>
+</div>
+
+<script>
+"use strict";
+const T={ text:"#e6e6e0", muted:"#8a8a8a", line:"#2c2c2c", rot:"#c7222a", accent:"#3987e5",
+  gas:"#1baf7a", brems:"#c7222a", lenk:"#a371f7", speed:"#3987e5" };
+const PALETTE=["#3987e5","#1baf7a","#d9a441","#a371f7","#e08e45","#4bc0c0","#c76bd6","#7a9e3a"];
+const SYNC="hws";
+const asArray=(v)=>Array.isArray(v)?v:(v==null?[]:[v]);
+
+let PL=null, erstesMal=true, auswahl=new Set(), nurToggled=false;
+let upKontext=[], upSpuren=[], upRails=[];
+
+function setup(hc){
+  hc.addEventListener("DataChanged",()=>render(hc.Data));
+  if(hc.Data) render(hc.Data);
+  window.sendToMatlab=(n,d)=>hc.sendEventToMATLAB(n,d);
+  document.getElementById("suche").oninput=renderListe;
+  document.getElementById("feed_filter").oninput=renderFeed;
+  document.getElementById("btn_clear").onclick=()=>{ auswahl.clear(); nachAuswahl(); };
+  document.getElementById("btn_toggled").onclick=()=>{ auswahl=new Set(asArray(PL.panels.bools).filter(b=>b.toggled).map(b=>b.name)); nachAuswahl(); };
+  document.getElementById("btn_visible").onclick=()=>{ sichtbare().forEach(n=>auswahl.add(n)); nachAuswahl(); };
+  document.getElementById("nur_toggled").onchange=(e)=>{ nurToggled=e.target.checked; renderListe(); };
+  document.getElementById("btn_cfg_load").onclick=cfgLaden;
+  document.getElementById("btn_cfg_save").onclick=cfgSpeichern;
+  document.getElementById("btn_cfg_del").onclick=cfgLoeschen;
+}
+window.setup=setup;
+
+const getSig=(pl,n)=>asArray(pl.signals).find(s=>s.name===n);
+const istOk=(s)=>s&&s.status==="gueltig"&&s.y&&s.y.length;
+
+function render(pl){
+  if(!pl||!pl.x) return;
+  PL=pl;
+  document.getElementById("x_info").textContent="x-Achse: "+(pl.meta.x_modus==="distanz"?"Distanz [m]":"Zeit [s]");
+  if(erstesMal){ asArray(pl.panels.vorauswahl).forEach(n=>auswahl.add(n)); erstesMal=false; }
+  renderKontext(pl);
+  renderPresets();
+  renderConfigs();
+  renderListe();
+  renderSpuren();
+  renderFeed();
+  renderSDC(pl);
+  renderRails(pl);
+}
+
+/* Fahrt-Kontext */
+function renderKontext(pl){
+  upKontext.forEach(u=>u.destroy()); upKontext=[];
+  const host=document.getElementById("kontext"); host.innerHTML="";
+  const xlab=pl.meta.x_einheit==="m"?"Distanz [m]":"Zeit [s]";
+  const bloecke=[
+    {t:"Geschwindigkeit",s:[["speed_can","v",T.speed]]},
+    {t:"Gas [%]",s:[["apps1_can","Gas",T.gas]]},
+    {t:"Bremsdruck [bar]",s:[["pbrake_front_can","vorn",T.brems],["pbrake_rear_can","hinten",T.accent]]},
+    {t:"Lenkwinkel [°]",s:[["steering_wheel_angle_can","δ",T.lenk]]},
+  ];
+  bloecke.forEach((b,idx)=>{
+    const vorhanden=b.s.filter(s=>istOk(getSig(pl,s[0])));
+    const div=document.createElement("div"); host.appendChild(div);
+    if(!vorhanden.length){ div.innerHTML=`<div class="leer">${b.t}: —</div>`; return; }
+    const data=[pl.x,...vorhanden.map(s=>getSig(pl,s[0]).y)];
+    const series=[{}].concat(vorhanden.map(s=>({label:s[1],stroke:s[2],width:1.3,points:{show:false}})));
+    upKontext.push(new uPlot(uplotOpts(b.t,host.clientWidth||800,88,series,xlab,idx===bloecke.length-1),data,div));
+  });
+}
+
+/* Explorer-Liste */
+function renderListe(){
+  const box=document.getElementById("liste"); box.innerHTML="";
+  const bools=asArray(PL.panels.bools);
+  const q=(document.getElementById("suche").value||"").toLowerCase();
+  const gefiltert=bools.filter(b=>(!q||b.name.toLowerCase().includes(q)) && (!nurToggled||b.toggled));
+  aktualisiereZaehler();
+
+  const gruppen={};
+  gefiltert.forEach(b=>{ (gruppen[b.subsystem]=gruppen[b.subsystem]||[]).push(b); });
+  Object.keys(gruppen).sort().forEach(g=>{
+    const namenG=gruppen[g].map(b=>b.name);
+    const alleAn=namenG.every(n=>auswahl.has(n));
+    const head=document.createElement("div"); head.className="grphead";
+    const gcb=document.createElement("input"); gcb.type="checkbox"; gcb.checked=alleAn; gcb.title="ganze Gruppe";
+    gcb.onchange=()=>{ namenG.forEach(n=> gcb.checked?auswahl.add(n):auswahl.delete(n)); nachAuswahl(); };
+    const glab=document.createElement("span"); glab.className="grp"; glab.textContent=g;
+    head.append(gcb,glab); box.appendChild(head);
+    gruppen[g].forEach(b=>{
+      const row=document.createElement("label"); row.className="item";
+      const cb=document.createElement("input"); cb.type="checkbox"; cb.checked=auswahl.has(b.name);
+      cb.onchange=()=>{ cb.checked?auswahl.add(b.name):auswahl.delete(b.name); renderSpuren(); aktualisiereZaehler(); };
+      const tg=document.createElement("span"); tg.className="tg"+(b.toggled?" on":"");
+      const nm=document.createElement("span"); nm.className="nm"; nm.textContent=b.name; nm.title=b.name;
+      row.append(cb,tg,nm); box.appendChild(row);
+    });
+  });
+}
+
+/* Schnellauswahl / Presets / Configs */
+function nachAuswahl(){ renderListe(); renderSpuren(); }
+function sichtbare(){
+  const bools=asArray(PL.panels.bools);
+  const q=(document.getElementById("suche").value||"").toLowerCase();
+  return bools.filter(b=>(!q||b.name.toLowerCase().includes(q))&&(!nurToggled||b.toggled)).map(b=>b.name);
+}
+function renderPresets(){
+  const bar=document.getElementById("preset_bar");
+  bar.innerHTML=`<span class="tlabel">Presets:</span>`;
+  const ps=asArray(PL.panels.presets);
+  if(!ps.length){ const s=document.createElement("span"); s.className="tlabel"; s.textContent="—"; bar.appendChild(s); return; }
+  ps.forEach(p=>{
+    const b=document.createElement("button"); b.className="preset";
+    b.textContent=`${p.name} (${asArray(p.signale).length})`;
+    b.onclick=()=>{ asArray(p.signale).forEach(n=>auswahl.add(n)); nachAuswahl(); };
+    bar.appendChild(b);
+  });
+}
+function renderConfigs(){
+  const sel=document.getElementById("cfg_sel"); const cur=sel.value;
+  const cfgs=asArray(PL.panels.configs);
+  sel.innerHTML=`<option value="">— wählen —</option>`+cfgs.map((c,i)=>`<option value="${i}">${c.name}</option>`).join("");
+  if(cur&&+cur<cfgs.length) sel.value=cur;
+}
+function cfgLaden(){
+  const i=document.getElementById("cfg_sel").value; if(i==="") return;
+  const c=asArray(PL.panels.configs)[+i]; if(!c) return;
+  auswahl=new Set(asArray(c.signale)); nachAuswahl();
+}
+function cfgSpeichern(){
+  const name=(document.getElementById("cfg_name").value||"").trim();
+  if(!name){ document.getElementById("cfg_name").focus(); return; }
+  if(window.sendToMatlab) window.sendToMatlab("signalconfig_speichern",{name:name,signale:[...auswahl]});
+  document.getElementById("cfg_name").value="";
+}
+function cfgLoeschen(){
+  const i=document.getElementById("cfg_sel").value; if(i==="") return;
+  const c=asArray(PL.panels.configs)[+i]; if(!c) return;
+  if(window.sendToMatlab) window.sendToMatlab("signalconfig_loeschen",{name:c.name});
+}
+function aktualisiereZaehler(){
+  const bools=asArray(PL.panels.bools);
+  const anzToggled=bools.filter(b=>b.toggled).length;
+  document.getElementById("expl_zaehler").textContent=`${auswahl.size} gewählt · ${anzToggled} getoggelt · ${bools.length} gesamt`;
+}
+
+/* Ausgewählte Bools als Stufenkurven */
+function renderSpuren(){
+  upSpuren.forEach(u=>u.destroy()); upSpuren=[];
+  const host=document.getElementById("spuren"); host.innerHTML="";
+  const bools=asArray(PL.panels.bools);
+  const gewaehlt=[...auswahl].map(n=>bools.find(b=>b.name===n)).filter(Boolean);
+  if(!gewaehlt.length){ host.innerHTML=`<div class="leer">Signale links auswählen…</div>`; return; }
+  const xlab=PL.meta.x_einheit==="m"?"Distanz [m]":"Zeit [s]";
+  gewaehlt.forEach((b,idx)=>{
+    const div=document.createElement("div"); div.className="spur"; host.appendChild(div);
+    const y=boolAufX(PL.x,b);
+    const opts=uplotOpts(b.name,div.clientWidth||760,54,
+      [{},{label:b.name,stroke:PALETTE[idx%PALETTE.length],width:1.4,points:{show:false},
+        paths:uPlot.paths.stepped({align:1})}],xlab,idx===gewaehlt.length-1);
+    opts.scales.y={range:[-0.1,1.1]};
+    upSpuren.push(new uPlot(opts,[PL.x,y],div));
+  });
+}
+function boolAufX(x,b){
+  const tr=asArray(b.transitions);
+  const y=new Array(x.length); let ti=0, cur=b.start_wert;
+  for(let i=0;i<x.length;i++){
+    while(ti<tr.length && tr[ti].x<=x[i]){ cur=tr[ti].wert; ti++; }
+    y[i]=(cur==null?null:cur);
+  }
+  return y;
+}
+
+/* Fehler-Zeitlog */
+function renderFeed(){
+  const el=document.getElementById("feed");
+  const alle=asArray(PL.panels.fehler_feed&&PL.panels.fehler_feed.eintraege);
+  const q=(document.getElementById("feed_filter").value||"").toLowerCase();
+  const e=alle.filter(x=>!q||x.name.toLowerCase().includes(q));
+  document.getElementById("feed_zaehler").textContent=`${e.length} Einträge`;
+  if(!e.length){ el.innerHTML=`<li class="leer">keine Fehler/Warnungen</li>`; return; }
+  el.innerHTML=e.map(x=>
+    `<li><span class="dot ${x.schwere}"></span>`+
+    `<span class="nm" title="${x.name}">${x.name}</span>`+
+    `<span class="z">${fmtS(x.t_s)}</span>`+
+    `<span class="z">${x.uhrzeit||"—"}</span>`+
+    `<span class="z">${fmtM(x.distanz)}</span></li>`).join("");
+}
+
+/* SDC */
+function renderSDC(pl){
+  const el=document.getElementById("sdc"); const sdc=pl.panels.sdc||{};
+  if(!sdc.hat_signal){ el.innerHTML=`<div class="leer">kein SDC-Signal — Signal im Explorer auswählen und Verlauf prüfen</div>`; return; }
+  const off=asArray(sdc.oeffnungen), ung=off.filter(o=>o.ungeplant);
+  let html="";
+  if(ung.length) html+=`<div class="banner">${ung.length}× ungeplantes SDC-Öffnen während der Fahrt!</div>`;
+  if(!off.length){ html+=`<div class="leer">keine SDC-Öffnung im Log erkannt (öffnet der Fahrer erst nach Logende, fehlt die Flanke — im Explorer am Signalverlauf prüfen)</div>`; }
+  else{
+    html+=`<div class="kopfzeile"><span></span><span>Art</span><span>t [s]</span><span>Uhrzeit</span><span>Distanz</span></div><ul class="feed">`+
+      off.map(o=>`<li><span class="dot ${o.ungeplant?'fehler':'warnung'}"></span>`+
+        `<span class="nm">${o.ungeplant?'ungeplant':'regulär'}</span>`+
+        `<span class="z">${fmtS(o.t_s)}</span><span class="z">${o.uhrzeit||"—"}</span>`+
+        `<span class="z">${fmtM(o.distanz)}</span></li>`).join("")+`</ul>`;
+  }
+  el.innerHTML=html;
+}
+
+/* Rails */
+function renderRails(pl){
+  upRails.forEach(u=>u.destroy()); upRails=[];
+  const host=document.getElementById("rails"); host.innerHTML="";
+  const xlab=pl.meta.x_einheit==="m"?"Distanz [m]":"Zeit [s]";
+  const stroeme=asArray(pl.panels.rails&&pl.panels.rails.stroeme);
+  if(!stroeme.length){ host.innerHTML=`<div class="leer">keine eFuse-Ströme (IMON)</div>`; }
+  else{
+    const series=[{}].concat(stroeme.map((s,i)=>({label:kurz(s.name),stroke:PALETTE[i%PALETTE.length],width:1,points:{show:false}})));
+    const opts=uplotOpts("Strom [A]",host.clientWidth||800,230,series,xlab,true); opts.legend.show=true;
+    upRails.push(new uPlot(opts,[pl.x].concat(stroeme.map(s=>s.y)),host));
+  }
+  const trips=asArray(pl.panels.rails&&pl.panels.rails.trips);
+  const tb=document.getElementById("trips"); tb.innerHTML="";
+  trips.forEach(t=>{ const c=document.createElement("span"); c.className="chip"; c.style.color="#f0c0c4";
+    c.textContent=`Trip: ${kurz(t.name)} @ ${fmtS(t.t_s)}`; tb.appendChild(c); });
+}
+
+/* Helfer */
+function uplotOpts(titel,breite,hoehe,series,xlab,zeigX){
+  const a={stroke:T.muted,grid:{stroke:T.line,width:.5},ticks:{stroke:T.line,width:.5},font:"11px -apple-system, sans-serif"};
+  return {title:titel||undefined,width:breite,height:hoehe,
+    cursor:{sync:{key:SYNC},points:{size:4}},scales:{x:{time:false}},legend:{show:false,live:true},series:series,
+    axes:[Object.assign({},a,{label:zeigX?xlab:undefined,size:zeigX?38:22}),Object.assign({},a,{size:46})]};
+}
+const fmtS=(v)=> (v==null||isNaN(v))?"—":Number(v).toFixed(2);
+const fmtM=(v)=> (v==null||isNaN(v))?"—":Math.round(v).toLocaleString("de-DE")+" m";
+const kurz=(n)=> n.replace(/_can$/,"").replace(/^PDU_eFuse_/,"");
+
+let rt;
+function resizeAll(){
+  [upKontext,upSpuren,upRails].forEach(arr=>arr.forEach(u=>{
+    const w=u.root.parentNode.clientWidth; if(w>0) u.setSize({width:w,height:u.height}); }));
+}
+function planeResize(){ clearTimeout(rt); rt=setTimeout(resizeAll,120); }
+window.addEventListener("resize", planeResize);
+if(window.ResizeObserver) new ResizeObserver(planeResize).observe(document.body);
+</script>
+</body>
+</html>

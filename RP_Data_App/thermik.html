@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Thermik &amp; Leistung</title>
+<link rel="stylesheet" href="./lib/uPlot.min.css">
+<style>
+  :root{
+    --bg:#121212; --panel:#1e1e1e; --panel2:#171717; --line:#2c2c2c;
+    --text:#e6e6e0; --muted:#8a8a8a; --achse:#bdbdb6; --rot:#c7222a; --ok:#3fb950; --warn:#d9a441; --accent:#3987e5; --mech:#1baf7a;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,"Segoe UI",Roboto,sans-serif;font-size:13px;}
+  .kopf{display:flex;align-items:center;gap:12px;padding:8px 12px;border-bottom:.5px solid var(--line);flex-wrap:wrap;}
+  .kopf h1{font-size:14px;margin:0;font-weight:600;border-left:3px solid var(--rot);padding-left:8px;}
+  .kpi{display:flex;gap:16px;margin-left:auto;flex-wrap:wrap;}
+  .kpi .k{font-size:11px;color:var(--muted);white-space:nowrap;} .kpi .k b{color:var(--text);font-size:15px;margin-right:3px;} .kpi .k.rot b{color:var(--rot);}
+  .marker{display:flex;align-items:center;gap:8px;padding:7px 12px;border-bottom:.5px solid var(--line);background:var(--panel2);flex-wrap:wrap;}
+  .marker .lab{color:var(--muted);font-size:11px;}
+  .tgl{display:inline-flex;align-items:center;gap:6px;background:#202020;color:var(--muted);border:.5px solid var(--line);border-radius:14px;padding:5px 11px;font-size:11px;cursor:pointer;user-select:none;}
+  .tgl .sw{width:9px;height:9px;border-radius:2px;} .tgl.warn .sw{background:var(--warn);} .tgl.krit .sw{background:var(--rot);}
+  .tgl.an{color:var(--text);border-color:#5a5a5a;background:#2a2a2a;} .tgl.leer{opacity:.4;cursor:not-allowed;}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px;align-items:start;}
+  .panel{background:var(--panel);border:.5px solid var(--line);border-radius:10px;padding:10px 12px;min-width:0;}
+  .panel.voll{grid-column:1 / -1;}
+  .panel h2{font-size:13px;margin:0 0 8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .panel h2 .titel{border-left:3px solid var(--rot);padding-left:8px;}
+  .panel h2 .rechts{margin-left:auto;font-weight:400;font-size:11px;color:var(--muted);}
+  .leer{color:var(--muted);font-size:12px;padding:18px 4px;text-align:center;}
+  .hinweis{color:var(--muted);font-size:11px;margin-top:6px;}
+  .stack{display:flex;flex-direction:column;gap:6px;}
+  .gbar{display:grid;grid-template-columns:120px 1fr 92px;gap:8px;align-items:center;margin:3px 0;font-size:12px;}
+  .gbar .n{color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .gbar.krit .n{color:var(--rot);font-weight:600;}
+  .gbar .track{background:#151515;border:.5px solid var(--line);border-radius:5px;height:12px;overflow:hidden;}
+  .gbar .fill{height:100%;border-radius:5px;} .gbar .v{color:var(--muted);text-align:right;}
+  .rank{list-style:none;margin:0;padding:0;max-height:300px;overflow:auto;}
+  .rank li{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:3px 4px;border-radius:6px;cursor:pointer;font-size:12px;}
+  .rank li:hover{background:var(--panel2);} .rank li.sel{background:#2a2020;}
+  .rank .lab{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;} .rank .lab.bad{color:var(--rot);}
+  .energie{display:flex;gap:16px;flex-wrap:wrap;margin-top:6px;font-size:11px;color:var(--muted);}
+  .energie b{color:var(--text);font-size:13px;margin-right:3px;}
+  .flags{display:flex;flex-wrap:wrap;gap:6px;}
+  .flag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-family:ui-monospace,monospace;background:var(--panel2);border:.5px solid var(--line);border-radius:6px;padding:3px 8px;color:var(--muted);}
+  .flag .d{width:8px;height:8px;border-radius:50%;background:var(--ok);} .flag.an{color:#f0c0c4;border-color:var(--rot);} .flag.an .d{background:var(--rot);}
+  #hm_canvas{width:100%;display:block;border-radius:6px;cursor:pointer;}
+  .legend{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:11px;color:var(--muted);}
+  .legend .bar{height:10px;flex:1;border-radius:5px;background:linear-gradient(90deg,#3987e5,#3fb950,#d9a441,#c7222a);}
+  .u-legend{display:none;}
+  @media (max-width:900px){ .grid{grid-template-columns:1fr;} }
+</style>
+<script src="./lib/uPlot.iife.min.js"></script>
+</head>
+<body>
+
+<div class="kopf">
+  <h1>Thermik &amp; Leistung</h1>
+  <div id="kpi" class="kpi"></div>
+</div>
+
+<div class="marker" id="marker">
+  <span class="lab">Markieren:</span>
+  <button class="tgl warn" id="tgl_warn" data-key="uebertemp_warn"><span class="sw"></span>Übertemp (Warn)</button>
+  <button class="tgl krit" id="tgl_krit" data-key="uebertemp_krit"><span class="sw"></span>Übertemp (Kritisch)</button>
+  <span id="marker_info" class="lab" style="margin-left:auto"></span>
+</div>
+
+<div class="grid" id="inhalt">
+  <div class="panel voll" id="p_leer" style="display:none"><div class="leer" id="leer_txt"></div></div>
+
+  <div class="panel voll">
+    <h2><span class="titel">Temperatur-Heatmap (Anteil vom Grenzwert)</span><span class="rechts">Kanal × Zeit</span></h2>
+    <canvas id="hm_canvas"></canvas>
+    <div class="legend"><span>0 (kühl)</span><span class="bar"></span><span>Grenzwert</span></div>
+    <div class="hinweis">Jeder Kanal auf seinen eigenen Grenzwert normiert – rot heißt „nah am Limit dieser Komponente", unabhängig vom Absolutwert. Klick öffnet den Kanal-Detail.</div>
+  </div>
+
+  <div class="panel">
+    <h2><span class="titel">Gruppen</span><span id="grp_info" class="rechts"></span></h2>
+    <div id="gruppen"></div>
+  </div>
+  <div class="panel">
+    <h2><span class="titel">Heißeste Kanäle</span><span id="rank_info" class="rechts"></span></h2>
+    <ul id="rank" class="rank"></ul>
+  </div>
+
+  <div class="panel voll">
+    <h2><span class="titel">Kanal-Detail</span><span id="detail_titel" class="rechts"></span></h2>
+    <div id="detail"></div>
+  </div>
+
+  <div class="panel voll" id="p_flags" style="display:none">
+    <h2><span class="titel">Derating &amp; thermische Warnungen</span><span id="flags_info" class="rechts"></span></h2>
+    <div id="flags" class="flags"></div>
+  </div>
+
+  <div class="panel voll">
+    <h2><span class="titel">Leistung &amp; Verluste</span><span id="omega_info" class="rechts"></span></h2>
+    <div id="leistung"></div>
+    <div id="energie" class="energie"></div>
+    <div class="hinweis">Elektrisch = U·I (zuverlässig). Mechanisch = ΣMoment·ω mit ω aus Geschwindigkeit × Getriebe/Reifenradius – bei Bedarf die Parameter kalibrieren.</div>
+  </div>
+</div>
+
+<script>
+"use strict";
+const T={text:"#e6e6e0",muted:"#8a8a8a",achse:"#bdbdb6",line:"#2c2c2c",rot:"#c7222a",ok:"#3fb950",warn:"#d9a441",accent:"#3987e5",mech:"#1baf7a"};
+const asArray=(v)=>Array.isArray(v)?v:(v==null?[]:[v]);
+const fmt=(v,d)=>(v==null||isNaN(v))?"—":Number(v).toFixed(d);
+const lerp=(a,b,t)=>Math.round(a+(b-a)*t);
+let PL=null, up=[], selChan=null;
+
+const AKTIV={uebertemp_warn:false,uebertemp_krit:false};
+let BEREICHE={uebertemp_warn:[],uebertemp_krit:[]};
+const BAND={uebertemp_warn:"rgba(217,164,65,0.16)",uebertemp_krit:"rgba(199,34,42,0.18)"};
+
+function setup(hc){
+  hc.addEventListener("DataChanged",()=>render(hc.Data));
+  if(hc.Data) render(hc.Data);
+  window.sendToMatlab=(n,d)=>hc.sendEventToMATLAB(n,d);
+  document.querySelectorAll(".tgl").forEach(b=>b.onclick=()=>toggle(b));
+  document.getElementById("hm_canvas").onclick=hmClick;
+}
+window.setup=setup;
+
+function ramp(t){ t=Math.max(0,Math.min(1,t));
+  const stops=[[57,135,229],[63,185,80],[217,164,65],[199,34,42]];
+  const seg=1/(stops.length-1); let i=Math.min(stops.length-2,Math.floor(t/seg)); const k=(t-i*seg)/seg;
+  const a=stops[i], b=stops[i+1]; return `rgb(${lerp(a[0],b[0],k)},${lerp(a[1],b[1],k)},${lerp(a[2],b[2],k)})`; }
+
+function toggle(btn){ if(btn.classList.contains("leer")) return;
+  const key=btn.dataset.key; AKTIV[key]=!AKTIV[key]; btn.classList.toggle("an",AKTIV[key]); up.forEach(u=>u.redraw()); }
+function bandHook(u){ const ctx=u.ctx;
+  for(const key of Object.keys(AKTIV)){ if(!AKTIV[key]) continue; ctx.save(); ctx.fillStyle=BAND[key];
+    for(const r of asArray(BEREICHE[key])){ const p0=u.valToPos(r[0],"x",true), p1=u.valToPos(r[1],"x",true);
+      ctx.fillRect(p0,u.bbox.top,Math.max(1,p1-p0),u.bbox.height); } ctx.restore(); } }
+function levelLine(scaleKey,val,color){ return (u)=>{ const y=u.valToPos(val,scaleKey,true); if(!isFinite(y)) return;
+  const ctx=u.ctx; ctx.save(); ctx.strokeStyle=color; ctx.lineWidth=1; ctx.setLineDash([4,4]);
+  ctx.beginPath(); ctx.moveTo(u.bbox.left,y); ctx.lineTo(u.bbox.left+u.bbox.width,y); ctx.stroke(); ctx.restore(); }; }
+function zeroLine(sc){ return levelLine(sc,0,"rgba(138,138,138,.6)"); }
+
+function fmtAchse(v){ if(v==null||!isFinite(v)) return ""; const a=Math.abs(v);
+  if(a>=1e3) return (v/1e3).toFixed(1)+"k"; if(a>=100) return v.toFixed(0);
+  if(a>=10) return v.toFixed(1); if(a>=1) return v.toFixed(2); if(a===0) return "0"; return v.toFixed(2); }
+function achse(zeigX,xlab){ const a={stroke:T.achse,grid:{stroke:T.line,width:.5},ticks:{stroke:T.line,width:.5},font:"11px -apple-system, sans-serif"};
+  return Object.assign({},a,{label:zeigX?xlab:undefined,size:zeigX?36:20}); }
+function yAchse(label){ const a={stroke:T.achse,grid:{stroke:T.line,width:.5},ticks:{stroke:T.line,width:.5},font:"11px -apple-system, sans-serif"};
+  return Object.assign({},a,{label:label,labelSize:20,size:54,values:(u,s)=>s.map(fmtAchse)}); }
+function optsSingle(titel,breite,hoehe,series,xlab,zeigX,ylab,extra){
+  return {title:titel||undefined,width:breite,height:hoehe,cursor:{sync:{key:"thermik"},points:{size:4}},
+    scales:{x:{time:false}},legend:{show:false},series,axes:[achse(zeigX,xlab),yAchse(ylab)],
+    hooks:{draw:[bandHook].concat(extra||[])}}; }
+const W=(el)=>el.clientWidth||760;
+function mk(opts,data,el){ const u=new uPlot(opts,data,el); up.push(u); return u; }
+function resetUp(){ up.forEach(u=>u.destroy()); up=[]; }
+
+/* ---------- Render ---------- */
+function render(pl){
+  if(!pl||!pl.x||!pl.panels) return;
+  PL=pl; resetUp();
+  const leer = pl.panels.status==="leer";
+  document.getElementById("p_leer").style.display=leer?"":"none";
+  document.querySelectorAll("#inhalt > .panel:not(#p_leer)").forEach(p=>{
+    const nurLeistung = p.querySelector("#leistung");
+    p.style.display = (leer && !nurLeistung) ? "none" : "";
+  });
+  if(leer){ document.getElementById("leer_txt").textContent = pl.panels.hinweis||"Keine Temperaturkanäle."; }
+
+  const e=pl.panels.ereignisse||{};
+  BEREICHE={uebertemp_warn:asArray(e.uebertemp_warn),uebertemp_krit:asArray(e.uebertemp_krit)};
+  setupToggles();
+  renderKpi(pl);
+  if(!leer){
+    drawHeatmap(pl); renderGruppen(pl); renderRank(pl);
+    if(selChan==null){ const r=asArray(pl.panels.ranking); if(r.length) selChan=r[0].index; }
+    renderDetail(pl);
+  }
+  renderFlags(pl);
+  renderLeistung(pl);
+}
+
+function renderFlags(pl){
+  const el=document.getElementById("flags"); const panel=document.getElementById("p_flags");
+  const F=asArray(pl.panels.flags);
+  if(!F.length){ panel.style.display="none"; return; } panel.style.display="";
+  const nAktiv=F.filter(f=>f.aktiv).length;
+  document.getElementById("flags_info").textContent = nAktiv?`${nAktiv} aktiv im Run`:"keine ausgelöst";
+  el.innerHTML="";
+  F.sort((a,b)=>(b.aktiv?1:0)-(a.aktiv?1:0)).forEach(f=>{
+    const s=document.createElement("span"); s.className="flag"+(f.aktiv?" an":"");
+    const wo = (f.aktiv&&f.x!=null&&isFinite(f.x)) ? ` @ ${Math.round(f.x)} ${PL.meta.x_einheit||""}` : "";
+    s.innerHTML=`<span class="d"></span>${f.label}${wo}`;
+    el.appendChild(s);
+  });
+}
+
+function setupToggles(){
+  const map={tgl_warn:"uebertemp_warn",tgl_krit:"uebertemp_krit"}; let hin=[];
+  for(const [id,key] of Object.entries(map)){ const b=document.getElementById(id); const n=asArray(BEREICHE[key]).length;
+    b.classList.toggle("leer",n===0); if(!AKTIV[key]) b.classList.remove("an"); b.title=n?`${n} Bereich(e)`:"keine";
+    if(n) hin.push(`${b.textContent.trim()}: ${n}`); }
+  document.getElementById("marker_info").textContent = hin.length?("erkannt — "+hin.join("  ·  ")):"keine Übertemperatur erkannt";
+}
+
+function renderKpi(pl){ const k=pl.panels.kpi||{}, el=document.getElementById("kpi");
+  el.innerHTML =
+    `<span class="k ${k.n_krit>0?'rot':''}"><b>${fmt(k.max_temp,0)}</b>°C ${k.hotspot_label||""}</span>`+
+    `<span class="k ${k.n_krit>0?'rot':''}"><b>${fmt(k.n_krit,0)}</b>krit. Kanäle</span>`+
+    `<span class="k"><b>${fmt(k.p_el_max,0)}</b>kW Peak</span>`+
+    `<span class="k"><b>${fmt(k.loss_mean,1)}</b>kW Verlust</span>`+
+    `<span class="k"><b>${fmt(k.wirkungsgrad,0)}</b>% η</span>`;
+}
+
+/* Heatmap (Anteil vom Grenzwert) mit Kanal-Labels */
+function drawHeatmap(pl){
+  const cv=document.getElementById("hm_canvas"); const h=pl.panels.heatmap;
+  if(!h||!h.matrix){ cv.style.display="none"; return; } cv.style.display="block";
+  const M=asArray(h.matrix).map(r=>asArray(r)); const labels=asArray(h.label); const grp=asArray(h.gruppe); const nS=M.length; const cols=M[0]?M[0].length:0;
+  if(!nS||!cols) return;
+  const dpr=window.devicePixelRatio||1, padL=96;
+  const cssW=cv.clientWidth||760, rowH=Math.max(12,Math.min(20,Math.floor(420/nS))), cssH=nS*rowH;
+  cv.style.height=cssH+"px"; cv.width=Math.round(cssW*dpr); cv.height=Math.round(cssH*dpr);
+  const ctx=cv.getContext("2d"); ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,cssW,cssH);
+  const cw=(cssW-padL)/cols;
+  ctx.textBaseline="middle"; ctx.font="10px -apple-system, sans-serif";
+  for(let r=0;r<nS;r++){ const row=M[r];
+    for(let c=0;c<cols;c++){ const v=row[c];
+      ctx.fillStyle=(v==null||!isFinite(v))?"#0a0a0a":ramp(v); ctx.fillRect(padL+c*cw, r*rowH, Math.ceil(cw)+1, rowH-0.5); }
+    ctx.fillStyle=(h.index[r]===selChan)?"#fff":T.muted;
+    const lab=(labels[r]||"").slice(0,16);
+    ctx.fillText(lab, 4, r*rowH+rowH/2);
+    if(h.index[r]===selChan){ ctx.strokeStyle="#fff"; ctx.lineWidth=1; ctx.strokeRect(padL+0.5,r*rowH+0.5,cssW-padL-1,rowH-1); }
+    if(r>0 && grp[r]!==grp[r-1]){ ctx.strokeStyle="rgba(230,230,224,0.35)"; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(0,r*rowH+0.5); ctx.lineTo(cssW,r*rowH+0.5); ctx.stroke(); }
+  }
+}
+function hmClick(e){
+  const h=PL&&PL.panels.heatmap; if(!h) return; const nS=asArray(h.matrix).length; if(!nS) return;
+  const cv=e.currentTarget, rect=cv.getBoundingClientRect();
+  let row=Math.floor((e.clientY-rect.top)/rect.height*nS); row=Math.max(0,Math.min(nS-1,row));
+  selChan=asArray(h.index)[row]; drawHeatmap(PL); renderRank(PL); renderDetail(PL);
+}
+
+/* Gruppen */
+function renderGruppen(pl){
+  const host=document.getElementById("gruppen"); host.innerHTML="";
+  const G=asArray(pl.panels.gruppen); document.getElementById("grp_info").textContent=`${G.length} Gruppen`;
+  if(!G.length){ host.innerHTML=`<div class="leer">keine Gruppen</div>`; return; }
+  const hi=Math.max(...G.map(g=>g.max||0))||1;
+  G.forEach(g=>{ const row=document.createElement("div"); row.className="gbar"+(g.kritisch?" krit":"");
+    const t=Math.max(0,Math.min(1,(g.max||0)/hi));
+    row.innerHTML=`<span class="n" title="${g.name}">${g.name}</span>`+
+      `<span class="track"><span class="fill" style="width:${Math.round(t*100)}%;background:${ramp(t)}"></span></span>`+
+      `<span class="v">${fmt(g.max,0)} °C</span>`;
+    row.title=`${g.name}: max ${fmt(g.max,1)} °C · Hotspot ${g.hotspot_label} · ${g.anzahl} Kanäle`;
+    row.onclick=()=>{ selChan=g.hotspot_index; drawHeatmap(PL); renderRank(PL); renderDetail(PL); };
+    host.appendChild(row); });
+}
+
+/* Ranking */
+function renderRank(pl){
+  const el=document.getElementById("rank"); const R=asArray(pl.panels.ranking);
+  document.getElementById("rank_info").textContent=`Top ${R.length}`;
+  if(!R.length){ el.innerHTML=`<li class="leer">keine Daten</li>`; return; }
+  el.innerHTML="";
+  R.forEach(r=>{ const li=document.createElement("li"); if(r.index===selChan) li.className="sel";
+    li.innerHTML=`<span class="lab ${r.kritisch?'bad':''}" title="${r.name}">${r.label}</span>`+
+      `<span>${fmt(r.t_max,1)} °C</span>`;
+    li.onclick=()=>{ selChan=r.index; drawHeatmap(PL); renderRank(PL); renderDetail(PL); };
+    el.appendChild(li); });
+}
+
+/* Kanal-Detail */
+function renderDetail(pl){
+  const host=document.getElementById("detail"); host.innerHTML="";
+  const K=asArray(pl.panels.kanaele); const ser=asArray(pl.panels.serien);
+  const k=K.find(z=>z.index===selChan);
+  document.getElementById("detail_titel").textContent = k?`${k.label} · ${k.typ} · Grenzwert ${k.krit} °C`:"";
+  if(!k){ host.innerHTML=`<div class="leer">Kanal wählen</div>`; return; }
+  const y=asArray(ser[k.index-1]); if(!y.length){ host.innerHTML=`<div class="leer">keine Serie</div>`; return; }
+  const xlab=pl.meta.x_einheit==="m"?"Distanz [m]":"Zeit [s]";
+  const extras=[];
+  if(isFinite(k.warn)) extras.push(levelLine("y",k.warn,"rgba(217,164,65,.6)"));
+  if(isFinite(k.krit)) extras.push(levelLine("y",k.krit,"rgba(199,34,42,.6)"));
+  mk(optsSingle("Temperatur [°C]",W(host),160,
+    [{},{label:"T",stroke:T.rot,width:1.4,points:{show:false}}],xlab,true,"°C",extras),[pl.x,y],host);
+}
+
+/* Leistung & Verluste */
+function renderLeistung(pl){
+  const host=document.getElementById("leistung"); host.innerHTML="";
+  const L=pl.panels.leistung; if(!L||!L.p_el){ host.innerHTML=`<div class="leer">keine Leistungsdaten</div>`; return; }
+  document.getElementById("omega_info").textContent = "ω: "+(L.omega_quelle||"");
+  const xlab=pl.meta.x_einheit==="m"?"Distanz [m]":"Zeit [s]";
+  mk(optsSingle("Leistung [kW]",W(host),180,
+    [{},{label:"elektrisch",stroke:T.accent,width:1.4,points:{show:false}},
+        {label:"mechanisch",stroke:T.mech,width:1.3,points:{show:false}},
+        {label:"Verluste",stroke:T.rot,width:1.2,points:{show:false}}],
+    xlab,true,"kW",[zeroLine("y")]),[pl.x,L.p_el,L.p_mech,L.p_loss],host);
+  document.getElementById("energie").innerHTML=
+    `<span><b>${fmt(L.e_el_wh,0)}</b>Wh elektr.</span>`+
+    `<span><b>${fmt(L.e_mech_wh,0)}</b>Wh mech.</span>`+
+    `<span><b>${fmt(L.e_loss_wh,0)}</b>Wh Verlust</span>`+
+    `<span><b>${fmt(L.wirkungsgrad,0)}</b>% Wirkungsgrad</span>`+
+    `<span><b>${fmt(L.p_el_max,1)}</b>kW Peak el.</span>`;
+}
+
+let rt;
+function resizeAll(){ up.forEach(u=>{ const w=u.root.parentNode.clientWidth; if(w>0) u.setSize({width:w,height:u.height}); }); if(PL&&PL.panels.status!=="leer") drawHeatmap(PL); }
+function planeResize(){ clearTimeout(rt); rt=setTimeout(resizeAll,140); }
+window.addEventListener("resize", planeResize);
+if(window.ResizeObserver) new ResizeObserver(planeResize).observe(document.body);
+</script>
+</body>
+</html>

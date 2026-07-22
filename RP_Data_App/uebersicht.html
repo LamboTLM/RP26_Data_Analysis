@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Übersicht</title>
+<link rel="stylesheet" href="./lib/uPlot.min.css">
+<style>
+  :root{
+    --bg:#121212; --panel:#1e1e1e; --panel2:#171717; --line:#2c2c2c;
+    --text:#e6e6e0; --muted:#8a8a8a; --achse:#bdbdb6; --rot:#c7222a; --ok:#3fb950; --warn:#d9a441; --accent:#3987e5;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,"Segoe UI",Roboto,sans-serif;font-size:13px;}
+  .kopf{display:flex;align-items:center;gap:12px;padding:8px 12px;border-bottom:.5px solid var(--line);}
+  .kopf h1{font-size:14px;margin:0;font-weight:600;border-left:3px solid var(--rot);padding-left:8px;}
+  .kopf .x-info{color:var(--muted);font-size:12px;margin-left:auto;}
+  .wrap{padding:10px;display:flex;flex-direction:column;gap:10px;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .panel{background:var(--panel);border:.5px solid var(--line);border-radius:10px;padding:10px 12px;min-width:0;}
+  .panel h2{font-size:13px;margin:0 0 8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .panel h2 .titel{border-left:3px solid var(--rot);padding-left:8px;}
+  .panel h2 .rechts{margin-left:auto;font-weight:400;}
+  .leer{color:var(--muted);font-size:12px;padding:16px 4px;text-align:center;}
+  .hinweis{color:var(--muted);font-size:11px;margin-top:6px;}
+  .markform{display:none;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap;}
+  .markform.an{display:flex;}
+  input[type=text]{background:var(--panel2);color:var(--text);border:.5px solid var(--line);border-radius:6px;padding:6px 9px;font-size:12px;}
+  select{background:var(--panel2);color:var(--text);border:.5px solid var(--line);border-radius:6px;padding:4px 8px;font-size:11px;max-width:280px;}
+  button{background:var(--rot);color:#fff;border:none;border-radius:6px;padding:6px 11px;font-size:12px;cursor:pointer;}
+  button.sek{background:var(--panel2);color:var(--text);border:.5px solid var(--line);}
+  .runden{list-style:none;margin:8px 0 0;padding:0;}
+  .runden li{display:flex;align-items:center;gap:10px;padding:4px 2px;border-bottom:.5px solid var(--line);font-size:12px;}
+  .runden .nm{font-weight:600;} .runden .rg{color:var(--muted);font-variant-numeric:tabular-nums;}
+  .runden .del{margin-left:auto;background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;}
+  .runden .del:hover{color:var(--rot);}
+  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;}
+  .tile{background:var(--panel2);border-radius:8px;padding:9px 11px;}
+  .tile .l{font-size:11px;color:var(--muted);} .tile .v{font-size:19px;font-weight:600;}
+  .hgrp{margin-bottom:8px;}
+  .hgrp .glabel{font-size:11px;color:var(--rot);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;}
+  .hchip{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-family:ui-monospace,monospace;
+    background:var(--panel2);border-radius:6px;padding:3px 8px;color:var(--muted);}
+  .dot{width:8px;height:8px;border-radius:50%;}
+  .dot.gueltig{background:var(--ok);} .dot.statisch,.dot.nan{background:var(--warn);} .dot.fehlt{background:var(--rot);}
+  .triage{display:flex;gap:10px;align-items:center;font-size:13px;flex-wrap:wrap;}
+  .triage .ok{color:var(--ok);} .triage .bad{color:var(--rot);font-weight:600;}
+  .u-legend{display:none;}
+</style>
+<script src="./lib/uPlot.iife.min.js"></script>
+<script src="./lib/echarts.min.js"></script>
+</head>
+<body>
+
+<div class="kopf">
+  <h1>Übersicht</h1>
+  <span id="x_info" class="x-info">—</span>
+</div>
+
+<div class="wrap">
+  <div class="panel">
+    <h2><span class="titel">Verlauf &amp; Runden markieren</span>
+      <span class="rechts"><select id="spine_sel"></select></span>
+    </h2>
+    <div id="spine"></div>
+    <div class="hinweis">Auf dem Verlauf einen Bereich aufziehen, um eine Runde zu markieren. Das Signal oben rechts ist frei wählbar – die Markierung bezieht sich immer auf die x-Achse.</div>
+    <div id="markform" class="markform">
+      <span id="mark_range" class="rg"></span>
+      <input type="text" id="mark_name" placeholder="Rundenname">
+      <button id="mark_save">Speichern</button>
+      <button class="sek" id="mark_cancel">Abbrechen</button>
+    </div>
+    <ul id="runden" class="runden"></ul>
+  </div>
+
+  <div class="panel">
+    <h2><span class="titel">Kennzahlen</span></h2>
+    <div id="tiles" class="tiles"></div>
+  </div>
+
+  <div class="row2">
+    <div class="panel">
+      <h2><span class="titel">Grip-Nutzung (g-g)</span></h2>
+      <div id="gg" style="height:250px"></div>
+      <div class="hinweis">Längs- gegen Querbeschleunigung – füllt der Fahrer den Reibkreis aus?</div>
+    </div>
+    <div class="panel">
+      <h2><span class="titel">Geschwindigkeitsverteilung</span></h2>
+      <div id="hist" style="height:250px"></div>
+      <div class="hinweis">Wie viel Zeit in welchem Tempobereich verbracht wurde.</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2><span class="titel">Datenhealth</span></h2>
+    <div id="health"></div>
+  </div>
+
+  <div class="panel">
+    <h2><span class="titel">Triage</span></h2>
+    <div id="triage" class="triage"></div>
+  </div>
+</div>
+
+<script>
+"use strict";
+const T={ text:"#e6e6e0", muted:"#8a8a8a", achse:"#bdbdb6", line:"#2c2c2c", rot:"#c7222a", accent:"#3987e5", ok:"#3fb950" };
+const asArray=(v)=>Array.isArray(v)?v:(v==null?[]:[v]);
+const getSig=(pl,n)=>asArray(pl.signals).find(s=>s.name===n);
+const istOk=(s)=>s&&s.status==="gueltig"&&s.y&&s.y.length;
+let PL=null, spineChart=null, ggChart=null, histChart=null, pending=null, topSel=null;
+
+const NAME_MAP={speed_can:"Geschwindigkeit",apps1_can:"Gas",steering_wheel_angle_can:"Lenkwinkel",
+  INS_acc_x_can:"Längsbeschl.",INS_acc_y_can:"Querbeschl.",INS_ang_vel_z_can:"Gierrate",
+  pbrake_front_can:"Bremsdruck vorn",pbrake_rear_can:"Bremsdruck hinten",
+  ams_overall_voltage_can:"Pack-Spannung",IVT_Result_I_can:"Pack-Strom",
+  ams_cell_min_voltage_can:"Zelle min",ams_cell_max_temp_can:"Temp max"};
+const pretty=(n)=>NAME_MAP[n]||String(n).replace(/_can$/,"");
+
+function setup(hc){
+  hc.addEventListener("DataChanged",()=>render(hc.Data));
+  if(hc.Data) render(hc.Data);
+  window.sendToMatlab=(n,d)=>hc.sendEventToMATLAB(n,d);
+  document.getElementById("mark_save").onclick=markSpeichern;
+  document.getElementById("mark_cancel").onclick=markAbbrechen;
+  document.getElementById("spine_sel").onchange=(e)=>{ topSel=e.target.value; zeichneTop(PL); };
+}
+window.setup=setup;
+
+function render(pl){
+  if(!pl||!pl.x){ return; }
+  PL=pl;
+  document.getElementById("x_info").textContent="x-Achse: "+(pl.meta.x_modus==="distanz"?"Distanz [m]":"Zeit [s]");
+  renderTop(pl);
+  renderRunden(pl);
+  renderTiles(pl);
+  renderGG(pl);
+  renderHist(pl);
+  renderHealth(pl);
+  renderTriage(pl);
+}
+
+/* ---------- Top-Plot (wählbares Signal) + Markieren ---------- */
+function fmtAchse(v){
+  if(v==null||!isFinite(v)) return "";
+  const a=Math.abs(v);
+  if(a>=1e3) return (v/1e3).toFixed(a>=1e4?0:1)+"k";
+  if(a>=100) return v.toFixed(0);
+  if(a>=10)  return v.toFixed(1);
+  if(a>=1)   return v.toFixed(2);
+  if(a===0)  return "0";
+  return v.toFixed(2);
+}
+function renderTop(pl){
+  const sel=document.getElementById("spine_sel");
+  const valid=asArray(pl.signals).filter(istOk);
+  const prev=topSel||sel.value;
+  sel.innerHTML=valid.map(s=>`<option value="${s.name}">${pretty(s.name)}${s.unit?` [${s.unit}]`:""}</option>`).join("");
+  if(!valid.length){ document.getElementById("spine").innerHTML=`<div class="leer">keine Signale zum Anzeigen</div>`; return; }
+  topSel=(prev&&valid.some(s=>s.name===prev))?prev:(valid.some(s=>s.name==="speed_can")?"speed_can":valid[0].name);
+  sel.value=topSel;
+  zeichneTop(pl);
+}
+function zeichneTop(pl){
+  if(!pl) return;
+  if(spineChart){ spineChart.destroy(); spineChart=null; }
+  const host=document.getElementById("spine"); host.innerHTML="";
+  const sig=getSig(pl,topSel);
+  if(!istOk(sig)){ host.innerHTML=`<div class="leer">${pretty(topSel)}: nicht verfügbar</div>`; return; }
+  const xlab=pl.meta.x_einheit==="m"?"Distanz [m]":"Zeit [s]";
+  const a={stroke:T.achse,grid:{stroke:T.line,width:.5},ticks:{stroke:T.line,width:.5},font:"11px -apple-system, sans-serif"};
+  const opts={
+    width:host.clientWidth||900, height:160,
+    scales:{x:{time:false}}, legend:{show:false},
+    cursor:{ drag:{x:true,y:false,setScale:false} },
+    series:[{}, {label:pretty(topSel), stroke:T.accent, width:1.3, points:{show:false}}],
+    axes:[Object.assign({},a,{label:xlab,size:38}),
+          Object.assign({},a,{label:sig.unit||undefined,labelSize:22,size:52,values:(u,s)=>s.map(fmtAchse)})],
+    hooks:{ draw:[drawRunden], setSelect:[onSelect] }
+  };
+  spineChart=new uPlot(opts,[pl.x, sig.y], host);
+}
+function drawRunden(u){
+  const rr=asArray(PL.panels.runden);
+  const ctx=u.ctx, top=u.bbox.top, h=u.bbox.height;
+  ctx.save();
+  rr.forEach(r=>{
+    if(r.x_start==null||r.x_ende==null||isNaN(r.x_start)||isNaN(r.x_ende)) return;
+    const p0=u.valToPos(Math.min(r.x_start,r.x_ende),'x',true);
+    const p1=u.valToPos(Math.max(r.x_start,r.x_ende),'x',true);
+    ctx.fillStyle="rgba(199,34,42,0.15)"; ctx.fillRect(p0,top,p1-p0,h);
+    ctx.strokeStyle="rgba(199,34,42,0.6)"; ctx.lineWidth=1; ctx.strokeRect(p0,top,p1-p0,h);
+    ctx.fillStyle="#e6e6e0"; ctx.font="10px sans-serif"; ctx.fillText(r.name||"", p0+3, top+11);
+  });
+  ctx.restore();
+}
+function onSelect(u){
+  const s=u.select;
+  if(!s || s.width<3){ return; }
+  const x0=u.posToVal(s.left,'x'), x1=u.posToVal(s.left+s.width,'x');
+  pending={x_start:Math.min(x0,x1), x_ende:Math.max(x0,x1)};
+  const einh=PL.meta.x_einheit||"";
+  document.getElementById("mark_range").textContent=`${Math.round(pending.x_start)}–${Math.round(pending.x_ende)} ${einh}`;
+  document.getElementById("mark_name").value="Runde "+(asArray(PL.panels.runden).length+1);
+  document.getElementById("markform").classList.add("an");
+  document.getElementById("mark_name").focus();
+}
+function markSpeichern(){
+  if(!pending) return;
+  const name=(document.getElementById("mark_name").value||"").trim()||("Runde "+(asArray(PL.panels.runden).length+1));
+  if(window.sendToMatlab) window.sendToMatlab("runde_markiert",{x_start:pending.x_start,x_ende:pending.x_ende,name:name});
+  markAbbrechen();
+}
+function markAbbrechen(){
+  pending=null;
+  document.getElementById("markform").classList.remove("an");
+  if(spineChart) spineChart.setSelect({left:0,width:0,top:0,height:0},false);
+}
+
+/* ---------- Runden-Liste ---------- */
+function renderRunden(pl){
+  const el=document.getElementById("runden");
+  const rr=asArray(pl.panels.runden);
+  if(!rr.length){ el.innerHTML=`<li class="leer" style="justify-content:flex-start">Noch keine Runden markiert.</li>`; return; }
+  el.innerHTML="";
+  rr.forEach(r=>{
+    const li=document.createElement("li");
+    li.innerHTML=`<span class="nm">${r.name}</span>`+
+      `<span class="rg">${Math.round(r.x_start)}–${Math.round(r.x_ende)} ${pl.meta.x_einheit}</span>`+
+      (r.fahrer?`<span class="rg">· ${r.fahrer}</span>`:``);
+    const del=document.createElement("button"); del.className="del"; del.textContent="✕"; del.title="löschen";
+    del.onclick=()=>{ if(window.sendToMatlab) window.sendToMatlab("runde_loeschen",{name:r.name}); };
+    li.appendChild(del); el.appendChild(li);
+  });
+}
+
+/* ---------- Kennzahlen ---------- */
+function renderTiles(pl){
+  const k=pl.panels.kennzahlen||{};
+  const el=document.getElementById("tiles");
+  el.innerHTML=[
+    tile("Dauer", fmt(k.dauer_s,1,"s")),
+    tile("Strecke", fmt(k.strecke_m,0,"m")),
+    tile("Runden", k.runden_anzahl==null?"—":k.runden_anzahl),
+    tile("Fahrer", k.fahrer||"—"),
+    tile("Max Speed", fmt(k.speed_max,1)),
+    tile("Max ax", fmt(k.ax_max,1,"m/s²")),
+    tile("Max ay", fmt(k.ay_max,1,"m/s²")),
+    tile("Energie", fmt(k.energie_wh,0,"Wh")),
+    tile("Max Leistung", fmt(k.leistung_max_kw,1,"kW")),
+    tile("Min Zellspg.", fmt(k.zellspannung_min,2,"V")),
+    tile("Max Temp", fmt(k.temp_max,0,"°C")),
+  ].join("");
+}
+
+/* ---------- g-g-Scatter ---------- */
+function dezimiere(arr,ziel){
+  const n=arr.length; if(n<=ziel) return arr.map((v,i)=>[i,v]);
+  const step=Math.ceil(n/ziel); const out=[];
+  for(let i=0;i<n;i+=step) out.push([i,arr[i]]);
+  return out;
+}
+function renderGG(pl){
+  const el=document.getElementById("gg");
+  if(typeof echarts==="undefined"){ el.innerHTML=`<div class="leer">ECharts fehlt in ./lib</div>`; return; }
+  const ax=getSig(pl,"INS_acc_x_can"), ay=getSig(pl,"INS_acc_y_can");
+  if(!istOk(ax)||!istOk(ay)){ el.innerHTML=`<div class="leer">INS-Beschleunigung nicht verfügbar</div>`; return; }
+  el.innerHTML="";
+  const n=Math.min(ax.y.length, ay.y.length);
+  const step=Math.max(1, Math.ceil(n/2500));
+  const pts=[];
+  for(let i=0;i<n;i+=step){
+    const x=ay.y[i], y=ax.y[i];
+    if(x==null||y==null||!isFinite(x)||!isFinite(y)) continue;
+    pts.push([x/9.81, y/9.81]);
+  }
+  if(ggChart) ggChart.dispose();
+  ggChart=echarts.init(el,null,{renderer:"canvas"});
+  ggChart.setOption({
+    backgroundColor:"transparent", grid:{left:52,right:14,top:12,bottom:40},
+    tooltip:{backgroundColor:"#1e1e1e",borderColor:T.line,textStyle:{color:T.text},
+      formatter:p=>`ay ${p.value[0].toFixed(2)} g<br>ax ${p.value[1].toFixed(2)} g`},
+    xAxis:{name:"quer ay [g]",nameLocation:"middle",nameGap:26,scale:true,nameTextStyle:{color:T.achse},
+      axisLine:{lineStyle:{color:T.achse}},axisLabel:{color:T.achse},splitLine:{lineStyle:{color:T.line}}},
+    yAxis:{name:"längs ax [g]",nameLocation:"middle",nameGap:36,scale:true,nameTextStyle:{color:T.achse},
+      axisLine:{lineStyle:{color:T.achse}},axisLabel:{color:T.achse},splitLine:{lineStyle:{color:T.line}}},
+    series:[{type:"scatter",data:pts,symbolSize:3,itemStyle:{color:"rgba(57,135,229,0.5)"}}]
+  });
+}
+
+/* ---------- Geschwindigkeitsverteilung ---------- */
+function renderHist(pl){
+  const el=document.getElementById("hist");
+  if(typeof echarts==="undefined"){ el.innerHTML=`<div class="leer">ECharts fehlt in ./lib</div>`; return; }
+  const sp=getSig(pl,"speed_can");
+  if(!istOk(sp)){ el.innerHTML=`<div class="leer">Geschwindigkeit nicht verfügbar</div>`; return; }
+  el.innerHTML="";
+  const vals=sp.y.filter(v=>v!=null&&isFinite(v));
+  if(!vals.length){ el.innerHTML=`<div class="leer">keine Werte</div>`; return; }
+  const lo=Math.min(...vals), hi=Math.max(...vals), nb=20;
+  const span=(hi-lo)||1, bw=span/nb;
+  const bins=new Array(nb).fill(0);
+  vals.forEach(v=>{ let b=Math.floor((v-lo)/bw); if(b>=nb)b=nb-1; if(b<0)b=0; bins[b]++; });
+  const cats=bins.map((_,i)=>(lo+(i+0.5)*bw).toFixed(0));
+  if(histChart) histChart.dispose();
+  histChart=echarts.init(el,null,{renderer:"canvas"});
+  histChart.setOption({
+    backgroundColor:"transparent", grid:{left:48,right:14,top:12,bottom:40},
+    tooltip:{trigger:"axis",backgroundColor:"#1e1e1e",borderColor:T.line,textStyle:{color:T.text}},
+    xAxis:{type:"category",data:cats,name:"Speed",nameLocation:"middle",nameGap:26,nameTextStyle:{color:T.achse},
+      axisLine:{lineStyle:{color:T.achse}},axisLabel:{color:T.achse,fontSize:10},splitLine:{show:false}},
+    yAxis:{type:"value",name:"Anteil",nameTextStyle:{color:T.achse},
+      axisLine:{lineStyle:{color:T.achse}},axisLabel:{color:T.achse},splitLine:{lineStyle:{color:T.line}}},
+    series:[{type:"bar",data:bins,itemStyle:{color:T.accent},barCategoryGap:"20%"}]
+  });
+}
+
+/* ---------- Datenhealth ---------- */
+function renderHealth(pl){
+  const el=document.getElementById("health");
+  const m=asArray(pl.panels.health_matrix);
+  if(!m.length){ el.innerHTML=`<div class="leer">keine Signale</div>`; return; }
+  const grp={};
+  m.forEach(s=>{ (grp[s.subsystem]=grp[s.subsystem]||[]).push(s); });
+  el.innerHTML="";
+  Object.keys(grp).sort().forEach(g=>{
+    const d=document.createElement("div"); d.className="hgrp";
+    const chips=grp[g].map(s=>`<span class="hchip"><span class="dot ${s.status}"></span>${s.name.replace(/_can$/,"")}</span>`).join("");
+    d.innerHTML=`<div class="glabel">${g}</div><div class="chips">${chips}</div>`;
+    el.appendChild(d);
+  });
+}
+
+/* ---------- Triage ---------- */
+function renderTriage(pl){
+  const t=pl.panels.triage||{};
+  const el=document.getElementById("triage");
+  const teile=[];
+  if(t.sdc_ungeplant) teile.push(`<span class="bad">⚠ Ungeplantes SDC-Öffnen erkannt</span>`);
+  if(t.anzahl_fehler>0) teile.push(`<span class="bad">${t.anzahl_fehler} Fehler-Flags ausgelöst</span>`);
+  if(!teile.length) teile.push(`<span class="ok">✓ keine Auffälligkeiten</span>`);
+  el.innerHTML=teile.join('<span style="color:var(--muted)">·</span>');
+}
+
+/* ---------- Helfer ---------- */
+function tile(l,v){ return `<div class="tile"><div class="l">${l}</div><div class="v">${v}</div></div>`; }
+function fmt(v,d,e){ if(v==null||isNaN(v)) return "—"; return Number(v).toFixed(d)+(e?(" "+e):""); }
+
+let rt;
+function resizeAll(){
+  if(spineChart) spineChart.setSize({width:spineChart.root.parentNode.clientWidth,height:spineChart.height});
+  if(ggChart) ggChart.resize();
+  if(histChart) histChart.resize();
+}
+function planeResize(){ clearTimeout(rt); rt=setTimeout(resizeAll,120); }
+window.addEventListener("resize", planeResize);
+if(window.ResizeObserver) new ResizeObserver(planeResize).observe(document.body);
+</script>
+</body>
+</html>

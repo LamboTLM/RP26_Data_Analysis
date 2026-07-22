@@ -1,0 +1,506 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fahrer</title>
+<link rel="stylesheet" href="./lib/uPlot.min.css">
+<style>
+  :root{
+    --bg:#121212; --panel:#1e1e1e; --panel2:#171717; --line:#2c2c2c;
+    --text:#e6e6e0; --muted:#8a8a8a; --rot:#c7222a; --ok:#3fb950; --warn:#d9a441;
+    --gas:#1baf7a; --brems:#c7222a; --lenk:#a371f7; --reib:#d9a441; --anf:#e6e6e0;
+    --fl:#3987e5; --fr:#1baf7a; --rl:#d9a441; --rr:#a371f7;
+    --us:#d9a441; --os:#c7222a; --lock:#3987e5;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,"Segoe UI",Roboto,sans-serif;font-size:13px;}
+  .kopf{display:flex;align-items:center;gap:12px;padding:8px 12px;border-bottom:.5px solid var(--line);flex-wrap:wrap;}
+  .kopf h1{font-size:14px;margin:0;font-weight:600;border-left:3px solid var(--rot);padding-left:8px;}
+  .kopf .x-info{color:var(--muted);font-size:12px;}
+  .kpi{display:flex;gap:16px;margin-left:auto;flex-wrap:wrap;}
+  .kpi .k{font-size:11px;color:var(--muted);white-space:nowrap;}
+  .kpi .k b{color:var(--text);font-size:15px;margin-right:3px;}
+  .kpi .k.warn b{color:var(--warn);} .kpi .k.rot b{color:var(--rot);}
+
+  .marker{display:flex;align-items:center;gap:8px;padding:7px 12px;border-bottom:.5px solid var(--line);
+    background:var(--panel2);position:sticky;top:0;z-index:5;flex-wrap:wrap;}
+  .marker .lab{color:var(--muted);font-size:11px;margin-right:2px;}
+  .tgl{display:inline-flex;align-items:center;gap:6px;background:#202020;color:var(--muted);
+    border:.5px solid var(--line);border-radius:14px;padding:5px 11px;font-size:11px;cursor:pointer;user-select:none;}
+  .tgl .sw{width:9px;height:9px;border-radius:2px;}
+  .tgl.us .sw{background:var(--us);} .tgl.os .sw{background:var(--os);} .tgl.lock .sw{background:var(--lock);}
+  .tgl.an{color:var(--text);border-color:#5a5a5a;background:#2a2a2a;}
+  .tgl:disabled,.tgl.leer{opacity:.4;cursor:not-allowed;}
+
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px;}
+  .panel{background:var(--panel);border:.5px solid var(--line);border-radius:10px;padding:10px 12px;min-width:0;}
+  .panel.voll{grid-column:1 / -1;}
+  .panel h2{font-size:13px;margin:0 0 8px;display:flex;align-items:center;gap:8px;}
+  .panel h2 .titel{border-left:3px solid var(--rot);padding-left:8px;}
+  .panel h2 .sub{color:var(--muted);font-size:11px;font-weight:400;}
+  .health{display:flex;flex-wrap:wrap;gap:6px;margin-left:auto;}
+  .chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);}
+  .chip .dot{width:8px;height:8px;border-radius:50%;background:var(--muted);}
+  .dot.gueltig{background:var(--ok);} .dot.statisch,.dot.nan{background:var(--warn);} .dot.fehlt{background:var(--rot);}
+  .leer{color:var(--muted);font-size:12px;padding:14px 4px;text-align:center;}
+  .stack{display:flex;flex-direction:column;gap:6px;}
+
+  .metrik-grp{margin-bottom:10px;}
+  .metrik-grp .gtitel{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin:0 0 5px;}
+  .bar{display:grid;grid-template-columns:130px 1fr 34px;align-items:center;gap:8px;margin:3px 0;}
+  .bar .name{font-size:11px;color:var(--text);cursor:help;}
+  .bar .track{background:#151515;border:.5px solid var(--line);border-radius:5px;height:10px;overflow:hidden;}
+  .bar .fill{height:100%;background:linear-gradient(90deg,#7a4f18,var(--rot));border-radius:5px;}
+  .bar .val{font-size:11px;color:var(--muted);text-align:right;}
+
+  input[type=text]{background:var(--panel2);color:var(--text);border:.5px solid var(--line);border-radius:6px;padding:6px 8px;font-size:12px;}
+  select{background:var(--panel2);color:var(--text);border:.5px solid var(--line);border-radius:6px;padding:5px 8px;font-size:12px;}
+  button.act{background:var(--rot);color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;}
+  button.act:disabled{opacity:.5;cursor:not-allowed;}
+  .anlegen{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap;}
+  .u-legend{color:var(--text);font-size:11px;} .u-title{color:var(--text);}
+  @media (max-width:900px){ .grid{grid-template-columns:1fr;} }
+</style>
+<script src="./lib/uPlot.iife.min.js"></script>
+<script src="./lib/echarts.min.js"></script>
+</head>
+<body>
+
+<div class="kopf">
+  <h1>Fahrer</h1>
+  <span id="fahrer_id" class="x-info">—</span>
+  <div id="kpi" class="kpi"></div>
+</div>
+
+<div class="marker">
+  <span class="lab">Markieren:</span>
+  <button class="tgl us"   id="tgl_us"   data-key="untersteuern"><span class="sw"></span>Untersteuern</button>
+  <button class="tgl os"   id="tgl_os"   data-key="uebersteuern"><span class="sw"></span>Übersteuern</button>
+  <button class="tgl lock" id="tgl_lock" data-key="lockup_any"><span class="sw"></span>Lockups</button>
+  <span id="marker_info" class="lab" style="margin-left:auto"></span>
+</div>
+
+<div class="grid">
+  <!-- Eingaben -->
+  <div class="panel voll">
+    <h2><span class="titel">Fahrer-Eingaben</span><span class="sub">was der Fahrer tut</span><div id="h_in" class="health"></div></h2>
+    <div id="eingaben" class="stack"></div>
+  </div>
+
+  <!-- Fahrzeug-Reaktion / Balance -->
+  <div class="panel voll">
+    <h2><span class="titel">Fahrzeug-Reaktion &amp; Balance</span><span class="sub">Über-/Untersteuern aus δ und Gierrate</span></h2>
+    <div id="balance" class="stack"></div>
+    <div class="leer" style="text-align:left;padding:4px 2px">
+      Untersteuerwinkel = δ<sub>Reifen</sub> − L·ψ̇/v. Über 0 → Untersteuern, unter 0 → Übersteuern.</div>
+  </div>
+
+  <!-- Laufende Aktivität -->
+  <div class="panel voll">
+    <h2><span class="titel">Laufende Aktivität</span><span class="sub">wo im Run der Fahrer wie stark war</span></h2>
+    <div id="aktiv" class="stack"></div>
+  </div>
+
+  <!-- Lockups & TC -->
+  <div class="panel">
+    <h2><span class="titel">Lockups je Ecke</span></h2>
+    <div id="lockups" class="stack"></div>
+  </div>
+  <div class="panel">
+    <h2><span class="titel">TC-Arbeit</span></h2>
+    <div id="tc" class="stack"></div>
+  </div>
+
+  <!-- TQV -->
+  <div class="panel voll">
+    <h2><span class="titel">TQV: Anforderung vs. Lieferung</span><div id="tqv_kpi" class="kpi" style="margin-left:auto"></div></h2>
+    <div id="tqv" class="stack"></div>
+  </div>
+
+  <!-- Fingerprint + Klassifizierung -->
+  <div class="panel voll">
+    <h2><span class="titel">Fingerprint &amp; Klassifizierung</span></h2>
+    <div style="display:grid;grid-template-columns:1fr 340px;gap:14px;align-items:start">
+      <div>
+        <div id="radar" style="height:330px"></div>
+        <div class="anlegen">
+          <select id="verg_sel"><option value="">— Vergleichsprofil überlagern —</option></select>
+          <input type="text" id="neu_name" placeholder="Neuer Fahrername">
+          <button class="act" id="btn_anlegen" disabled>Aus Run anlegen</button>
+        </div>
+        <div id="anlegen_hint" class="leer" style="text-align:left;padding:6px 2px"></div>
+      </div>
+      <div id="klass"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+const T={ text:"#e6e6e0", muted:"#8a8a8a", line:"#2c2c2c", rot:"#c7222a",
+  gas:"#1baf7a", brems:"#c7222a", lenk:"#a371f7", reib:"#d9a441", anf:"#e6e6e0",
+  fl:"#3987e5", fr:"#1baf7a", rl:"#d9a441", rr:"#a371f7",
+  us:"#d9a441", os:"#c7222a", lock:"#3987e5" };
+const SYNC="fahrer";
+let PL=null, uplots=[], radarChart=null;
+
+/* farbliche Markierung von Ereignisbereichen ueber alle uPlots */
+const AKTIV = { untersteuern:false, uebersteuern:false, lockup_any:false };
+let BEREICHE = { untersteuern:[], uebersteuern:[], lockup_any:[] };
+const BAND = { untersteuern:"rgba(217,164,65,0.16)", uebersteuern:"rgba(199,34,42,0.18)", lockup_any:"rgba(57,135,229,0.18)" };
+
+/* uihtml */
+function setup(hc){
+  hc.addEventListener("DataChanged",()=>render(hc.Data));
+  if(hc.Data) render(hc.Data);
+  window.sendToMatlab=(n,d)=>hc.sendEventToMATLAB(n,d);
+  document.getElementById("btn_anlegen").onclick=anlegen;
+  document.getElementById("verg_sel").onchange=renderRadar;
+  document.querySelectorAll(".tgl").forEach(b=>b.onclick=()=>toggle(b));
+}
+window.setup=setup;
+
+const getSig=(pl,n)=>pl.signals.find(s=>s.name===n);
+const asArray=(v)=>Array.isArray(v)?v:(v==null?[]:[v]);
+const istOk=(s)=>s&&s.status==="gueltig"&&s.y&&s.y.length;
+const statusVon=(s)=>s?s.status:"fehlt";
+const fmt=(v,d)=> (v==null||isNaN(v))?"—":Number(v).toFixed(d);
+
+function healthChips(el,pl,e){ el.innerHTML="";
+  for(const [n,l] of e){ const st=statusVon(getSig(pl,n));
+    const c=document.createElement("span");c.className="chip";
+    c.innerHTML=`<span class="dot ${st}"></span>${l}`; el.appendChild(c);} }
+function reset(){ uplots.forEach(u=>u.destroy());uplots=[];
+  if(radarChart){radarChart.dispose();radarChart=null;} }
+
+/* ---------- Highlight-Toggles ---------- */
+function toggle(btn){
+  if(btn.classList.contains("leer")) return;
+  const key=btn.dataset.key;
+  AKTIV[key]=!AKTIV[key];
+  btn.classList.toggle("an",AKTIV[key]);
+  uplots.forEach(u=>u.redraw());
+}
+function bandHook(u){
+  const ctx=u.ctx;
+  for(const key of Object.keys(AKTIV)){
+    if(!AKTIV[key]) continue;
+    ctx.save(); ctx.fillStyle=BAND[key];
+    for(const r of asArray(BEREICHE[key])){
+      const x0=Array.isArray(r)?r[0]:r.x0, x1=Array.isArray(r)?r[1]:r.x1;
+      const p0=u.valToPos(x0,"x",true), p1=u.valToPos(x1,"x",true);
+      ctx.fillRect(p0,u.bbox.top,Math.max(1,p1-p0),u.bbox.height);
+    }
+    ctx.restore();
+  }
+}
+function zeroLine(scaleKey,color){ return (u)=>{
+  const y=u.valToPos(0,scaleKey,true); if(!isFinite(y)) return;
+  const ctx=u.ctx; ctx.save(); ctx.strokeStyle=color||T.muted; ctx.lineWidth=1; ctx.setLineDash([4,4]);
+  ctx.beginPath(); ctx.moveTo(u.bbox.left,y); ctx.lineTo(u.bbox.left+u.bbox.width,y); ctx.stroke(); ctx.restore(); }; }
+function levelLine(scaleKey,val,color){ return (u)=>{
+  const y=u.valToPos(val,scaleKey,true); if(!isFinite(y)) return;
+  const ctx=u.ctx; ctx.save(); ctx.strokeStyle=color||T.muted; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+  ctx.beginPath(); ctx.moveTo(u.bbox.left,y); ctx.lineTo(u.bbox.left+u.bbox.width,y); ctx.stroke(); ctx.restore(); }; }
+
+/* ---------- uPlot-Optionen ---------- */
+function achse(zeigX,xlab){
+  const a={stroke:T.muted,grid:{stroke:T.line,width:.5},ticks:{stroke:T.line,width:.5},font:"11px -apple-system, sans-serif"};
+  return Object.assign({},a,{label:zeigX?xlab:undefined,size:zeigX?38:24});
+}
+function yAchse(scaleKey,label,side){
+  const a={stroke:T.muted,grid:{stroke:T.line,width:.5},ticks:{stroke:T.line,width:.5},font:"11px -apple-system, sans-serif"};
+  const o=Object.assign({},a,{label:label,size:54}); if(scaleKey) o.scale=scaleKey;
+  if(side===1){ o.side=1; o.grid={show:false}; } return o;
+}
+function optsSingle(titel,breite,hoehe,series,xlab,zeigX,extra){
+  return {title:titel||undefined,width:breite,height:hoehe,
+    cursor:{sync:{key:SYNC},points:{size:5}},scales:{x:{time:false}},legend:{live:true},series,
+    axes:[achse(zeigX,xlab),yAchse(null,undefined)],hooks:{draw:[bandHook].concat(extra||[])}};
+}
+function optsDual(titel,breite,hoehe,series,xlab,zeigX,links,rechts,extra){
+  const scales={x:{time:false}};
+  scales[links.key]=links.range?{range:links.range}:{};
+  if(rechts) scales[rechts.key]=rechts.range?{range:rechts.range}:{};
+  const axes=[achse(zeigX,xlab),yAchse(links.key,links.label,0)];
+  if(rechts) axes.push(yAchse(rechts.key,rechts.label,1));
+  return {title:titel||undefined,width:breite,height:hoehe,
+    cursor:{sync:{key:SYNC},points:{size:5}},scales,legend:{live:true},series,axes,
+    hooks:{draw:[bandHook].concat(extra||[])}};
+}
+function mk(opts,data,el){ uplots.push(new uPlot(opts,data,el)); }
+const W=(host)=>host.clientWidth||760;
+
+/* ---------- Haupt-Render ---------- */
+function render(pl){
+  if(!pl||!pl.x||!pl.signals) return;
+  PL=pl; reset();
+  const xlab = pl.meta.x_einheit==="m" ? "Distanz [m]" : "Zeit [s]";
+  const idSig=getSig(pl,"driver_id_can");
+  document.getElementById("fahrer_id").textContent =
+    istOk(idSig) ? ("driver_id ~ "+mode(idSig.y)) : "driver_id: —";
+
+  const e=pl.panels.ereignisse||{};
+  BEREICHE={ untersteuern:asArray(e.untersteuern), uebersteuern:asArray(e.uebersteuern), lockup_any:asArray(e.lockup_any) };
+  setupToggles();
+  renderKpi(pl);
+  renderEingaben(pl,xlab);
+  renderBalance(pl,xlab);
+  renderAktiv(pl,xlab);
+  renderLockups(pl,xlab);
+  renderTC(pl,xlab);
+  renderTQV(pl,xlab);
+  renderKlass(pl);
+  renderFinger(pl);
+
+  const fp=pl.panels.fingerprint;
+  document.getElementById("btn_anlegen").disabled = !(fp&&fp.kennzahlen);
+  document.getElementById("anlegen_hint").textContent =
+    (fp&&fp.kennzahlen)?"Legt einen Fahrer aus dem Run-Fingerprint an.":"Kein Fingerprint verfügbar.";
+}
+
+function setupToggles(){
+  const map={tgl_us:"untersteuern",tgl_os:"uebersteuern",tgl_lock:"lockup_any"};
+  let hinweis=[];
+  for(const [id,key] of Object.entries(map)){
+    const b=document.getElementById(id); const n=asArray(BEREICHE[key]).length;
+    b.disabled=n===0; b.classList.toggle("leer",n===0);
+    if(!AKTIV[key]) b.classList.remove("an");
+    b.querySelector(".sw")&&null;
+    b.title=n?`${n} Bereich(e) erkannt`:"keine erkannt";
+    if(n) hinweis.push(`${b.textContent.trim()}: ${n}`);
+  }
+  document.getElementById("marker_info").textContent = hinweis.length?("erkannt — "+hinweis.join("  ·  ")):"keine Ereignisse erkannt";
+}
+
+/* KPI-Leiste */
+function renderKpi(pl){
+  const k=pl.panels.kpi, el=document.getElementById("kpi");
+  if(!k){ el.innerHTML=""; return; }
+  const rot=(v,g)=> v>g?"rot":"";
+  el.innerHTML =
+    `<span class="k ${rot(k.anteil_us,40)}"><b>${fmt(k.anteil_us,0)} %</b>Untersteuern</span>`+
+    `<span class="k ${rot(k.anteil_os,25)}"><b>${fmt(k.anteil_os,0)} %</b>Übersteuern</span>`+
+    `<span class="k ${k.lockups>0?'rot':''}"><b>${fmt(k.lockups,0)}</b>Lockups</span>`+
+    `<span class="k"><b>${fmt(k.tc_anteil,0)} %</b>TC aktiv</span>`+
+    `<span class="k"><b>${fmt(k.reib_nutzung,0)} %</b>Grip-Ausn.</span>`;
+}
+
+/* Eingaben: kombiniert mit Doppelachse */
+function renderEingaben(pl,xlab){
+  healthChips(document.getElementById("h_in"),pl,
+    [["apps1_can","Gas"],["pbrake_front_can","p_v"],["pbrake_rear_can","p_h"],["steering_wheel_angle_can","δ"],["INS_ang_vel_z_can","ψ̇"]]);
+  const host=document.getElementById("eingaben"); host.innerHTML="";
+  const b=pl.panels.balance||{};
+
+  // Pedale: Gas [%] links, Bremsdruck [bar] rechts
+  const gas=getSig(pl,"apps1_can"), pv=getSig(pl,"pbrake_front_can"), ph=getSig(pl,"pbrake_rear_can");
+  let data=[pl.x], series=[{}];
+  if(istOk(gas)){ series.push({label:"Gas [%]",stroke:T.gas,width:1.4,scale:"pct",points:{show:false}}); data.push(gas.y); }
+  if(istOk(pv)){  series.push({label:"Brems vorn [bar]",stroke:T.brems,width:1.4,scale:"bar",points:{show:false}}); data.push(pv.y); }
+  if(istOk(ph)){  series.push({label:"Brems hinten [bar]",stroke:T.fl,width:1.1,scale:"bar",points:{show:false}}); data.push(ph.y); }
+  const d1=document.createElement("div"); host.appendChild(d1);
+  if(series.length>1) mk(optsDual("Pedale",W(host),150,series,xlab,false,
+      {key:"pct",label:"Gas [%]",range:[0,100]},{key:"bar",label:"Druck [bar]"}),data,d1);
+  else d1.innerHTML=`<div class="leer">Pedale: nicht verfügbar</div>`;
+
+  // Lenkung [°] links, Gierrate [°/s] rechts (Input vs. Antwort)
+  const st=getSig(pl,"steering_wheel_angle_can");
+  data=[pl.x]; series=[{}];
+  if(istOk(st)){ series.push({label:"Lenkwinkel [°]",stroke:T.lenk,width:1.4,scale:"deg",points:{show:false}}); data.push(st.y); }
+  if(b.yaw_ist){ series.push({label:"Gierrate [°/s]",stroke:T.muted,width:1.1,scale:"yaw",points:{show:false}}); data.push(b.yaw_ist); }
+  const d2=document.createElement("div"); host.appendChild(d2);
+  if(series.length>1) mk(optsDual("Lenkung & Gierrate",W(host),150,series,xlab,true,
+      {key:"deg",label:"δ [°]"},{key:"yaw",label:"ψ̇ [°/s]"},[zeroLine("deg"),zeroLine("yaw")]),data,d2);
+  else d2.innerHTML=`<div class="leer">Lenkung: nicht verfügbar</div>`;
+}
+
+/* Balance: Gierrate Ist/Ziel, Untersteuerwinkel, Schwimmwinkel */
+function renderBalance(pl,xlab){
+  const host=document.getElementById("balance"); host.innerHTML="";
+  const b=pl.panels.balance;
+  if(!b){ host.innerHTML=`<div class="leer">nicht verfügbar</div>`; return; }
+
+  // Gierrate Ist vs. Ziel
+  const d1=document.createElement("div"); host.appendChild(d1);
+  mk(optsSingle("Gierrate: Ist vs. Ziel [°/s]",W(host),130,
+    [{},{label:"Ist",stroke:T.anf,width:1.6,points:{show:false}},
+        {label:"Ziel (Ackermann)",stroke:T.muted,width:1.2,dash:[5,4],points:{show:false}}],
+    xlab,false),[pl.x,b.yaw_ist,b.yaw_ziel],d1);
+
+  // Untersteuerwinkel (signiert) mit Nulllinie + Schwellen
+  const d2=document.createElement("div"); host.appendChild(d2);
+  const extras=[zeroLine("us",T.muted)];
+  if(isFinite(b.schwelle_us)) extras.push(levelLine("us",b.schwelle_us,"rgba(217,164,65,.5)"));
+  if(isFinite(b.schwelle_os)) extras.push(levelLine("us",b.schwelle_os,"rgba(199,34,42,.5)"));
+  mk(optsDual("Untersteuerwinkel [°]   (+ Unter / − Über)",W(host),150,
+    [{},{label:"Untersteuerwinkel",stroke:T.us,width:1.6,scale:"us",points:{show:false}}],
+    xlab, !hatBeta(b), {key:"us",label:"us [°]"}, null, extras),[pl.x,b.us_winkel],d2);
+
+  // Schwimmwinkel beta (nur wenn INS gueltig)
+  if(hatBeta(b)){
+    const d3=document.createElement("div"); host.appendChild(d3);
+    mk(optsSingle("Schwimmwinkel β [°]",W(host),120,
+      [{},{label:"β",stroke:T.lenk,width:1.3,points:{show:false}}],xlab,true,[zeroLine("y",T.muted)]),
+      [pl.x,b.beta],d3);
+  }
+}
+function hatBeta(b){ return b&&Array.isArray(b.beta)&&b.beta.some(v=>v!=null&&isFinite(v)); }
+
+/* Laufende Aktivitaet */
+function renderAktiv(pl,xlab){
+  const host=document.getElementById("aktiv"); host.innerHTML="";
+  const v=pl.panels.verlauf;
+  if(!v){ host.innerHTML=`<div class="leer">nicht verfügbar</div>`; return; }
+  const bloecke=[["Gas-Aktivität",v.gas,T.gas],["Brems-Aktivität",v.brems,T.brems],
+                 ["Lenk-Aktivität",v.lenk,T.lenk],["Reibkreis",v.reibkreis,T.reib]];
+  bloecke.forEach((bl,idx)=>{
+    const div=document.createElement("div"); host.appendChild(div);
+    if(!bl[1]||!bl[1].length||bl[1].every(x=>x==null)){ div.innerHTML=`<div class="leer">${bl[0]}: —</div>`; return; }
+    mk(optsSingle(bl[0],W(host),92,
+      [{},{label:bl[0],stroke:bl[2],width:1.2,points:{show:false}}],xlab,idx===bloecke.length-1),[pl.x,bl[1]],div);
+  });
+}
+
+/* Lockups: Schlupf je Ecke + Bremsdruck + Schwelle */
+function renderLockups(pl,xlab){
+  const host=document.getElementById("lockups"); host.innerHTML="";
+  const l=pl.panels.lockups;
+  if(!l){ host.innerHTML=`<div class="leer">nicht verfügbar</div>`; return; }
+  const kpi=document.createElement("div"); kpi.className="kpi"; kpi.style.margin="0 0 6px";
+  kpi.innerHTML=`<span class="k ${l.anzahl>0?'rot':''}"><b>${fmt(l.anzahl,0)}</b>Blockierer</span>`+
+    `<span class="k"><b>${fmt((l.worst==null?0:Math.abs(l.worst))*100,0)} %</b>tiefster Schlupf</span>`;
+  host.appendChild(kpi);
+
+  const d1=document.createElement("div"); host.appendChild(d1);
+  const extras=[zeroLine("slip",T.muted)];
+  if(isFinite(l.schwelle)) extras.push(levelLine("slip",l.schwelle,"rgba(199,34,42,.5)"));
+  mk(optsDual("Schlupf je Ecke   /   Bremsdruck",W(host),190,
+    [{},
+     {label:"FL",stroke:T.fl,width:1.1,scale:"slip",points:{show:false}},
+     {label:"FR",stroke:T.fr,width:1.1,scale:"slip",points:{show:false}},
+     {label:"RL",stroke:T.rl,width:1.1,scale:"slip",points:{show:false}},
+     {label:"RR",stroke:T.rr,width:1.1,scale:"slip",points:{show:false}},
+     {label:"p vorn [bar]",stroke:T.brems,width:1,scale:"bar",points:{show:false}}],
+    xlab,true,{key:"slip",label:"Schlupf [-]"},{key:"bar",label:"p [bar]"},extras),
+    [pl.x,l.slip_fl,l.slip_fr,l.slip_rl,l.slip_rr,l.p_brems],d1);
+}
+
+/* TC-Arbeit */
+function renderTC(pl,xlab){
+  const tc=pl.panels.tc, host=document.getElementById("tc"); host.innerHTML="";
+  if(!tc){ host.innerHTML=`<div class="leer">nicht verfügbar</div>`; return; }
+  const d1=document.createElement("div"); host.appendChild(d1);
+  mk(optsSingle("Schlupf: Ziel vs. Ist",W(host),120,
+    [{},{label:"Ziel",stroke:T.reib,width:1.5,points:{show:false}},{label:"Ist",stroke:T.brems,width:1.2,points:{show:false}}],
+    xlab,false),[pl.x,tc.slip_target,tc.slip_ist],d1);
+  const d2=document.createElement("div"); host.appendChild(d2);
+  mk(optsSingle("µ-Faktor / Stärke",W(host),110,
+    [{},{label:"µ-Faktor",stroke:T.lenk,width:1.2,points:{show:false}},{label:"Stärke",stroke:T.fl,width:1.2,points:{show:false}}],
+    xlab,true),[pl.x,tc.mu_factor,tc.strength],d2);
+}
+
+/* TQV Anforderung vs Lieferung + Delta */
+function renderTQV(pl,xlab){
+  const q=pl.panels.tqv;
+  const kpi=document.getElementById("tqv_kpi"), host=document.getElementById("tqv"); host.innerHTML="";
+  if(!q){ kpi.innerHTML=""; host.innerHTML=`<div class="leer">nicht verfügbar</div>`; return; }
+  kpi.innerHTML =
+    `<span class="k"><b>${fmt(q.eingriff&&q.eingriff.tc_anteil,0)} %</b>TC aktiv</span>`+
+    `<span class="k"><b>${fmt(q.eingriff&&q.eingriff.moment_spread,1)}</b>Momentenspreizung</span>`;
+  const dA=document.createElement("div"); host.appendChild(dA);
+  mk(optsSingle("Moment [Nm]",W(host),150,
+    [{},{label:"Anforderung",stroke:T.anf,width:2,points:{show:false}},
+        {label:"FL",stroke:T.fl,width:1,points:{show:false}},{label:"FR",stroke:T.fr,width:1,points:{show:false}},
+        {label:"RL",stroke:T.rl,width:1,points:{show:false}},{label:"RR",stroke:T.rr,width:1,points:{show:false}}],
+    xlab,false),[pl.x,q.anforderung,q.lieferung.fl,q.lieferung.fr,q.lieferung.rl,q.lieferung.rr],dA);
+  const dB=document.createElement("div"); host.appendChild(dB);
+  mk(optsSingle("Delta zur Anforderung [Nm]",W(host),130,
+    [{},{label:"ΔFL",stroke:T.fl,width:1,points:{show:false}},{label:"ΔFR",stroke:T.fr,width:1,points:{show:false}},
+        {label:"ΔRL",stroke:T.rl,width:1,points:{show:false}},{label:"ΔRR",stroke:T.rr,width:1,points:{show:false}}],
+    xlab,true,[zeroLine("y",T.muted)]),[pl.x,q.delta.fl,q.delta.fr,q.delta.rl,q.delta.rr],dB);
+}
+
+/* Erweiterte Klassifizierungs-Kennzahlen (Balken) */
+function renderKlass(pl){
+  const host=document.getElementById("klass"); host.innerHTML="";
+  const k=pl.panels.klassifizierung;
+  const gr=k&&asArray(k.gruppen);
+  if(!gr||!gr.length){ host.innerHTML=`<div class="leer">keine erweiterten Kennzahlen</div>`; return; }
+  gr.forEach(g=>{
+    const wrap=document.createElement("div"); wrap.className="metrik-grp";
+    const h=document.createElement("div"); h.className="gtitel"; h.textContent=g.label; wrap.appendChild(h);
+    asArray(g.metriken).forEach(m=>{
+      const row=document.createElement("div"); row.className="bar";
+      const w=Math.max(0,Math.min(100,+m.wert||0));
+      row.innerHTML=`<span class="name" title="${(m.info||"").replace(/"/g,'&quot;')}">${m.label}</span>`+
+        `<span class="track"><span class="fill" style="width:${w}%"></span></span>`+
+        `<span class="val">${fmt(m.roh!=null?m.roh:m.wert,0)}</span>`;
+      wrap.appendChild(row);
+    });
+    host.appendChild(wrap);
+  });
+}
+
+/* Fingerprint + Vergleich (Radar) */
+function renderFinger(pl){
+  const sel=document.getElementById("verg_sel"); const cur=sel.value;
+  const prof=asArray(pl.panels.vergleich&&pl.panels.vergleich.profile);
+  sel.innerHTML=`<option value="">— Vergleichsprofil überlagern —</option>`+prof.map((p,i)=>`<option value="${i}">${p.name}</option>`).join("");
+  if(cur) sel.value=cur;
+  renderRadar();
+}
+function renderRadar(){
+  const el=document.getElementById("radar");
+  if(typeof echarts==="undefined"){ el.innerHTML=`<div class="leer">ECharts fehlt in ./lib — echarts.min.js dort ablegen.</div>`; return; }
+  if(radarChart){radarChart.dispose();radarChart=null;}
+  const fp=PL.panels.fingerprint;
+  if(!fp||!fp.metriken){ el.innerHTML=`<div class="leer">kein Fingerprint</div>`; return; }
+  el.innerHTML="";
+  const keys=asArray(fp.metriken).map(m=>m.key), labels=asArray(fp.metriken).map(m=>m.label);
+  const runVals=keys.map(k=> (fp.kennzahlen&&isFinite(fp.kennzahlen[k]))?fp.kennzahlen[k]:0 );
+  const data=[{name:"Aktueller Run",value:runVals,
+    lineStyle:{color:"#e6e6e0",width:2.5,type:"dashed"},itemStyle:{color:"#e6e6e0"},areaStyle:{opacity:0.05}}];
+  const sel=document.getElementById("verg_sel").value;
+  const prof=asArray(PL.panels.vergleich&&PL.panels.vergleich.profile);
+  if(sel!==""&&prof[sel]){
+    data.push({name:prof[sel].name,value:prof[sel].werte,
+      lineStyle:{color:T.rot,width:1.5},itemStyle:{color:T.rot},areaStyle:{opacity:0.05}});
+  }
+  radarChart=echarts.init(el,null,{renderer:"canvas"});
+  radarChart.setOption({
+    backgroundColor:"transparent",
+    legend:{data:data.map(d=>d.name),textStyle:{color:T.muted},bottom:0},
+    tooltip:{backgroundColor:"#1e1e1e",borderColor:T.line,textStyle:{color:T.text}},
+    radar:{indicator:labels.map(l=>({name:l,max:100})),splitLine:{lineStyle:{color:T.line}},
+      splitArea:{show:false},axisLine:{lineStyle:{color:T.line}},axisName:{color:T.muted,fontSize:11}},
+    series:[{type:"radar",data:data}]
+  });
+}
+
+function anlegen(){
+  const fp=PL.panels.fingerprint;
+  if(!fp||!fp.kennzahlen) return;
+  const name=(document.getElementById("neu_name").value||"").trim();
+  if(!name){ document.getElementById("neu_name").focus(); return; }
+  window.sendToMatlab("fahrer_anlegen",{name:name,kennzahlen:fp.kennzahlen});
+  document.getElementById("neu_name").value="";
+}
+
+/* Hilfen */
+function mode(arr){ const m={}; let best=null,bc=-1;
+  for(const v of arr){ if(v==null)continue; m[v]=(m[v]||0)+1; if(m[v]>bc){bc=m[v];best=v;} } return best==null?"—":best; }
+
+let rt;
+function resizeAll(){
+  uplots.forEach(u=>{ const w=u.root.parentNode.clientWidth; if(w>0) u.setSize({width:w,height:u.height}); });
+  if(radarChart) radarChart.resize();
+}
+function planeResize(){ clearTimeout(rt); rt=setTimeout(resizeAll,120); }
+window.addEventListener("resize", planeResize);
+if (window.ResizeObserver) new ResizeObserver(planeResize).observe(document.body);
+</script>
+</body>
+</html>

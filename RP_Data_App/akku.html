@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Akku</title>
+<link rel="stylesheet" href="./lib/uPlot.min.css">
+<style>
+  :root{
+    --bg:#121212; --panel:#1e1e1e; --panel2:#171717; --line:#2c2c2c;
+    --text:#e6e6e0; --muted:#8a8a8a; --achse:#bdbdb6; --rot:#c7222a; --ok:#3fb950; --warn:#d9a441; --accent:#3987e5;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,"Segoe UI",Roboto,sans-serif;font-size:13px;}
+  .kopf{display:flex;align-items:center;gap:12px;padding:8px 12px;border-bottom:.5px solid var(--line);}
+  .kopf h1{font-size:14px;margin:0;font-weight:600;border-left:3px solid var(--rot);padding-left:8px;}
+  .kopf .x-info{color:var(--muted);font-size:12px;margin-left:auto;}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px;align-items:start;}
+  .panel{background:var(--panel);border:.5px solid var(--line);border-radius:10px;padding:10px 12px;min-width:0;}
+  .panel.voll{grid-column:1 / -1;}
+  .panel h2{font-size:13px;margin:0 0 8px;display:flex;align-items:center;gap:8px;}
+  .panel h2 .titel{border-left:3px solid var(--rot);padding-left:8px;}
+  .panel h2 .rechts{margin-left:auto;font-weight:400;font-size:11px;color:var(--muted);}
+  .stack{display:flex;flex-direction:column;gap:4px;}
+  .leer{color:var(--muted);font-size:12px;padding:16px 4px;text-align:center;}
+  .hinweis{color:var(--muted);font-size:11px;margin-top:6px;}
+  button{background:var(--panel2);color:var(--text);border:.5px solid var(--line);border-radius:6px;padding:4px 9px;font-size:11px;cursor:pointer;}
+  button.an{border-color:var(--rot);color:#fff;background:var(--rot);}
+  select{background:var(--panel2);color:var(--text);border:.5px solid var(--line);border-radius:6px;padding:4px 8px;font-size:11px;max-width:260px;}
+  #hm_canvas{width:100%;display:block;border-radius:6px;cursor:crosshair;}
+  .krit{list-style:none;margin:0;padding:0;max-height:340px;overflow:auto;}
+  .krit li{display:grid;grid-template-columns:52px 1fr auto;gap:8px;align-items:center;padding:3px 4px;border-radius:6px;cursor:pointer;font-size:12px;}
+  .krit li:hover{background:var(--panel2);}
+  .krit li.sel{background:#2a2020;}
+  .krit .zn{font-variant-numeric:tabular-nums;}
+  .krit .zn.bad{color:var(--rot);font-weight:600;}
+  .bar{height:8px;border-radius:4px;background:var(--panel2);overflow:hidden;}
+  .bar > span{display:block;height:100%;background:var(--accent);}
+  .bar > span.bad{background:var(--rot);}
+  .kpis{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:6px;}
+  .kpi{font-size:12px;color:var(--muted);} .kpi b{color:var(--text);font-size:15px;margin-right:4px;}
+  .kpi b.bad{color:var(--rot);}
+  .u-legend{display:none;}
+  @media (max-width:900px){ .grid{grid-template-columns:1fr;} }
+</style>
+<script src="./lib/uPlot.iife.min.js"></script>
+<script src="./lib/echarts.min.js"></script>
+</head>
+<body>
+
+<div class="kopf"><h1>Akku (HV)</h1><span id="x_info" class="x-info">—</span></div>
+
+<div class="grid">
+  <div class="panel voll">
+    <h2><span class="titel">Kontext</span>
+      <span class="rechts"><select id="ctx_sel"></select></span>
+    </h2>
+    <div id="ctx_plot"></div>
+    <div class="hinweis">Standard: Geschwindigkeit. Über das Dropdown ein anderes Signal wählen – cursor-synchron mit den übrigen Plots.</div>
+  </div>
+
+  <div class="panel voll">
+    <h2><span class="titel">Pack-Übersicht</span></h2>
+    <div id="pack" class="stack"></div>
+  </div>
+
+  <div class="panel voll">
+    <h2><span class="titel">Zell-Heatmap</span>
+      <span class="rechts">
+        <button id="hm_dev" class="an">Abweichung</button>
+        <button id="hm_abs">Spannung</button>
+      </span>
+    </h2>
+    <canvas id="hm_canvas"></canvas>
+    <div class="hinweis">Zeile = Zelle, Spalte = Zeit. Rot = unter dem Pack-Mittel (schwach). Klick wählt eine Zelle für den Inspektor.</div>
+  </div>
+
+  <div class="panel">
+    <h2><span class="titel">Kritische Zellen</span><span id="krit_info" class="rechts"></span></h2>
+    <ul id="krit" class="krit"></ul>
+  </div>
+
+  <div class="panel">
+    <h2><span class="titel">Zell-Inspektor</span><span id="insp_titel" class="rechts"></span></h2>
+    <div id="insp_kpis" class="kpis"></div>
+    <div id="insp"></div>
+  </div>
+
+  <div class="panel">
+    <h2><span class="titel">Spannungsabfall</span><span id="sag_info" class="rechts"></span></h2>
+    <div id="sag" style="height:260px"></div>
+    <div id="verlust"></div>
+  </div>
+
+  <div class="panel">
+    <h2><span class="titel">Temperatur</span><span id="temp_info" class="rechts"></span></h2>
+    <div id="temp"></div>
+    <div id="derating" class="hinweis"></div>
+  </div>
+</div>
+
+<script>
+"use strict";
+const T={text:"#e6e6e0",muted:"#8a8a8a",achse:"#bdbdb6",line:"#2c2c2c",rot:"#c7222a",ok:"#3fb950",warn:"#d9a441",accent:"#3987e5"};
+const asArray=(v)=>Array.isArray(v)?v:(v==null?[]:[v]);
+let PL=null, up=[], sagChart=null, hmModus="dev", selCell=null, ctxSel=null, ctxUp=null;
+
+function setup(hc){
+  hc.addEventListener("DataChanged",()=>render(hc.Data));
+  if(hc.Data) render(hc.Data);
+  window.sendToMatlab=(n,d)=>hc.sendEventToMATLAB(n,d);
+  document.getElementById("hm_dev").onclick=()=>{hmModus="dev";modusUI();drawHeatmap();};
+  document.getElementById("hm_abs").onclick=()=>{hmModus="abs";modusUI();drawHeatmap();};
+  document.getElementById("hm_canvas").onclick=hmClick;
+  document.getElementById("ctx_sel").onchange=(e)=>{ ctxSel=e.target.value; zeichneKontext(PL); };
+}
+window.setup=setup;
+function modusUI(){ document.getElementById("hm_dev").classList.toggle("an",hmModus==="dev");
+  document.getElementById("hm_abs").classList.toggle("an",hmModus==="abs"); }
+
+const getSig=(pl,n)=>asArray(pl.signals).find(s=>s.name===n);
+const istOk=(s)=>s&&s.status==="gueltig"&&s.y&&s.y.length;
+function resetUp(){ up.forEach(u=>u.destroy()); up=[]; ctxUp=null; }
+
+function render(pl){
+  if(!pl||!pl.x) return;
+  PL=pl; resetUp();
+  document.getElementById("x_info").textContent="x-Achse: "+(pl.meta.x_modus==="distanz"?"Distanz [m]":"Zeit [s]");
+  // Standard-Auswahl: schlechteste Zelle
+  const krit=asArray(pl.panels.zellen&&pl.panels.zellen.kritische);
+  if(selCell==null && krit.length) selCell=krit[0].index;
+  renderKontext(pl);
+  renderPack(pl);
+  drawHeatmap();
+  renderKritisch(pl);
+  renderInspektor(pl);
+  renderSag(pl);
+  renderTemp(pl);
+}
+
+/* Kontext-Signal (waehlbar per Dropdown, Default Geschwindigkeit) */
+const NAME_MAP={speed_can:"Geschwindigkeit",apps1_can:"Gas",ams_overall_voltage_can:"Pack-Spannung",
+  IVT_Result_I_can:"Pack-Strom",ams_cell_min_voltage_can:"Zelle min",ams_cell_max_voltage_can:"Zelle max",
+  ams_cell_min_temp_can:"Temp min",ams_cell_max_temp_can:"Temp max",ams_cell_avg_temp_can:"Temp mittel",
+  ams_capacity_fl_can:"Kapazität",IVT_Result_As_can:"Ladung"};
+function pretty(n){ return NAME_MAP[n]||String(n).replace(/_can$/,""); }
+function renderKontext(pl){
+  const sel=document.getElementById("ctx_sel");
+  const valid=asArray(pl.signals).filter(istOk);
+  const prev=ctxSel||sel.value;
+  sel.innerHTML=valid.map(s=>`<option value="${s.name}">${pretty(s.name)}${s.unit?` [${s.unit}]`:""}</option>`).join("");
+  if(!valid.length){ ctxSel=null; document.getElementById("ctx_plot").innerHTML=`<div class="leer">keine Signale</div>`; return; }
+  ctxSel = (prev && valid.some(s=>s.name===prev)) ? prev
+         : (valid.some(s=>s.name==="speed_can") ? "speed_can" : valid[0].name);
+  sel.value=ctxSel;
+  zeichneKontext(pl);
+}
+function zeichneKontext(pl){
+  if(!pl) return;
+  const host=document.getElementById("ctx_plot");
+  if(ctxUp){ const i=up.indexOf(ctxUp); if(i>=0) up.splice(i,1); ctxUp.destroy(); ctxUp=null; }
+  const s=getSig(pl,ctxSel);
+  if(!istOk(s)){ host.innerHTML=`<div class="leer">${pretty(ctxSel)}: nicht verfügbar</div>`; return; }
+  host.innerHTML="";
+  const xlab=pl.meta.x_einheit==="m"?"Distanz [m]":"Zeit [s]";
+  ctxUp=new uPlot(uo(pretty(ctxSel),host.clientWidth||800,160,
+    [{},{label:pretty(ctxSel),stroke:T.accent,width:1.3,points:{show:false}}],xlab,true,s.unit||""),
+    [pl.x,s.y],host);
+  up.push(ctxUp);
+}
+
+/* Pack-Übersicht */
+function renderPack(pl){
+  const host=document.getElementById("pack"); host.innerHTML="";
+  const xlab=pl.meta.x_einheit==="m"?"Distanz [m]":"Zeit [s]";
+  const v=getSig(pl,"ams_overall_voltage_can"), i=getSig(pl,"IVT_Result_I_can");
+  const soc=pl.panels.soc||{};
+  const power = (istOk(v)&&istOk(i)) ? pl.x.map((_,k)=>{const a=v.y[k],b=i.y[k];return (a==null||b==null)?null:a*b/1000;}) : null;
+  const bloecke=[
+    {t:"Pack-Spannung [V]", ylab:"V", data:istOk(v)?[pl.x,v.y]:null, ser:[{label:"V",stroke:T.accent}]},
+    {t:"Strom [A]", ylab:"A", data:istOk(i)?[pl.x,i.y]:null, ser:[{label:"I",stroke:T.rot}]},
+    {t:"Leistung [kW]", ylab:"kW", data:power?[pl.x,power]:null, ser:[{label:"P",stroke:T.warn}]},
+    {t:"SOC [%]", ylab:"%", data:(soc.ivt||soc.bms)?[pl.x,soc.ivt||[],soc.bms||[]]:null,
+      ser:[{label:"IVT",stroke:T.ok},{label:"BMS",stroke:T.muted}]},
+  ];
+  bloecke.forEach((b,idx)=>{
+    const div=document.createElement("div"); host.appendChild(div);
+    if(!b.data){ div.innerHTML=`<div class="leer">${b.t}: nicht verfügbar</div>`; return; }
+    const series=[{}].concat(b.ser.map(s=>({label:s.label,stroke:s.stroke,width:1.3,points:{show:false}})));
+    up.push(new uPlot(uo(b.t,host.clientWidth||800,110,series,xlab,idx===bloecke.length-1,b.ylab),b.data,div));
+  });
+}
+
+/* Heatmap */
+function drawHeatmap(){
+  const z=PL&&PL.panels.zellen; const h=z&&z.heatmap;
+  const cv=document.getElementById("hm_canvas");
+  if(!h||!h.matrix){ cv.getContext("2d").clearRect(0,0,cv.width,cv.height); return; }
+  const rows=asArray(h.matrix), nR=rows.length, nC=nR?asArray(rows[0]).length:0, mean=asArray(h.mean);
+  const W=cv.clientWidth||900, H=Math.max(160,Math.min(520,nR*3));
+  cv.width=W; cv.height=H; const ctx=cv.getContext("2d");
+  let lo=Infinity,hi=-Infinity,devs=[];
+  rows.forEach((r)=>asArray(r).forEach((val,ci)=>{ if(val!=null&&isFinite(val)){ if(val<lo)lo=val; if(val>hi)hi=val; if(mean[ci]!=null)devs.push(Math.abs(val-mean[ci])); }}));
+  devs.sort((a,b)=>a-b); const D=Math.max(0.01, devs[Math.floor(devs.length*0.95)]||0.05);
+  const cw=W/nC, ch=H/nR;
+  for(let ri=0;ri<nR;ri++){ const row=asArray(rows[ri]);
+    for(let ci=0;ci<nC;ci++){ const val=row[ci];
+      ctx.fillStyle=(val==null||!isFinite(val))?"#000":(hmModus==="dev"?farbeDev(val-(mean[ci]!=null?mean[ci]:val),D):farbeAbs(val,lo,hi));
+      ctx.fillRect(ci*cw,ri*ch,Math.ceil(cw),Math.ceil(ch));
+    }
+  }
+  // markierte Zelle hervorheben
+  const idx=asArray(h.index); const sr=idx.indexOf(selCell);
+  if(sr>=0){ ctx.strokeStyle="#fff"; ctx.lineWidth=1.5; ctx.strokeRect(0,sr*ch,W,Math.max(2,ch)); }
+}
+function hmClick(e){
+  const z=PL&&PL.panels.zellen; const h=z&&z.heatmap; if(!h) return;
+  const cv=document.getElementById("hm_canvas"); const rect=cv.getBoundingClientRect();
+  const idx=asArray(h.index); const nR=idx.length;
+  const ri=Math.floor((e.clientY-rect.top)/rect.height*nR);
+  if(ri>=0&&ri<nR){ selCell=idx[ri]; drawHeatmap(); renderKritisch(PL); renderInspektor(PL); }
+}
+function farbeDev(d,D){ const t=Math.max(-1,Math.min(1,(d||0)/(D||1)));
+  if(t<=0){const k=-t;return `rgb(${lerp(30,199,k)},${lerp(30,34,k)},${lerp(35,42,k)})`;}
+  const k=t;return `rgb(${lerp(30,57,k)},${lerp(30,135,k)},${lerp(35,229,k)})`; }
+function farbeAbs(v,lo,hi){ const t=Math.max(0,Math.min(1,(v-lo)/((hi-lo)||1)));
+  if(t<0.5){const k=t/0.5;return `rgb(${lerp(199,217,k)},${lerp(34,164,k)},${lerp(42,65,k)})`;}
+  const k=(t-0.5)/0.5;return `rgb(${lerp(217,63,k)},${lerp(164,185,k)},${lerp(65,80,k)})`; }
+const lerp=(a,b,t)=>Math.round(a+(b-a)*t);
+
+/* Kritische Zellen */
+function renderKritisch(pl){
+  const el=document.getElementById("krit");
+  const krit=asArray(pl.panels.zellen&&pl.panels.zellen.kritische);
+  const anzKrit=krit.filter(k=>k.kritisch).length;
+  document.getElementById("krit_info").textContent=`${anzKrit} kritisch · ${krit.length} Zellen`;
+  if(!krit.length){ el.innerHTML=`<li class="leer">keine Zelldaten</li>`; return; }
+  const top=krit.slice(0,20);
+  el.innerHTML="";
+  top.forEach(k=>{
+    const li=document.createElement("li"); if(k.index===selCell) li.className="sel";
+    li.innerHTML=`<span class="zn ${k.kritisch?'bad':''}">Z${k.index}</span>`+
+      `<span class="bar"><span class="${k.kritisch?'bad':''}" style="width:${Math.round((k.score||0)*100)}%"></span></span>`+
+      `<span class="zn">${fmt(k.v_min,2)} V</span>`;
+    li.onclick=()=>{ selCell=k.index; drawHeatmap(); renderKritisch(pl); renderInspektor(pl); };
+    el.appendChild(li);
+  });
+}
+
+/* Zell-Inspektor */
+function renderInspektor(pl){
+  const host=document.getElementById("insp"); host.innerHTML="";
+  const z=pl.panels.zellen, h=z&&z.heatmap;
+  document.getElementById("insp_titel").textContent=selCell!=null?`Zelle ${selCell}`:"";
+  const krit=asArray(z&&z.kritische).find(k=>k.index===selCell);
+  document.getElementById("insp_kpis").innerHTML = krit ?
+    `<span class="kpi"><b class="${krit.kritisch?'bad':''}">${fmt(krit.score,2)}</b>Score</span>`+
+    `<span class="kpi"><b>${fmt(krit.r_innen,4)}</b>R_i [Ω]</span>`+
+    `<span class="kpi"><b>${fmt(krit.v_min,3)}</b>V_min</span>`+
+    `<span class="kpi"><b>${fmt(krit.abweichung,3)}</b>Abw.</span>` : "";
+  if(!h||!h.matrix||selCell==null){ host.innerHTML=`<div class="leer">Zelle wählen</div>`; return; }
+  const idx=asArray(h.index), r=idx.indexOf(selCell);
+  if(r<0){ host.innerHTML=`<div class="leer">Zelle nicht verfügbar</div>`; return; }
+  const y=asArray(asArray(h.matrix)[r]), mean=asArray(h.mean), t=asArray(h.t);
+  const xlab=pl.meta.x_einheit==="m"?"Distanz [m]":"Zeit [s]";
+  up.push(new uPlot(uo("Zelle vs. Pack-Mittel [V]",host.clientWidth||400,190,
+    [{},{label:"Zelle",stroke:T.rot,width:1.4,points:{show:false}},{label:"Mittel",stroke:T.muted,width:1,points:{show:false}}],
+    xlab,true,"V"),[t,y,mean],host));
+}
+
+/* Spannungsabfall */
+function renderSag(pl){
+  const v=getSig(pl,"ams_overall_voltage_can"), i=getSig(pl,"IVT_Result_I_can");
+  const sa=pl.panels.spannungsabfall||{};
+  document.getElementById("sag_info").textContent = sa.r_i_pack!=null&&!isNaN(sa.r_i_pack) ? `R_i Pack ≈ ${fmt(sa.r_i_pack,4)} Ω` : "";
+  const el=document.getElementById("sag");
+  if(typeof echarts==="undefined"){ el.innerHTML=`<div class="leer">ECharts fehlt in ./lib</div>`; }
+  else if(!istOk(v)||!istOk(i)){ el.innerHTML=`<div class="leer">nicht verfügbar</div>`; }
+  else{
+    const pts=[]; const stride=Math.max(1,Math.floor(pl.x.length/4000));
+    for(let k=0;k<pl.x.length;k+=stride){ const a=i.y[k],b=v.y[k]; if(a==null||b==null)continue; pts.push([a,b]); }
+    if(sagChart) sagChart.dispose();
+    sagChart=echarts.init(el,null,{renderer:"canvas"});
+    sagChart.setOption(scatterOpt(pts,"Strom [A]","Pack-Spannung [V]"));
+  }
+  const vb=document.getElementById("verlust"); vb.innerHTML="";
+  if(sa.verlustleistung&&asArray(sa.verlustleistung).length){
+    const xlab=pl.meta.x_einheit==="m"?"Distanz [m]":"Zeit [s]";
+    up.push(new uPlot(uo("Verlustleistung [W]",vb.clientWidth||400,120,
+      [{},{label:"P_loss",stroke:T.warn,width:1.2,points:{show:false}}],xlab,true,"W"),[pl.x,sa.verlustleistung],vb));
+  }
+}
+
+/* Temperatur */
+function renderTemp(pl){
+  const host=document.getElementById("temp"); host.innerHTML="";
+  const tp=pl.panels.temp||{};
+  document.getElementById("temp_info").textContent = (tp.max_temp!=null&&!isNaN(tp.max_temp)) ?
+    `Hotspot: Zelle ${tp.hotspot_index} · ${fmt(tp.max_temp,1)} °C` : "";
+  const sp=tp.spread;
+  if(!sp||!sp.max){ host.innerHTML=`<div class="leer">keine Temperaturdaten</div>`; }
+  else{
+    const xlab=pl.meta.x_einheit==="m"?"Distanz [m]":"Zeit [s]";
+    up.push(new uPlot(uo("Zelltemperatur min/mittel/max [°C]",host.clientWidth||400,180,
+      [{},{label:"max",stroke:T.rot,width:1.2,points:{show:false}},{label:"mittel",stroke:T.warn,width:1,points:{show:false}},{label:"min",stroke:T.accent,width:1,points:{show:false}}],
+      xlab,true,"°C"),[pl.x,sp.max,sp.mean,sp.min],host));
+  }
+  const marker=asArray(pl.panels.derating&&pl.panels.derating.marker);
+  document.getElementById("derating").innerHTML = marker.length ?
+    "Derating (Akku): "+marker.map(m=>`${m.name.replace(/_can$/,"")} @ ${Math.round(m.x)}`).join(" · ") : "";
+}
+
+/* Chart-Optionen */
+function fmtAchse(v){
+  if(v==null||!isFinite(v)) return "";
+  const a=Math.abs(v);
+  if(a>=1e6) return (v/1e6).toFixed(1)+"M";
+  if(a>=1e3) return (v/1e3).toFixed(a>=1e4?0:1)+"k";
+  if(a>=100) return v.toFixed(0);
+  if(a>=10)  return v.toFixed(1);
+  if(a>=1)   return v.toFixed(2);
+  if(a===0)  return "0";
+  return v.toFixed(3);
+}
+function uo(titel,breite,hoehe,series,xlab,zeigX,ylab){
+  const a={stroke:T.achse,grid:{stroke:T.line,width:.5},ticks:{stroke:T.line,width:.5},font:"11px -apple-system, sans-serif"};
+  const xa=Object.assign({},a,{label:zeigX?xlab:undefined,labelFont:"11px -apple-system, sans-serif",labelSize:24,size:zeigX?38:22});
+  const ya=Object.assign({},a,{label:ylab||undefined,labelFont:"11px -apple-system, sans-serif",labelSize:22,size:48,
+    values:(u,splits)=>splits.map(fmtAchse)});
+  return {title:titel||undefined,width:breite,height:hoehe,cursor:{sync:{key:"akku"},points:{size:4}},
+    scales:{x:{time:false}},legend:{show:false},series:series,axes:[xa,ya]};
+}
+function scatterOpt(pts,xlab,ylab){
+  return {backgroundColor:"transparent",grid:{left:60,right:16,top:14,bottom:42},
+    tooltip:{trigger:"item",backgroundColor:"#1e1e1e",borderColor:T.line,textStyle:{color:T.text}},
+    xAxis:{name:xlab,nameLocation:"middle",nameGap:26,type:"value",scale:true,axisLine:{lineStyle:{color:T.achse}},splitLine:{lineStyle:{color:T.line}},nameTextStyle:{color:T.achse},axisLabel:{color:T.achse}},
+    yAxis:{name:ylab,nameLocation:"middle",nameGap:48,type:"value",scale:true,axisLine:{lineStyle:{color:T.achse}},splitLine:{lineStyle:{color:T.line}},nameTextStyle:{color:T.achse},axisLabel:{color:T.achse}},
+    series:[{type:"scatter",symbolSize:3,data:pts,itemStyle:{color:T.accent,opacity:0.5},large:true,largeThreshold:2000}]};
+}
+const fmt=(v,d)=> (v==null||isNaN(v))?"—":Number(v).toFixed(d);
+
+let rt;
+function resizeAll(){ up.forEach(u=>{const w=u.root.parentNode.clientWidth; if(w>0)u.setSize({width:w,height:u.height});});
+  if(sagChart)sagChart.resize(); drawHeatmap(); }
+function planeResize(){ clearTimeout(rt); rt=setTimeout(resizeAll,150); }
+window.addEventListener("resize", planeResize);
+if(window.ResizeObserver) new ResizeObserver(planeResize).observe(document.body);
+</script>
+</body>
+</html>

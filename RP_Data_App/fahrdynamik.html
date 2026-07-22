@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fahrdynamik</title>
+<link rel="stylesheet" href="./lib/uPlot.min.css">
+<style>
+  :root{
+    --bg:#121212; --panel:#1e1e1e; --panel2:#171717; --line:#2c2c2c;
+    --text:#e6e6e0; --muted:#8a8a8a; --rot:#c7222a;
+    --ok:#3fb950; --warn:#d9a441; --fehlt:#c7222a;
+    --c-speed:#3987e5; --c-ax:#c7222a; --c-ay:#1baf7a;
+    --c-yaw:#d9a441; --c-steer:#a371f7;
+    --fl:#3987e5; --fr:#1baf7a; --rl:#d9a441; --rr:#a371f7;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,"Segoe UI",Roboto,sans-serif;font-size:13px;}
+  .kopf{display:flex;align-items:center;gap:12px;padding:8px 12px;
+    border-bottom:.5px solid var(--line);}
+  .kopf h1{font-size:14px;margin:0;font-weight:600;
+    border-left:3px solid var(--rot);padding-left:8px;}
+  .kopf .x-info{color:var(--muted);font-size:12px;margin-left:auto;}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px;}
+  .panel{background:var(--panel);border:.5px solid var(--line);
+    border-radius:10px;padding:10px 12px;min-width:0;}
+  .panel.voll{grid-column:1 / -1;}
+  .panel h2{font-size:13px;margin:0 0 8px;display:flex;align-items:center;gap:8px;}
+  .panel h2 .titel{border-left:3px solid var(--rot);padding-left:8px;}
+  .health{display:flex;flex-wrap:wrap;gap:6px;margin-left:auto;}
+  .chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;
+    color:var(--muted);}
+  .chip .dot{width:8px;height:8px;border-radius:50%;background:var(--muted);}
+  .dot.gueltig{background:var(--ok);} .dot.statisch,.dot.nan{background:var(--warn);}
+  .dot.fehlt{background:var(--fehlt);}
+  .leer{color:var(--muted);font-size:12px;padding:18px 4px;text-align:center;}
+  .hinweis{color:var(--muted);font-size:11px;margin-top:6px;}
+  .stack{display:flex;flex-direction:column;gap:4px;}
+  /* uPlot dark */
+  .u-legend{color:var(--text);font-size:11px;}
+  .u-legend .u-marker{width:9px;height:9px;}
+  .u-title{color:var(--text);}
+  @media (max-width:900px){ .grid{grid-template-columns:1fr;} }
+</style>
+<script src="./lib/uPlot.iife.min.js"></script>
+<script src="./lib/echarts.min.js"></script>
+</head>
+<body>
+
+<div class="kopf">
+  <h1>Fahrdynamik</h1>
+  <span id="x_info" class="x-info">—</span>
+</div>
+
+<!-- Telemetrie-Stack (Signatur: verknüpfter Cursor über alle Kanäle) -->
+<div class="grid">
+  <div class="panel voll">
+    <h2><span class="titel">Fahrzustand</span><div id="h_stack" class="health"></div></h2>
+    <div id="stack" class="stack"></div>
+  </div>
+
+  <div class="panel">
+    <h2><span class="titel">g-g-Diagramm</span><div id="h_gg" class="health"></div></h2>
+    <div id="gg" style="height:340px"></div>
+  </div>
+
+  <div class="panel">
+    <h2><span class="titel">Eigenlenkverhalten</span><div id="h_ulg" class="health"></div></h2>
+    <div id="ulg" style="height:340px"></div>
+  </div>
+
+  <div class="panel">
+    <h2><span class="titel">Schlupf (geloggt)</span><div id="h_slip" class="health"></div></h2>
+    <div id="slip"></div>
+    <div class="hinweis">Eigene Schlupfrechnung und Delta folgen aus dem Backend.</div>
+  </div>
+
+  <div class="panel">
+    <h2><span class="titel">Schwimmwinkel β</span><div id="h_beta" class="health"></div></h2>
+    <div id="beta"></div>
+    <div class="hinweis">β aus INS-Geschwindigkeiten; Rückfall/Reifenwinkel folgen aus dem Backend.</div>
+  </div>
+
+  <div class="panel voll">
+    <h2><span class="titel">Reifenmomente &amp; Bremsdruck</span><div id="h_moment" class="health"></div></h2>
+    <div id="moment" class="stack"></div>
+    <div class="hinweis">Zerlegte Längskraft am Latsch (Antrieb + Regen + Bremse) folgt aus dem Backend (braucht Parameter).</div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* ---------- Theme (Hex-Spiegel der CSS-Tokens für Canvas-Libs) ---------- */
+const T = {
+  text:"#e6e6e0", muted:"#8a8a8a", line:"#2c2c2c", panel:"#1e1e1e",
+  speed:"#3987e5", ax:"#c7222a", ay:"#1baf7a", yaw:"#d9a441", steer:"#a371f7",
+  fl:"#3987e5", fr:"#1baf7a", rl:"#d9a441", rr:"#a371f7", rot:"#c7222a"
+};
+const SYNC = "fd";                 // Sync-Key für den Telemetrie-Cursor
+let uplots = [];                   // aktive uPlot-Instanzen (zum Aufräumen)
+let echartsInst = [];              // aktive ECharts-Instanzen
+
+/* ---------- uihtml-Anbindung ---------- */
+function setup(htmlComponent){
+  htmlComponent.addEventListener("DataChanged", () => render(htmlComponent.Data));
+  if (htmlComponent.Data) render(htmlComponent.Data);
+  window.sendToMatlab = (n,d) => htmlComponent.sendEventToMATLAB(n,d);
+}
+window.setup = setup;
+
+/* ---------- Datenzugriff ---------- */
+const getSig = (pl,name) => pl.signals.find(s => s.name === name);
+const istOk  = (s) => s && s.status === "gueltig" && s.y && s.y.length;
+const statusVon = (s) => s ? s.status : "fehlt";
+
+/* ---------- Health-Chips ---------- */
+function healthChips(el, pl, eintraege){
+  el.innerHTML = "";
+  for (const [name,label] of eintraege){
+    const st = statusVon(getSig(pl,name));
+    const c = document.createElement("span"); c.className = "chip";
+    c.innerHTML = `<span class="dot ${st}"></span>${label}`;
+    el.appendChild(c);
+  }
+}
+function leer(id, text){
+  const el = document.getElementById(id);
+  el.innerHTML = `<div class="leer">${text}</div>`;
+}
+
+/* ---------- Aufräumen vor Neu-Render ---------- */
+function reset(){
+  uplots.forEach(u => u.destroy()); uplots = [];
+  echartsInst.forEach(e => e.dispose()); echartsInst = [];
+}
+
+/* ---------- Haupt-Render ---------- */
+function render(pl){
+  if (!pl || !pl.x || !pl.signals) return;
+  reset();
+  document.getElementById("x_info").textContent =
+    "x-Achse: " + (pl.meta.x_modus === "distanz" ? "Distanz [m]" : "Zeit [s]");
+  const xlab = pl.meta.x_einheit === "m" ? "Distanz [m]" : "Zeit [s]";
+
+  renderStack(pl, xlab);
+  renderGG(pl);
+  renderEigenlenk(pl);
+  renderSchlupf(pl, xlab);
+  renderBeta(pl, xlab);
+  renderMoment(pl, xlab);
+}
+
+/* ---------- Telemetrie-Stack (uPlot, Cursor synchronisiert) ---------- */
+function renderStack(pl, xlab){
+  const kanaele = [
+    { titel:"Geschwindigkeit", serien:[["speed_can","v",T.speed]] },
+    { titel:"Beschleunigung",  serien:[["INS_acc_x_can","ax",T.ax],["INS_acc_y_can","ay",T.ay]] },
+    { titel:"Gierrate",        serien:[["INS_ang_vel_z_can","yaw",T.yaw],["DL_Yaw_rate_can","yaw (DL)",T.yaw]] },
+    { titel:"Lenkwinkel",      serien:[["steering_wheel_angle_can","δ",T.steer]] },
+  ];
+  healthChips(document.getElementById("h_stack"), pl, [
+    ["speed_can","v"],["INS_acc_x_can","ax"],["INS_acc_y_can","ay"],
+    ["INS_ang_vel_z_can","yaw"],["steering_wheel_angle_can","δ"] ]);
+
+  const host = document.getElementById("stack"); host.innerHTML = "";
+  const breite = host.clientWidth || 800;
+
+  kanaele.forEach((k, idx) => {
+    const vorhanden = k.serien.filter(s => istOk(getSig(pl, s[0])));
+    const div = document.createElement("div"); host.appendChild(div);
+    if (!vorhanden.length){
+      div.innerHTML = `<div class="leer">${k.titel}: nicht verfügbar</div>`; return;
+    }
+    const data = [pl.x, ...vorhanden.map(s => getSig(pl,s[0]).y)];
+    const series = [{}].concat(vorhanden.map(s => ({
+      label: s[1], stroke: s[2], width: 1.3, points:{show:false}
+    })));
+    const zeigX = idx === kanaele.length - 1;   // x-Achse nur unten beschriften
+    const u = new uPlot(uplotOpts(k.titel, breite, 132, series, xlab, zeigX), data, div);
+    uplots.push(u);
+  });
+}
+
+/* ---------- Reifenmomente + Bremsdruck (uPlot-Stack) ---------- */
+function renderMoment(pl, xlab){
+  healthChips(document.getElementById("h_moment"), pl, [
+    ["unitek_fl_torque_motor_ist_can","FL"],["unitek_fr_torque_motor_ist_can","FR"],
+    ["unitek_rl_torque_motor_ist_can","RL"],["unitek_rr_torque_motor_ist_can","RR"],
+    ["pbrake_front_can","p_v"],["pbrake_rear_can","p_h"] ]);
+
+  const host = document.getElementById("moment"); host.innerHTML = "";
+  const breite = host.clientWidth || 800;
+
+  const bloecke = [
+    { titel:"Motormoment je Ecke", serien:[
+        ["unitek_fl_torque_motor_ist_can","FL",T.fl],["unitek_fr_torque_motor_ist_can","FR",T.fr],
+        ["unitek_rl_torque_motor_ist_can","RL",T.rl],["unitek_rr_torque_motor_ist_can","RR",T.rr]] },
+    { titel:"Bremsdruck", serien:[
+        ["pbrake_front_can","vorn",T.ax],["pbrake_rear_can","hinten",T.speed]] },
+  ];
+  bloecke.forEach((b, idx) => {
+    const vorhanden = b.serien.filter(s => istOk(getSig(pl, s[0])));
+    const div = document.createElement("div"); host.appendChild(div);
+    if (!vorhanden.length){ div.innerHTML = `<div class="leer">${b.titel}: nicht verfügbar</div>`; return; }
+    const data = [pl.x, ...vorhanden.map(s => getSig(pl,s[0]).y)];
+    const series = [{}].concat(vorhanden.map(s => ({label:s[1],stroke:s[2],width:1.3,points:{show:false}})));
+    const u = new uPlot(uplotOpts(b.titel, breite, 150, series, xlab, idx===bloecke.length-1), data, div);
+    uplots.push(u);
+  });
+}
+
+/* ---------- Schlupf (geloggt) ---------- */
+function renderSchlupf(pl, xlab){
+  const eck = [["slip_compare_val_fl_can","FL",T.fl],["slip_compare_val_fr_can","FR",T.fr],
+               ["slip_compare_val_rl_can","RL",T.rl],["slip_compare_val_rr_can","RR",T.rr]];
+  healthChips(document.getElementById("h_slip"), pl, eck.map(e=>[e[0],e[1]]));
+  const vorhanden = eck.filter(s => istOk(getSig(pl,s[0])));
+  if (!vorhanden.length){ leer("slip","nicht verfügbar"); return; }
+  const host = document.getElementById("slip"); host.innerHTML = "";
+  const data = [pl.x, ...vorhanden.map(s => getSig(pl,s[0]).y)];
+  const series = [{}].concat(vorhanden.map(s => ({label:s[1],stroke:s[2],width:1.2,points:{show:false}})));
+  const u = new uPlot(uplotOpts("", host.clientWidth||400, 200, series, xlab, true), data, host);
+  uplots.push(u);
+}
+
+/* ---------- Schwimmwinkel β aus INS ---------- */
+function renderBeta(pl, xlab){
+  const vx = getSig(pl,"INS_vel_x_can"), vy = getSig(pl,"INS_vel_y_can");
+  healthChips(document.getElementById("h_beta"), pl, [["INS_vel_x_can","vx"],["INS_vel_y_can","vy"]]);
+  if (!istOk(vx) || !istOk(vy)){ leer("beta","nicht verfügbar (INS)"); return; }
+  const beta = pl.x.map((_,i) => {
+    const a = vx.y[i], b = vy.y[i];
+    return (a==null || b==null) ? null : Math.atan2(b,a)*180/Math.PI;
+  });
+  const host = document.getElementById("beta"); host.innerHTML = "";
+  const series = [{}, {label:"β [°]", stroke:T.ay, width:1.3, points:{show:false}}];
+  const u = new uPlot(uplotOpts("", host.clientWidth||400, 200, series, xlab, true), [pl.x, beta], host);
+  uplots.push(u);
+}
+
+/* ---------- g-g-Diagramm (ECharts, nach Speed eingefärbt) ---------- */
+function renderGG(pl){
+  const ax = getSig(pl,"INS_acc_x_can"), ay = getSig(pl,"INS_acc_y_can"), v = getSig(pl,"speed_can");
+  healthChips(document.getElementById("h_gg"), pl, [["INS_acc_y_can","ay"],["INS_acc_x_can","ax"],["speed_can","v"]]);
+  if (!istOk(ax) || !istOk(ay)){ leer("gg","nicht verfügbar"); return; }
+  const pts = [];
+  const stride = Math.max(1, Math.floor(pl.x.length / 4000));
+  for (let i=0;i<pl.x.length;i+=stride){
+    const X = ay.y[i], Y = ax.y[i];
+    if (X==null || Y==null) continue;
+    pts.push([X, Y, istOk(v) ? v.y[i] : 0]);
+  }
+  const el = document.getElementById("gg");
+  const chart = echarts.init(el, null, {renderer:"canvas"});
+  chart.setOption(scatterOpt(pts, "ay [m/s²]", "ax [m/s²]", istOk(v), "v"));
+  echartsInst.push(chart);
+}
+
+/* ---------- Eigenlenkverhalten (Lenkwinkel vs ay) ---------- */
+function renderEigenlenk(pl){
+  const st = getSig(pl,"steering_wheel_angle_can"), ay = getSig(pl,"INS_acc_y_can");
+  healthChips(document.getElementById("h_ulg"), pl, [["steering_wheel_angle_can","δ"],["INS_acc_y_can","ay"]]);
+  if (!istOk(st) || !istOk(ay)){ leer("ulg","nicht verfügbar"); return; }
+  const pts = [];
+  const stride = Math.max(1, Math.floor(pl.x.length / 4000));
+  for (let i=0;i<pl.x.length;i+=stride){
+    const X = ay.y[i], Y = st.y[i];
+    if (X==null || Y==null) continue;
+    pts.push([X, Y]);
+  }
+  const el = document.getElementById("ulg");
+  const chart = echarts.init(el, null, {renderer:"canvas"});
+  chart.setOption(scatterOpt(pts, "ay [m/s²]", "Lenkwinkel [°]", false));
+  echartsInst.push(chart);
+}
+
+/* ---------- uPlot-Optionen (dunkel) ---------- */
+function uplotOpts(titel, breite, hoehe, series, xlab, zeigX){
+  const achse = {
+    stroke:T.muted, grid:{stroke:T.line, width:.5}, ticks:{stroke:T.line, width:.5},
+    font:"11px -apple-system, sans-serif"
+  };
+  return {
+    title: titel || undefined,
+    width: breite, height: hoehe,
+    cursor:{ sync:{ key:SYNC }, points:{size:5} },
+    scales:{ x:{ time:false } },
+    legend:{ live:true },
+    series: series,
+    axes:[
+      Object.assign({}, achse, { label: zeigX ? xlab : undefined, size: zeigX?40:26,
+        values:(u,vals)=>vals.map(v=>v) }),
+      Object.assign({}, achse, { size:52 })
+    ],
+  };
+}
+
+/* ---------- ECharts-Scatter (dunkel) ---------- */
+function scatterOpt(pts, xlab, ylab, mitVisual, vname){
+  const opt = {
+    backgroundColor:"transparent",
+    grid:{ left:56, right: mitVisual?70:20, top:16, bottom:44 },
+    tooltip:{ trigger:"item", backgroundColor:"#1e1e1e", borderColor:T.line,
+      textStyle:{color:T.text} },
+    xAxis:{ name:xlab, nameLocation:"middle", nameGap:26, type:"value", scale:true,
+      axisLine:{lineStyle:{color:T.muted}}, splitLine:{lineStyle:{color:T.line}},
+      nameTextStyle:{color:T.muted}, axisLabel:{color:T.muted} },
+    yAxis:{ name:ylab, nameLocation:"middle", nameGap:40, type:"value", scale:true,
+      axisLine:{lineStyle:{color:T.muted}}, splitLine:{lineStyle:{color:T.line}},
+      nameTextStyle:{color:T.muted}, axisLabel:{color:T.muted} },
+    series:[{ type:"scatter", symbolSize:3, data:pts,
+      itemStyle:{ color: mitVisual ? undefined : T.speed, opacity:0.6 },
+      large:true, largeThreshold:2000 }]
+  };
+  if (mitVisual){
+    const vv = pts.map(p=>p[2]);
+    opt.visualMap = {
+      min: Math.min.apply(null, vv), max: Math.max.apply(null, vv),
+      dimension:2, right:6, top:"center", calculable:true,
+      text:[vname,""], textStyle:{color:T.muted}, itemHeight:120,
+      inRange:{ color:["#3987e5","#1baf7a","#d9a441","#c7222a"] }
+    };
+  }
+  return opt;
+}
+
+/* ---------- Resize ---------- */
+let resizeTimer;
+function resizeAll(){
+  uplots.forEach(u => { const w = u.root.parentNode.clientWidth; if (w>0) u.setSize({ width: w, height: u.height }); });
+  echartsInst.forEach(e => e.resize());
+}
+function planeResize(){ clearTimeout(resizeTimer); resizeTimer = setTimeout(resizeAll, 120); }
+window.addEventListener("resize", planeResize);
+// Container ist 0px, solange der Tab nicht aktiv ist -> ECharts bliebe leer.
+// Neu zeichnen, sobald der Container sichtbar/gross wird.
+if (window.ResizeObserver) new ResizeObserver(planeResize).observe(document.body);
+</script>
+</body>
+</html>

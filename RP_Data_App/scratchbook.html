@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scratchbook</title>
+<link rel="stylesheet" href="./lib/uPlot.min.css">
+<style>
+  :root{
+    --bg:#121212; --panel:#1e1e1e; --panel2:#171717; --line:#2c2c2c;
+    --text:#e6e6e0; --muted:#8a8a8a; --rot:#c7222a; --ok:#3fb950; --warn:#d9a441; --accent:#3987e5;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,"Segoe UI",Roboto,sans-serif;font-size:13px;}
+  .kopf{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 12px;border-bottom:.5px solid var(--line);}
+  .kopf h1{font-size:14px;margin:0;font-weight:600;border-left:3px solid var(--rot);padding-left:8px;margin-right:6px;}
+  .tlabel{font-size:11px;color:var(--muted);margin-left:6px;}
+  .wrap{padding:10px;display:flex;flex-direction:column;gap:10px;}
+  .panel{background:var(--panel);border:.5px solid var(--line);border-radius:10px;padding:10px 12px;}
+  .panel h2{font-size:13px;margin:0 0 8px;border-left:3px solid var(--rot);padding-left:8px;}
+  button{background:var(--rot);color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer;}
+  button.sek{background:var(--panel2);color:var(--text);border:.5px solid var(--line);}
+  button.mini{padding:2px 7px;font-size:12px;}
+  select,input[type=text]{background:var(--panel2);color:var(--text);border:.5px solid var(--line);border-radius:6px;padding:5px 8px;font-size:12px;}
+  input.sm{width:130px;} input.mono{font-family:ui-monospace,monospace;}
+  .mrow{display:grid;grid-template-columns:150px 1fr auto auto;gap:8px;align-items:center;margin-bottom:6px;}
+  .mrow .st{font-size:11px;}
+  .st.ok{color:var(--ok);} .st.err{color:var(--rot);}
+  .pcard{border:.5px solid var(--line);border-radius:8px;padding:8px 10px;margin-bottom:8px;background:var(--panel2);}
+  .pcard .zeile{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:6px;}
+  .chips{display:flex;flex-wrap:wrap;gap:5px;}
+  .chip{display:inline-flex;align-items:center;gap:5px;font-family:ui-monospace,monospace;font-size:11px;background:var(--bg);border:.5px solid var(--line);border-radius:6px;padding:2px 7px;}
+  .chip b{cursor:pointer;color:var(--muted);} .chip b:hover{color:var(--rot);}
+  .leer{color:var(--muted);font-size:12px;padding:14px 4px;text-align:center;}
+  .hinweis{color:var(--muted);font-size:11px;margin-top:6px;}
+  .u-legend{display:none;}
+  .ergebnis{display:flex;flex-direction:column;gap:10px;}
+</style>
+<script src="./lib/uPlot.iife.min.js"></script>
+<script src="./lib/echarts.min.js"></script>
+</head>
+<body>
+
+<div class="kopf">
+  <h1>Scratchbook</h1>
+  <button id="btn_render">Aktualisieren</button>
+  <span class="tlabel">Config:</span>
+  <select id="cfg_sel"><option value="">— wählen —</option></select>
+  <button class="sek" id="btn_cfg_load">Laden</button>
+  <input type="text" id="cfg_name" class="sm" placeholder="Name">
+  <button id="btn_cfg_save">Speichern</button>
+  <button class="sek" id="btn_cfg_del">Löschen</button>
+</div>
+
+<datalist id="kanal_dl"></datalist>
+
+<div class="wrap">
+  <div class="panel">
+    <h2>Math-Kanäle</h2>
+    <div id="math"></div>
+    <button class="sek mini" id="btn_add_math">+ Math-Kanal</button>
+    <div class="hinweis">Signalnamen sind Variablen; elementweise rechnen mit <code>.*&nbsp;./&nbsp;.^</code>. Beispiel: <code>kombi_g = sqrt(INS_acc_x_can.^2 + INS_acc_y_can.^2)</code> — Name links, Formel rechts.</div>
+  </div>
+
+  <div class="panel">
+    <h2>Plots</h2>
+    <div id="plots"></div>
+    <button class="sek mini" id="btn_add_plot">+ Plot</button>
+  </div>
+
+  <div class="panel">
+    <h2>Ergebnis</h2>
+    <div id="ergebnis" class="ergebnis"><div class="leer">„Aktualisieren" drücken, um die Plots zu rechnen.</div></div>
+  </div>
+</div>
+
+<script>
+"use strict";
+const T={text:"#e6e6e0",muted:"#8a8a8a",line:"#2c2c2c",rot:"#c7222a",ok:"#3fb950",warn:"#d9a441",accent:"#3987e5"};
+const PALETTE=["#3987e5","#1baf7a","#d9a441","#a371f7","#e08e45","#4bc0c0","#c76bd6","#7a9e3a","#c7222a","#5b8def"];
+const asArray=(v)=>Array.isArray(v)?v:(v==null?[]:[v]);
+let PL=null, katNamen=[], lastStamp=0, up=[], ech=[];
+let state={ math:[], plots:[] };
+
+function setup(hc){
+  hc.addEventListener("DataChanged",()=>render(hc.Data));
+  if(hc.Data) render(hc.Data);
+  window.sendToMatlab=(n,d)=>hc.sendEventToMATLAB(n,d);
+  document.getElementById("btn_render").onclick=aktualisieren;
+  document.getElementById("btn_add_math").onclick=()=>{ state.math.push({name:"",ausdruck:""}); buildMath(); };
+  document.getElementById("btn_add_plot").onclick=()=>{ state.plots.push({typ:"zeit",titel:"",kanaele:[],x_kanal:"",bins:40}); buildPlots(); };
+  document.getElementById("btn_cfg_load").onclick=cfgLaden;
+  document.getElementById("btn_cfg_save").onclick=cfgSpeichern;
+  document.getElementById("btn_cfg_del").onclick=cfgLoeschen;
+}
+window.setup=setup;
+
+function render(pl){
+  if(!pl||!pl.panels) return;
+  PL=pl;
+  katNamen=asArray(pl.panels.katalog).map(k=>k.name);
+  renderConfigs();
+  // geladene Config uebernehmen (nur bei neuem Stamp)
+  const gc=pl.panels.geladene_config;
+  if(gc && gc.stamp>lastStamp && gc.config){
+    lastStamp=gc.stamp;
+    state.math=asArray(gc.config.math).map(m=>({name:m.name||"",ausdruck:m.ausdruck||""}));
+    state.plots=asArray(gc.config.plots).map(p=>({typ:p.typ||"zeit",titel:p.titel||"",
+      kanaele:asArray(p.kanaele).slice(),x_kanal:p.x_kanal||"",bins:p.bins||40}));
+    buildMath(); buildPlots();
+  }
+  updateDatalist();
+  if(state.math.length===0 && document.getElementById("math").children.length===0) buildMath();
+  if(state.plots.length===0 && document.getElementById("plots").children.length===0) buildPlots();
+  renderMathStatus(pl);
+  renderPlots(pl);
+}
+
+function updateDatalist(){
+  const dl=document.getElementById("kanal_dl");
+  const namen=katNamen.concat(state.math.map(m=>m.name).filter(Boolean));
+  dl.innerHTML=namen.map(n=>`<option value="${n}">`).join("");
+}
+
+/* Math-Builder */
+function buildMath(){
+  const box=document.getElementById("math"); box.innerHTML="";
+  state.math.forEach((m,i)=>{
+    const row=document.createElement("div"); row.className="mrow";
+    const nm=document.createElement("input"); nm.type="text"; nm.className="mono"; nm.placeholder="Name"; nm.value=m.name;
+    nm.oninput=()=>{ m.name=nm.value.trim(); updateDatalist(); };
+    const au=document.createElement("input"); au.type="text"; au.className="mono"; au.placeholder="Formel, z.B. speed_can .* 3.6"; au.value=m.ausdruck;
+    au.oninput=()=>{ m.ausdruck=au.value; };
+    const st=document.createElement("span"); st.className="st"; st.id="mst_"+i;
+    const del=document.createElement("button"); del.className="sek mini"; del.textContent="✕";
+    del.onclick=()=>{ state.math.splice(i,1); buildMath(); updateDatalist(); };
+    row.append(nm,au,st,del); box.appendChild(row);
+  });
+}
+function renderMathStatus(pl){
+  const ms=asArray(pl.panels.math_status);
+  state.math.forEach((m,i)=>{
+    const el=document.getElementById("mst_"+i); if(!el) return;
+    const s=ms.find(x=>x.name===m.name);
+    if(!s||!m.name){ el.textContent=""; el.className="st"; }
+    else if(s.ok){ el.textContent="✓"; el.className="st ok"; }
+    else { el.textContent="⚠ "+(s.fehler||"Fehler"); el.className="st err"; el.title=s.fehler||""; }
+  });
+}
+
+/* Plot-Builder */
+function buildPlots(){
+  const box=document.getElementById("plots"); box.innerHTML="";
+  if(!state.plots.length){ box.innerHTML=`<div class="leer">Noch kein Plot — „+ Plot" drücken.</div>`; }
+  state.plots.forEach((p,i)=>{
+    const card=document.createElement("div"); card.className="pcard";
+    // Zeile 1: Titel, Typ, x-Kanal (bei XY), löschen
+    const z1=document.createElement("div"); z1.className="zeile";
+    const tit=document.createElement("input"); tit.type="text"; tit.placeholder="Titel"; tit.value=p.titel;
+    tit.oninput=()=>{ p.titel=tit.value; };
+    const typ=document.createElement("select");
+    [["zeit","Zeitreihe"],["xy","XY-Scatter"],["hist","Histogramm"]].forEach(o=>{
+      const op=document.createElement("option"); op.value=o[0]; op.textContent=o[1]; if(p.typ===o[0])op.selected=true; typ.appendChild(op);
+    });
+    typ.onchange=()=>{ p.typ=typ.value; buildPlots(); };
+    z1.append(tit,typ);
+    if(p.typ==="xy"){
+      const xl=document.createElement("span"); xl.className="tlabel"; xl.textContent="x:";
+      const xk=document.createElement("input"); xk.type="text"; xk.className="mono sm"; xk.setAttribute("list","kanal_dl"); xk.placeholder="x-Kanal"; xk.value=p.x_kanal;
+      xk.oninput=()=>{ p.x_kanal=xk.value; };
+      z1.append(xl,xk);
+    }
+    const del=document.createElement("button"); del.className="sek mini"; del.textContent="✕ Plot"; del.style.marginLeft="auto";
+    del.onclick=()=>{ state.plots.splice(i,1); buildPlots(); };
+    z1.append(del); card.appendChild(z1);
+    // Zeile 2: Kanal hinzufügen + Chips
+    const z2=document.createElement("div"); z2.className="zeile";
+    const add=document.createElement("input"); add.type="text"; add.className="mono sm"; add.setAttribute("list","kanal_dl");
+    add.placeholder=p.typ==="hist"?"Kanal (einer)":"Kanal hinzufügen…";
+    add.onkeydown=(e)=>{ if(e.key==="Enter" && add.value.trim()){ p.kanaele.push(add.value.trim()); add.value=""; buildPlots(); } };
+    const addb=document.createElement("button"); addb.className="sek mini"; addb.textContent="+";
+    addb.onclick=()=>{ if(add.value.trim()){ p.kanaele.push(add.value.trim()); buildPlots(); } };
+    z2.append(add,addb); card.appendChild(z2);
+    const chips=document.createElement("div"); chips.className="chips";
+    p.kanaele.forEach((k,ki)=>{
+      const c=document.createElement("span"); c.className="chip"; c.innerHTML=`${k} <b>✕</b>`;
+      c.querySelector("b").onclick=()=>{ p.kanaele.splice(ki,1); buildPlots(); };
+      chips.appendChild(c);
+    });
+    card.appendChild(chips);
+    box.appendChild(card);
+  });
+}
+
+/* Ergebnis rendern */
+function renderPlots(pl){
+  up.forEach(u=>u.destroy()); up=[];
+  ech.forEach(e=>e.dispose()); ech=[];
+  const host=document.getElementById("ergebnis"); host.innerHTML="";
+  const plots=asArray(pl.panels.plots);
+  if(!plots.length){ host.innerHTML=`<div class="leer">„Aktualisieren" drücken, um die Plots zu rechnen.</div>`; return; }
+  const xlab=pl.meta&&pl.meta.x_einheit==="m"?"Distanz [m]":"Zeit [s]";
+  plots.forEach(p=>{
+    const box=document.createElement("div");
+    const h=document.createElement("div"); h.style.cssText="font-size:12px;color:var(--muted);margin-bottom:4px";
+    h.textContent=p.titel||"("+p.typ+")"; box.appendChild(h);
+    const chart=document.createElement("div"); box.appendChild(chart); host.appendChild(box);
+    try{
+      if(p.typ==="xy") plotXY(chart,p);
+      else if(p.typ==="hist") plotHist(chart,p);
+      else plotZeit(chart,p,xlab);
+    }catch(e){ chart.innerHTML=`<div class="leer">Fehler: ${e.message}</div>`; }
+  });
+}
+function plotZeit(el,p,xlab){
+  const serien=asArray(p.serien);
+  if(!serien.length){ el.innerHTML=`<div class="leer">keine Kanäle</div>`; return; }
+  const data=[asArray(p.x)].concat(serien.map(s=>asArray(s.y)));
+  const series=[{}].concat(serien.map((s,i)=>({label:s.name,stroke:PALETTE[i%PALETTE.length],width:1.3,points:{show:false}})));
+  up.push(new uPlot(uo(el.clientWidth||900,240,series,xlab),data,el));
+}
+function plotXY(el,p){
+  if(typeof echarts==="undefined"){ el.innerHTML=`<div class="leer">ECharts fehlt in ./lib</div>`; return; }
+  const serien=asArray(p.serien), xv=asArray(p.x);
+  el.style.height="300px";
+  const c=echarts.init(el,null,{renderer:"canvas"});
+  const series=serien.map((s,i)=>{ const y=asArray(s.y); const d=[];
+    for(let k=0;k<xv.length;k+=Math.max(1,Math.floor(xv.length/4000))){ if(xv[k]!=null&&y[k]!=null) d.push([xv[k],y[k]]); }
+    return {type:"scatter",name:s.name,symbolSize:3,data:d,itemStyle:{color:PALETTE[i%PALETTE.length],opacity:0.5},large:true};});
+  c.setOption({backgroundColor:"transparent",grid:{left:56,right:16,top:16,bottom:40},
+    legend:{textStyle:{color:T.muted},top:0},tooltip:{trigger:"item",backgroundColor:"#1e1e1e",borderColor:T.line,textStyle:{color:T.text}},
+    xAxis:{name:p.x_name||"x",nameLocation:"middle",nameGap:26,type:"value",scale:true,axisLine:{lineStyle:{color:T.muted}},splitLine:{lineStyle:{color:T.line}},nameTextStyle:{color:T.muted},axisLabel:{color:T.muted}},
+    yAxis:{type:"value",scale:true,axisLine:{lineStyle:{color:T.muted}},splitLine:{lineStyle:{color:T.line}},axisLabel:{color:T.muted}},
+    series:series});
+  ech.push(c);
+}
+function plotHist(el,p){
+  if(typeof echarts==="undefined"){ el.innerHTML=`<div class="leer">ECharts fehlt in ./lib</div>`; return; }
+  const v=asArray(p.werte).filter(x=>x!=null&&isFinite(x));
+  if(!v.length){ el.innerHTML=`<div class="leer">keine Daten</div>`; return; }
+  const nb=41; let lo=Math.min(...v),hi=Math.max(...v); if(lo===hi)hi=lo+1;
+  const w=(hi-lo)/nb, ctr=[],cnt=new Array(nb).fill(0);
+  for(let k=0;k<nb;k++)ctr[k]=lo+w*(k+0.5);
+  v.forEach(x=>{let k=Math.floor((x-lo)/w);if(k<0)k=0;if(k>=nb)k=nb-1;cnt[k]++;});
+  el.style.height="260px";
+  const c=echarts.init(el,null,{renderer:"canvas"});
+  c.setOption({backgroundColor:"transparent",grid:{left:48,right:12,top:12,bottom:30},
+    tooltip:{trigger:"axis",backgroundColor:"#1e1e1e",borderColor:T.line,textStyle:{color:T.text}},
+    xAxis:{type:"category",data:ctr.map(c=>c.toFixed(2)),axisLine:{lineStyle:{color:T.muted}},axisLabel:{color:T.muted,interval:9},splitLine:{show:false}},
+    yAxis:{type:"value",axisLine:{lineStyle:{color:T.muted}},splitLine:{lineStyle:{color:T.line}},axisLabel:{color:T.muted}},
+    series:[{type:"bar",data:cnt,itemStyle:{color:T.accent},barCategoryGap:"0%"}]});
+  ech.push(c);
+}
+function uo(breite,hoehe,series,xlab){
+  const a={stroke:T.muted,grid:{stroke:T.line,width:.5},ticks:{stroke:T.line,width:.5},font:"11px sans-serif"};
+  return {width:breite,height:hoehe,cursor:{sync:{key:"scratch"},points:{size:4}},scales:{x:{time:false}},
+    legend:{show:true},series:series,
+    axes:[Object.assign({},a,{label:xlab,size:38}),Object.assign({},a,{size:50})]};
+}
+
+/* Aktualisieren + Configs */
+function aktualisieren(){ if(window.sendToMatlab) window.sendToMatlab("scratch_render",{config:aktuelleConfig()}); }
+function aktuelleConfig(){ return { math: state.math.map(m=>({name:m.name,ausdruck:m.ausdruck})),
+  plots: state.plots.map(p=>({typ:p.typ,titel:p.titel,kanaele:p.kanaele.slice(),x_kanal:p.x_kanal,bins:p.bins})) }; }
+function renderConfigs(){
+  const sel=document.getElementById("cfg_sel"); const cur=sel.value;
+  const cfgs=asArray(PL.panels.configs);
+  sel.innerHTML=`<option value="">— wählen —</option>`+cfgs.map((c,i)=>`<option value="${i}">${c.name}</option>`).join("");
+  if(cur&&+cur<cfgs.length) sel.value=cur;
+}
+function cfgLaden(){ const i=document.getElementById("cfg_sel").value; if(i==="")return;
+  const c=asArray(PL.panels.configs)[+i]; if(!c)return; if(window.sendToMatlab) window.sendToMatlab("scratch_config_laden",{name:c.name}); }
+function cfgSpeichern(){ const name=(document.getElementById("cfg_name").value||"").trim(); if(!name){document.getElementById("cfg_name").focus();return;}
+  if(window.sendToMatlab) window.sendToMatlab("scratch_config_speichern",{name:name,config:aktuelleConfig()}); document.getElementById("cfg_name").value=""; }
+function cfgLoeschen(){ const i=document.getElementById("cfg_sel").value; if(i==="")return;
+  const c=asArray(PL.panels.configs)[+i]; if(!c)return; if(window.sendToMatlab) window.sendToMatlab("scratch_config_loeschen",{name:c.name}); }
+
+let rt;
+function resizeAll(){ up.forEach(u=>{const w=u.root.parentNode.clientWidth; if(w>0)u.setSize({width:w,height:u.height});}); ech.forEach(e=>e.resize()); }
+function planeResize(){ clearTimeout(rt); rt=setTimeout(resizeAll,150); }
+window.addEventListener("resize", planeResize);
+if(window.ResizeObserver) new ResizeObserver(planeResize).observe(document.body);
+</script>
+</body>
+</html>

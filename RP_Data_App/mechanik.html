@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mechanik</title>
+<link rel="stylesheet" href="./lib/uPlot.min.css">
+<style>
+  :root{
+    --bg:#121212; --panel:#1e1e1e; --line:#2c2c2c;
+    --text:#e6e6e0; --muted:#8a8a8a; --rot:#c7222a;
+    --ok:#3fb950; --warn:#d9a441; --fehlt:#c7222a;
+    --fl:#3987e5; --fr:#1baf7a; --rl:#d9a441; --rr:#a371f7;
+    --bump:#3987e5; --rebound:#c7222a;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,"Segoe UI",Roboto,sans-serif;font-size:13px;}
+  .kopf{display:flex;align-items:center;gap:12px;padding:8px 12px;
+    border-bottom:.5px solid var(--line);}
+  .kopf h1{font-size:14px;margin:0;font-weight:600;
+    border-left:3px solid var(--rot);padding-left:8px;}
+  .kopf .x-info{color:var(--muted);font-size:12px;margin-left:auto;}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px;}
+  .panel{background:var(--panel);border:.5px solid var(--line);
+    border-radius:10px;padding:10px 12px;min-width:0;}
+  .panel.voll{grid-column:1 / -1;}
+  .panel h2{font-size:13px;margin:0 0 8px;display:flex;align-items:center;gap:8px;}
+  .panel h2 .titel{border-left:3px solid var(--rot);padding-left:8px;}
+  .health{display:flex;flex-wrap:wrap;gap:6px;margin-left:auto;}
+  .chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);}
+  .chip .dot{width:8px;height:8px;border-radius:50%;background:var(--muted);}
+  .dot.gueltig{background:var(--ok);} .dot.statisch,.dot.nan{background:var(--warn);}
+  .dot.fehlt{background:var(--fehlt);}
+  .leer{color:var(--muted);font-size:12px;padding:18px 4px;text-align:center;}
+  .hinweis{color:var(--muted);font-size:11px;margin-top:6px;}
+  .kennwert{display:flex;gap:18px;margin:2px 0 8px;flex-wrap:wrap;}
+  .kennwert .kw{font-size:12px;color:var(--muted);}
+  .kennwert .kw b{color:var(--text);font-size:15px;font-weight:600;margin-right:4px;}
+  .kennwert .kw.warn b{color:var(--warn);}
+  .hist2x2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .hist2x2 .zelle{}
+  .hist2x2 .zelle .lab{font-size:11px;color:var(--muted);margin-bottom:2px;}
+  .u-legend{color:var(--text);font-size:11px;} .u-title{color:var(--text);}
+  @media (max-width:900px){ .grid,.hist2x2{grid-template-columns:1fr;} }
+</style>
+<script src="./lib/uPlot.iife.min.js"></script>
+<script src="./lib/echarts.min.js"></script>
+</head>
+<body>
+
+<div class="kopf">
+  <h1>Mechanik</h1>
+  <span id="x_info" class="x-info">—</span>
+</div>
+
+<div class="grid">
+  <div class="panel">
+    <h2><span class="titel">Bremslinearität vorn/hinten</span><div id="h_lin" class="health"></div></h2>
+    <div id="lin_kennwerte" class="kennwert"></div>
+    <div id="lin" style="height:300px"></div>
+    <div class="hinweis">R² der Regel p_hinten = m·p_vorn; sinkt R², hat ein Kreis ein Problem.</div>
+  </div>
+
+  <div class="panel">
+    <h2><span class="titel">Bremsbalance (mechanisch)</span><div id="h_bal" class="health"></div></h2>
+    <div id="bal"></div>
+    <div class="hinweis">Rein hydraulische Balance ohne Rekuperation.</div>
+  </div>
+
+  <div class="panel voll">
+    <h2><span class="titel">Dämpfergeschwindigkeit je Ecke</span><div id="h_damp" class="health"></div></h2>
+    <div id="damp" class="hist2x2"></div>
+    <div class="hinweis">Bump (blau) / Rebound (rot), in Rocker-Einheiten pro Sekunde.
+      Braucht die Zeit-Achse — sonst liefert das Backend die Werte.</div>
+  </div>
+
+  <div class="panel voll">
+    <h2><span class="titel">Roll / Pitch / Heave / Warp</span><div id="h_rphw" class="health"></div></h2>
+    <div id="rphw" class="stack"></div>
+    <div class="hinweis">Aus den vier Rockern (Rocker-Einheiten); echte Aufbaubewegung mit Parametern folgt.</div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+const T = {
+  text:"#e6e6e0", muted:"#8a8a8a", line:"#2c2c2c",
+  fl:"#3987e5", fr:"#1baf7a", rl:"#d9a441", rr:"#a371f7",
+  bump:"#3987e5", rebound:"#c7222a", rot:"#c7222a"
+};
+const SYNC = "mech";
+let uplots = [], echartsInst = [];
+
+/* ---- uihtml ---- */
+function setup(htmlComponent){
+  htmlComponent.addEventListener("DataChanged", () => render(htmlComponent.Data));
+  if (htmlComponent.Data) render(htmlComponent.Data);
+  window.sendToMatlab = (n,d) => htmlComponent.sendEventToMATLAB(n,d);
+}
+window.setup = setup;
+
+/* ---- Zugriff ---- */
+const getSig = (pl,name) => pl.signals.find(s => s.name === name);
+const istOk  = (s) => s && s.status === "gueltig" && s.y && s.y.length;
+const statusVon = (s) => s ? s.status : "fehlt";
+function healthChips(el, pl, eintraege){
+  el.innerHTML = "";
+  for (const [name,label] of eintraege){
+    const st = statusVon(getSig(pl,name));
+    const c = document.createElement("span"); c.className = "chip";
+    c.innerHTML = `<span class="dot ${st}"></span>${label}`; el.appendChild(c);
+  }
+}
+const leer = (id,t) => document.getElementById(id).innerHTML = `<div class="leer">${t}</div>`;
+function reset(){ uplots.forEach(u=>u.destroy()); uplots=[];
+  echartsInst.forEach(e=>e.dispose()); echartsInst=[]; }
+
+/* ---- Haupt-Render ---- */
+function render(pl){
+  if (!pl || !pl.x || !pl.signals) return;
+  reset();
+  document.getElementById("x_info").textContent =
+    "x-Achse: " + (pl.meta.x_modus === "distanz" ? "Distanz [m]" : "Zeit [s]");
+  const xlab = pl.meta.x_einheit === "m" ? "Distanz [m]" : "Zeit [s]";
+  renderLinearitaet(pl);
+  renderBalance(pl, xlab);
+  renderDaempfer(pl);
+  renderRPHW(pl, xlab);
+}
+
+/* ---- Bremslinearität + R² ---- */
+function renderLinearitaet(pl){
+  const pf = getSig(pl,"pbrake_front_can"), ph = getSig(pl,"pbrake_rear_can");
+  healthChips(document.getElementById("h_lin"), pl,
+    [["pbrake_front_can","p_v"],["pbrake_rear_can","p_h"]]);
+  if (!istOk(pf) || !istOk(ph)){ leer("lin","nicht verfügbar");
+    document.getElementById("lin_kennwerte").innerHTML=""; return; }
+
+  const pts=[], xs=[], ys=[];
+  const stride = Math.max(1, Math.floor(pl.x.length/4000));
+  for (let i=0;i<pl.x.length;i+=stride){
+    const a=pf.y[i], b=ph.y[i];
+    if (a==null||b==null) continue;
+    pts.push([a,b]); xs.push(a); ys.push(b);
+  }
+  // Backend-Wert bevorzugen, sonst in JS rechnen
+  const bp = (pl.panels && pl.panels.bremslinearitaet) || {};
+  const reg = (bp.r2==null || isNaN(bp.r2)) ? linReg(xs,ys)
+              : { r2:bp.r2, m:bp.steigung };
+  const warn = reg.r2 != null && reg.r2 < 0.9;
+
+  document.getElementById("lin_kennwerte").innerHTML =
+    `<span class="kw ${warn?'warn':''}"><b>${reg.r2==null?'—':reg.r2.toFixed(3)}</b>R²</span>` +
+    `<span class="kw"><b>${reg.m==null?'—':reg.m.toFixed(2)}</b>Steigung</span>` +
+    (bp.auffaelliger_kreis ? `<span class="kw warn"><b>${bp.auffaelliger_kreis}</b>auffällig</span>`
+      : (warn ? `<span class="kw warn"><b>!</b>Linearität gestört</span>` : ``));
+
+  const el=document.getElementById("lin");
+  const chart=echarts.init(el,null,{renderer:"canvas"});
+  const opt=scatterOpt(pts,"p vorn [bar]","p hinten [bar]");
+  if (reg.m!=null){                     // Regressionsgerade einzeichnen
+    const xmin=Math.min.apply(null,xs), xmax=Math.max.apply(null,xs);
+    opt.series.push({ type:"line", showSymbol:false, data:[[xmin,reg.m*xmin+reg.b],[xmax,reg.m*xmax+reg.b]],
+      lineStyle:{color:T.rot,width:1.5}, z:5 });
+  }
+  chart.setOption(opt); echartsInst.push(chart);
+}
+
+/* ---- Bremsbalance ---- */
+function renderBalance(pl, xlab){
+  const bb = getSig(pl,"brake_balance_front_can");
+  const pf = getSig(pl,"pbrake_front_can"), ph = getSig(pl,"pbrake_rear_can");
+  healthChips(document.getElementById("h_bal"), pl, [["brake_balance_front_can","BB"]]);
+  let y=null, label="Balance vorn";
+  if (istOk(bb)){ y = bb.y; }
+  else if (istOk(pf) && istOk(ph)){        // Rückfall: aus Drücken rechnen
+    y = pl.x.map((_,i)=>{ const a=pf.y[i],b=ph.y[i];
+      return (a==null||b==null||(a+b)<=0)?null:a/(a+b); });
+    label="Balance vorn (aus Druck)";
+  }
+  if (!y){ leer("bal","nicht verfügbar"); return; }
+  const host=document.getElementById("bal"); host.innerHTML="";
+  const u=new uPlot(uplotOpts("",host.clientWidth||400,220,
+    [{},{label:label,stroke:T.rot,width:1.3,points:{show:false}}], xlab, true),
+    [pl.x, y], host);
+  uplots.push(u);
+}
+
+/* ---- Dämpfergeschwindigkeit je Ecke (Histogramme) ---- */
+function renderDaempfer(pl){
+  const ecken=[["rocker_fl_can","FL",T.fl],["rocker_fr_can","FR",T.fr],
+               ["rocker_rl_can","RL",T.rl],["rocker_rr_can","RR",T.rr]];
+  healthChips(document.getElementById("h_damp"), pl, ecken.map(e=>[e[0],e[1]]));
+  const host=document.getElementById("damp"); host.innerHTML="";
+
+  const zeit = pl.meta.x_modus === "zeit";   // Ableitung nur sinnvoll über Zeit
+  ecken.forEach(e=>{
+    const zelle=document.createElement("div"); zelle.className="zelle";
+    const lab=document.createElement("div"); lab.className="lab"; lab.textContent=e[1];
+    const box=document.createElement("div"); box.style.height="180px";
+    zelle.appendChild(lab); zelle.appendChild(box); host.appendChild(zelle);
+
+    const sig=getSig(pl,e[0]);
+    // Backend-Werte bevorzugen (panels.daempfergeschw.<ecke>)
+    let vel = null;
+    const bd = pl.panels && pl.panels.daempfergeschw;
+    if (bd && bd[e[1].toLowerCase()] && bd[e[1].toLowerCase()].length) vel = bd[e[1].toLowerCase()];
+    else if (istOk(sig) && zeit) vel = ableitung(pl.x, sig.y);
+
+    if (!vel){ box.innerHTML = `<div class="leer">${zeit?'nicht verfügbar':'auf Zeit-Achse umschalten'}</div>`; return; }
+    const h=histogramm(vel, 41);
+    if (!h){ box.innerHTML=`<div class="leer">keine Daten</div>`; return; }
+    const chart=echarts.init(box,null,{renderer:"canvas"});
+    chart.setOption(barOpt(h));
+    echartsInst.push(chart);
+  });
+}
+
+/* ---- Roll / Pitch / Heave / Warp ---- */
+function renderRPHW(pl, xlab){
+  const R=["rocker_fl_can","rocker_fr_can","rocker_rl_can","rocker_rr_can"].map(n=>getSig(pl,n));
+  healthChips(document.getElementById("h_rphw"), pl,
+    [["rocker_fl_can","FL"],["rocker_fr_can","FR"],["rocker_rl_can","RL"],["rocker_rr_can","RR"]]);
+  if (!R.every(istOk)){ leer("rphw","alle vier Rocker nötig — nicht verfügbar"); return; }
+  const [fl,fr,rl,rr]=R.map(s=>s.y);
+  const n=pl.x.length, heave=[],roll=[],pitch=[],warp=[];
+  for(let i=0;i<n;i++){
+    const a=fl[i],b=fr[i],c=rl[i],d=rr[i];
+    if([a,b,c,d].some(v=>v==null)){ heave.push(null);roll.push(null);pitch.push(null);warp.push(null); continue; }
+    heave.push((a+b+c+d)/4);
+    roll.push(((a+c)-(b+d))/2);     // links - rechts
+    pitch.push(((a+b)-(c+d))/2);    // vorn - hinten
+    warp.push(((a+d)-(b+c))/2);     // diagonal
+  }
+  const host=document.getElementById("rphw"); host.innerHTML="";
+  const bloecke=[["Heave",heave,T.fl],["Roll",roll,T.fr],["Pitch",pitch,T.rl],["Warp",warp,T.rr]];
+  bloecke.forEach((b,idx)=>{
+    const div=document.createElement("div"); host.appendChild(div);
+    const u=new uPlot(uplotOpts(b[0], host.clientWidth||800, 120,
+      [{},{label:b[0],stroke:b[2],width:1.3,points:{show:false}}], xlab, idx===bloecke.length-1),
+      [pl.x, b[1]], div);
+    uplots.push(u);
+  });
+}
+
+/* ================= Helfer ================= */
+function linReg(xs, ys){
+  const n=xs.length; if(n<2) return {r2:null,m:null,b:null};
+  let sx=0,sy=0,sxx=0,sxy=0,syy=0;
+  for(let i=0;i<n;i++){ sx+=xs[i];sy+=ys[i];sxx+=xs[i]*xs[i];sxy+=xs[i]*ys[i];syy+=ys[i]*ys[i]; }
+  const d=n*sxx-sx*sx; if(d===0) return {r2:null,m:null,b:null};
+  const m=(n*sxy-sx*sy)/d, b=(sy-m*sx)/n;
+  const r=(n*sxy-sx*sy)/Math.sqrt(d*(n*syy-sy*sy));
+  return {m:m,b:b,r2:r*r};
+}
+function ableitung(x, y){
+  const v=new Array(y.length).fill(null);
+  for(let i=1;i<y.length;i++){
+    const dt=x[i]-x[i-1];
+    if(y[i]!=null && y[i-1]!=null && dt>0) v[i]=(y[i]-y[i-1])/dt;
+  }
+  return v;
+}
+function quantil(sortedAbs, q){ return sortedAbs[Math.min(sortedAbs.length-1, Math.floor(q*sortedAbs.length))]; }
+function histogramm(vals, nbins){
+  const v=vals.filter(x=>x!=null && isFinite(x));
+  if(!v.length) return null;
+  const absS=v.map(Math.abs).sort((a,b)=>a-b);
+  const M=quantil(absS,0.99)||1; if(M<=0) return null;
+  const lo=-M, hi=M, breite=(hi-lo)/nbins;
+  const counts=new Array(nbins).fill(0), centers=new Array(nbins);
+  for(let k=0;k<nbins;k++) centers[k]=lo+breite*(k+0.5);
+  for(const x of v){ let k=Math.floor((x-lo)/breite); if(k<0)k=0; if(k>=nbins)k=nbins-1; counts[k]++; }
+  return {centers,counts};
+}
+
+/* ---- Chart-Optionen (dunkel) ---- */
+function uplotOpts(titel, breite, hoehe, series, xlab, zeigX){
+  const a={stroke:T.muted, grid:{stroke:T.line,width:.5}, ticks:{stroke:T.line,width:.5},
+    font:"11px -apple-system, sans-serif"};
+  return { title:titel||undefined, width:breite, height:hoehe,
+    cursor:{sync:{key:SYNC}, points:{size:5}}, scales:{x:{time:false}}, legend:{live:true},
+    series:series,
+    axes:[ Object.assign({},a,{label:zeigX?xlab:undefined,size:zeigX?40:26}),
+           Object.assign({},a,{size:52}) ] };
+}
+function scatterOpt(pts, xlab, ylab){
+  return { backgroundColor:"transparent", grid:{left:56,right:20,top:16,bottom:44},
+    tooltip:{trigger:"item",backgroundColor:"#1e1e1e",borderColor:T.line,textStyle:{color:T.text}},
+    xAxis:{name:xlab,nameLocation:"middle",nameGap:26,type:"value",scale:true,
+      axisLine:{lineStyle:{color:T.muted}},splitLine:{lineStyle:{color:T.line}},
+      nameTextStyle:{color:T.muted},axisLabel:{color:T.muted}},
+    yAxis:{name:ylab,nameLocation:"middle",nameGap:40,type:"value",scale:true,
+      axisLine:{lineStyle:{color:T.muted}},splitLine:{lineStyle:{color:T.line}},
+      nameTextStyle:{color:T.muted},axisLabel:{color:T.muted}},
+    series:[{type:"scatter",symbolSize:3,data:pts,itemStyle:{color:T.fl,opacity:0.5},large:true,largeThreshold:2000}] };
+}
+function barOpt(h){
+  const farben=h.centers.map(c=> c<0 ? T.bump : T.rebound);
+  return { backgroundColor:"transparent", grid:{left:44,right:10,top:10,bottom:30},
+    tooltip:{trigger:"axis",backgroundColor:"#1e1e1e",borderColor:T.line,textStyle:{color:T.text}},
+    xAxis:{type:"category", data:h.centers.map(c=>c.toFixed(1)),
+      axisLine:{lineStyle:{color:T.muted}}, axisLabel:{color:T.muted,interval:9},
+      splitLine:{show:false}},
+    yAxis:{type:"value", axisLine:{lineStyle:{color:T.muted}},
+      splitLine:{lineStyle:{color:T.line}}, axisLabel:{color:T.muted}},
+    series:[{type:"bar", data:h.counts.map((v,i)=>({value:v,itemStyle:{color:farben[i]}})),
+      barCategoryGap:"0%"}] };
+}
+
+/* ---- Resize ---- */
+let resizeTimer;
+function resizeAll(){
+  uplots.forEach(u=>{ const w=u.root.parentNode.clientWidth; if(w>0) u.setSize({width:w,height:u.height}); });
+  echartsInst.forEach(e=>e.resize());
+}
+function planeResize(){ clearTimeout(resizeTimer); resizeTimer=setTimeout(resizeAll,120); }
+window.addEventListener("resize", planeResize);
+// Container ist 0px, solange der Tab nicht aktiv ist -> ECharts bliebe leer.
+if (window.ResizeObserver) new ResizeObserver(planeResize).observe(document.body);
+</script>
+</body>
+</html>

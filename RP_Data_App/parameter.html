@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fahrzeug-Parameter</title>
+<style>
+  :root{
+    --bg:#121212; --panel:#1e1e1e; --panel2:#171717; --line:#2c2c2c;
+    --text:#e6e6e0; --muted:#8a8a8a; --rot:#c7222a; --ok:#3fb950;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,"Segoe UI",Roboto,sans-serif;font-size:13px;}
+  .kopf{display:flex;align-items:center;gap:12px;padding:8px 12px;border-bottom:.5px solid var(--line);}
+  .kopf h1{font-size:14px;margin:0;font-weight:600;border-left:3px solid var(--rot);padding-left:8px;}
+  .kopf .hint{color:var(--muted);font-size:11px;margin-left:auto;}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px;align-items:start;}
+  .panel{background:var(--panel);border:.5px solid var(--line);border-radius:10px;padding:10px 14px;}
+  .panel h2{font-size:13px;margin:0 0 10px;border-left:3px solid var(--rot);padding-left:8px;}
+  .feld{display:grid;grid-template-columns:1fr 110px 54px;gap:8px;align-items:center;
+    padding:5px 0;border-bottom:.5px solid var(--line);}
+  .feld:last-child{border-bottom:none;}
+  .feld label{color:var(--text);}
+  .feld .einheit{color:var(--muted);font-size:11px;}
+  input[type=number]{background:var(--panel2);color:var(--text);border:.5px solid var(--line);
+    border-radius:6px;padding:6px 8px;font-size:12px;width:100%;text-align:right;}
+  input[type=number]:focus{outline:none;border-color:var(--rot);}
+  input.saved{border-color:var(--ok);}
+  .leer{color:var(--muted);padding:20px;text-align:center;}
+  .toolbar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 12px;border-bottom:.5px solid var(--line);}
+  .toolbar .tlabel{font-size:11px;color:var(--muted);margin-left:6px;}
+  button{background:var(--rot);color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer;}
+  button.sek{background:var(--panel2);color:var(--text);border:.5px solid var(--line);}
+  select{background:var(--panel2);color:var(--text);border:.5px solid var(--line);border-radius:6px;padding:5px 8px;font-size:12px;}
+  input[type=text]{background:var(--panel2);color:var(--text);border:.5px solid var(--line);border-radius:6px;padding:6px 8px;font-size:12px;}
+  input[type=text].sm{width:130px;}
+  @media (max-width:900px){ .grid{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+
+<div class="kopf">
+  <h1>Fahrzeug-Parameter</h1>
+  <span class="hint">Änderungen gelten sofort für Ableitungen; dauerhaft speichern in <code>fahrzeug_parameter.m</code>.</span>
+</div>
+
+<div class="toolbar">
+  <button class="sek" id="btn_standard">Standard laden</button>
+  <span class="tlabel">Config:</span>
+  <select id="cfg_sel"><option value="">— wählen —</option></select>
+  <button class="sek" id="btn_load">Laden</button>
+  <input type="text" id="cfg_name" class="sm" placeholder="Name">
+  <button id="btn_save">Speichern</button>
+  <button class="sek" id="btn_del">Löschen</button>
+</div>
+
+<div id="root" class="grid"><div class="leer">Parameter werden geladen…</div></div>
+
+<script>
+"use strict";
+const asArray=(v)=>Array.isArray(v)?v:(v==null?[]:[v]);
+let PL=null;
+function send(n,d){ if(window.sendToMatlab) window.sendToMatlab(n,d); }
+
+function setup(hc){
+  hc.addEventListener("DataChanged",()=>render(hc.Data));
+  if(hc.Data) render(hc.Data);
+  window.sendToMatlab=(n,d)=>hc.sendEventToMATLAB(n,d);
+  document.getElementById("btn_standard").onclick=()=>send("parameter_standard",{});
+  document.getElementById("btn_load").onclick=cfgLaden;
+  document.getElementById("btn_save").onclick=cfgSpeichern;
+  document.getElementById("btn_del").onclick=cfgLoeschen;
+}
+window.setup=setup;
+
+function render(pl){
+  if(!pl||!pl.panels) return;
+  PL=pl;
+  renderConfigs();
+  const gruppen=asArray(pl.panels.gruppen);
+  const root=document.getElementById("root");
+  if(!gruppen.length){ root.innerHTML=`<div class="leer">Keine Parameter.</div>`; return; }
+  root.innerHTML="";
+  gruppen.forEach(g=>{
+    const panel=document.createElement("div"); panel.className="panel";
+    const h=document.createElement("h2"); h.textContent=g.label; panel.appendChild(h);
+    asArray(g.felder).forEach(f=>{
+      const row=document.createElement("div"); row.className="feld";
+      const lab=document.createElement("label"); lab.textContent=f.label;
+      const inp=document.createElement("input"); inp.type="number"; inp.step="any";
+      inp.value=(f.wert==null||isNaN(f.wert))?"":f.wert;
+      inp.dataset.pfad=f.pfad;
+      inp.onchange=()=>aendern(inp);
+      const einh=document.createElement("span"); einh.className="einheit"; einh.textContent=f.einheit||"";
+      row.append(lab,inp,einh); panel.appendChild(row);
+    });
+    root.appendChild(panel);
+  });
+}
+
+function aendern(inp){
+  const wert=parseFloat(inp.value);
+  if(isNaN(wert)) return;
+  send("parameter_geaendert",{pfad:inp.dataset.pfad,wert:wert});
+  inp.classList.add("saved");
+  setTimeout(()=>inp.classList.remove("saved"),800);
+}
+
+function renderConfigs(){
+  const sel=document.getElementById("cfg_sel"); const cur=sel.value;
+  const cfgs=asArray(PL.panels.configs);
+  sel.innerHTML=`<option value="">— wählen —</option>`+cfgs.map((c,i)=>`<option value="${i}">${c.name}</option>`).join("");
+  if(cur&&+cur<cfgs.length) sel.value=cur;
+}
+function cfgLaden(){
+  const i=document.getElementById("cfg_sel").value; if(i==="") return;
+  const c=asArray(PL.panels.configs)[+i]; if(!c) return;
+  send("parameter_config_laden",{name:c.name});
+}
+function cfgSpeichern(){
+  const name=(document.getElementById("cfg_name").value||"").trim();
+  if(!name){ document.getElementById("cfg_name").focus(); return; }
+  send("parameter_config_speichern",{name:name});
+  document.getElementById("cfg_name").value="";
+}
+function cfgLoeschen(){
+  const i=document.getElementById("cfg_sel").value; if(i==="") return;
+  const c=asArray(PL.panels.configs)[+i]; if(!c) return;
+  send("parameter_config_loeschen",{name:c.name});
+}
+</script>
+</body>
+</html>
