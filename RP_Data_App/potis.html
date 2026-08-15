@@ -1,0 +1,393 @@
+<!-- potis.html - Linearpoti-Analyse-Tab
+     Erwartet Payload-Envelope von payload_potis.m via `pl` (uihtml Data).
+     Libs wie in den anderen Tabs unter ./lib/ erwartet:
+       uPlot.min.css, uPlot.iife.min.js, echarts.min.js
+     Sendet Events an die App:
+       poti_kalibrierung_geaendert  {ecke, v1, mm1, v2, mm2}
+     Design 1:1 an fahrer.html angelehnt (Dark-Theme, gleiche uPlot/ECharts-Helfer,
+     gleiches uihtml-Setup-Pattern ueber window.setup(hc)).
+-->
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Potis</title>
+<link rel="stylesheet" href="./lib/uPlot.min.css">
+<style>
+  :root{
+    --bg:#121212; --panel:#1e1e1e; --panel2:#171717; --line:#2c2c2c;
+    --text:#e6e6e0; --muted:#8a8a8a; --rot:#c7222a; --ok:#3fb950; --warn:#d9a441;
+    --fl:#3987e5; --fr:#1baf7a; --rl:#d9a441; --rr:#a371f7;
+    --bump:#1baf7a; --rebound:#3987e5;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,"Segoe UI",Roboto,sans-serif;font-size:13px;}
+  .kopf{display:flex;align-items:center;gap:12px;padding:8px 12px;border-bottom:.5px solid var(--line);flex-wrap:wrap;}
+  .kopf h1{font-size:14px;margin:0;font-weight:600;border-left:3px solid var(--rot);padding-left:8px;}
+  .kopf .x-info{color:var(--muted);font-size:12px;}
+  .kpi{display:flex;gap:16px;margin-left:auto;flex-wrap:wrap;}
+  .kpi .k{font-size:11px;color:var(--muted);white-space:nowrap;}
+  .kpi .k b{color:var(--text);font-size:15px;margin-right:3px;}
+  .kpi .k.warn b{color:var(--warn);} .kpi .k.rot b{color:var(--rot);}
+
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px;}
+  .panel{background:var(--panel);border:.5px solid var(--line);border-radius:10px;padding:10px 12px;min-width:0;}
+  .panel.voll{grid-column:1 / -1;}
+  .panel h2{font-size:13px;margin:0 0 8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .panel h2 .titel{border-left:3px solid var(--rot);padding-left:8px;}
+  .panel h2 .sub{color:var(--muted);font-size:11px;font-weight:400;}
+  .health{display:flex;flex-wrap:wrap;gap:6px;margin-left:auto;}
+  .chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);}
+  .chip .dot{width:8px;height:8px;border-radius:50%;background:var(--muted);}
+  .dot.gueltig{background:var(--ok);} .dot.statisch,.dot.nan{background:var(--warn);} .dot.fehlt{background:var(--rot);}
+  .leer{color:var(--muted);font-size:12px;padding:14px 4px;text-align:center;}
+  .stack{display:flex;flex-direction:column;gap:6px;}
+
+  .zeile{display:flex;gap:12px;flex-wrap:wrap;}
+  .karte{background:var(--panel2);border:.5px solid var(--line);border-radius:8px;padding:10px;flex:1 1 220px;min-width:0;}
+  .karte h4{margin:0 0 8px;font-size:12px;color:var(--text);display:flex;align-items:center;gap:6px;}
+  .karte h4 .ok{color:var(--ok);font-size:11px;font-weight:400;}
+  .karte h4 .warn{color:var(--warn);font-size:11px;font-weight:400;}
+  .kpi-mini{font-size:11px;color:var(--muted);margin:2px 0;}
+  .kpi-mini b{color:var(--text);font-size:12px;}
+  canvas.hist{width:100%;height:90px;display:block;margin-top:6px;}
+
+  .kal-form label{font-size:11px;color:var(--muted);}
+  .kal-form input[type=number]{width:64px;font-size:12px;margin:2px 6px 2px 2px;
+    background:var(--panel2);color:var(--text);border:.5px solid var(--line);border-radius:6px;padding:5px 6px;}
+  .kal-form input[type=number]:focus{outline:none;border-color:var(--rot);}
+  .kal-form .zeile2{margin:4px 0;}
+  button.act{background:var(--rot);color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;margin-top:4px;}
+  button.act:disabled{opacity:.5;cursor:not-allowed;}
+
+  #korrWrap{display:flex;gap:14px;flex-wrap:wrap;}
+  #korrRoll,#korrDive{flex:1 1 320px;height:280px;}
+  @media (max-width:900px){ .grid{grid-template-columns:1fr;} }
+</style>
+<script src="./lib/uPlot.iife.min.js"></script>
+<script src="./lib/echarts.min.js"></script>
+</head>
+<body>
+
+<div class="kopf">
+  <h1>Potis</h1>
+  <span id="poti_info" class="x-info">—</span>
+  <div id="kpi" class="kpi"></div>
+</div>
+
+<div class="grid">
+
+  <!-- Health & Kalibrierung -->
+  <div class="panel voll">
+    <h2><span class="titel">Health &amp; Kalibrierung</span><span class="sub">Signalstatus je Ecke</span><div id="healthZeile" class="health"></div></h2>
+    <div id="kalZeile" class="zeile"></div>
+  </div>
+
+  <!-- Rohsignale -->
+  <div class="panel voll">
+    <h2><span class="titel">Rohsignale (V)</span><span class="sub">unkalibrierte Poti-Spannung</span></h2>
+    <div id="plotRoh"></div>
+  </div>
+
+  <!-- Kalibrierte Signale -->
+  <div class="panel voll">
+    <h2><span class="titel">Kalibrierte Signale (mm)</span><span class="sub">Federweg nach Kalibrierung</span></h2>
+    <div id="plotMm"></div>
+  </div>
+
+  <!-- Federweg-Nutzung -->
+  <div class="panel voll">
+    <h2><span class="titel">Federweg-Nutzung</span></h2>
+    <div id="fedZeile" class="zeile"></div>
+  </div>
+
+  <!-- Daempfergeschwindigkeit -->
+  <div class="panel voll">
+    <h2><span class="titel">Dämpfergeschwindigkeit</span><span class="sub">aus Poti, native Zeitbasis</span></h2>
+    <div id="dvZeile" class="zeile"></div>
+  </div>
+
+  <!-- Korrelation -->
+  <div class="panel voll">
+    <h2><span class="titel">Roll-/Nick-Korrelation vs. IMU</span></h2>
+    <div id="korrWrap">
+      <div id="korrRoll"></div>
+      <div id="korrDive"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+"use strict";
+const T={ text:"#e6e6e0", muted:"#8a8a8a", line:"#2c2c2c", rot:"#c7222a",
+  fl:"#3987e5", fr:"#1baf7a", rl:"#d9a441", rr:"#a371f7",
+  bump:"#1baf7a", rebound:"#3987e5" };
+const SYNC="potis";
+let PL=null, uplots=[], echartsRoll=null, echartsDive=null;
+
+/* ---------- uihtml Setup (gleiches Pattern wie fahrer.html) ---------- */
+function setup(hc){
+  hc.addEventListener("DataChanged",()=>render(hc.Data));
+  if(hc.Data) render(hc.Data);
+  window.sendToMatlab=(n,d)=>hc.sendEventToMATLAB(n,d);
+}
+window.setup=setup;
+
+/* ---------- Hilfen ---------- */
+const asArray=(v)=>Array.isArray(v)?v:(v==null?[]:[v]);
+const fmt=(v,d)=> (v==null||isNaN(v))?"—":Number(v).toFixed(d);
+function reset(){ uplots.forEach(u=>u.destroy()); uplots=[]; }
+function W(host){ return host.clientWidth||760; }
+
+/* ---------- uPlot-Optionen (identisch zu fahrer.html) ---------- */
+function achse(zeigX,xlab){
+  const a={stroke:T.muted,grid:{stroke:T.line,width:.5},ticks:{stroke:T.line,width:.5},font:"11px -apple-system, sans-serif"};
+  return Object.assign({},a,{label:zeigX?xlab:undefined,size:zeigX?38:24});
+}
+function yAchse(scaleKey,label,side){
+  const a={stroke:T.muted,grid:{stroke:T.line,width:.5},ticks:{stroke:T.line,width:.5},font:"11px -apple-system, sans-serif"};
+  const o=Object.assign({},a,{label:label,size:54}); if(scaleKey) o.scale=scaleKey;
+  if(side===1){ o.side=1; o.grid={show:false}; } return o;
+}
+function zeroLine(scaleKey,color){ return (u)=>{
+  const y=u.valToPos(0,scaleKey,true); if(!isFinite(y)) return;
+  const ctx=u.ctx; ctx.save(); ctx.strokeStyle=color||T.muted; ctx.lineWidth=1; ctx.setLineDash([4,4]);
+  ctx.beginPath(); ctx.moveTo(u.bbox.left,y); ctx.lineTo(u.bbox.left+u.bbox.width,y); ctx.stroke(); ctx.restore(); }; }
+function optsSingle(titel,breite,hoehe,series,xlab,zeigX,extra){
+  return {title:titel||undefined,width:breite,height:hoehe,
+    cursor:{sync:{key:SYNC},points:{size:5}},scales:{x:{time:false}},legend:{live:true},series,
+    axes:[achse(zeigX,xlab),yAchse(null,undefined)],hooks:{draw:(extra||[])}};
+}
+function mk(opts,data,el){ uplots.push(new uPlot(opts,data,el)); }
+
+/* ---------- Haupt-Render ---------- */
+function render(pl){
+  if(!pl) return;
+  PL=pl; reset();
+  try{ renderKopf(pl); }catch(e){ console.error("renderKopf",e); }
+  try{ renderHealth(pl); }catch(e){ console.error("renderHealth",e); }
+  try{ renderKalibrierung(pl); }catch(e){ console.error("renderKalibrierung",e); }
+  try{ renderSignale(pl); }catch(e){ console.error("renderSignale",e); document.getElementById("plotRoh").innerHTML=document.getElementById("plotMm").innerHTML=`<div class="leer">Fehler beim Rendern der Signale</div>`; }
+  try{ renderFederweg(pl); }catch(e){ console.error("renderFederweg",e); }
+  try{ renderDaempferv(pl); }catch(e){ console.error("renderDaempferv",e); }
+  try{ renderKorrelation(pl); }catch(e){ console.error("renderKorrelation",e); }
+}
+
+function renderKopf(pl){
+  const xlab = (pl.meta&&pl.meta.x_einheit==="m") ? "Distanz [m]" : "Zeit [s]";
+  document.getElementById("poti_info").textContent = xlab;
+  const h=asArray(pl.health);
+  const nGueltig=h.filter(x=>x.status==="gueltig").length;
+  const nProblem=h.length-nGueltig;
+  const el=document.getElementById("kpi");
+  el.innerHTML =
+    `<span class="k ${nGueltig<h.length?'warn':''}"><b>${nGueltig}/${h.length||0}</b>Kanäle gültig</span>`+
+    `<span class="k ${nProblem>0?'rot':''}"><b>${fmt(nProblem,0)}</b>auffällig</span>`;
+}
+
+function renderHealth(pl){
+  const el=document.getElementById("healthZeile"); el.innerHTML="";
+  const h=asArray(pl.health);
+  if(!h.length){ el.innerHTML=`<span class="leer" style="padding:0">keine Health-Daten</span>`; return; }
+  h.forEach(x=>{
+    const chip=document.createElement("span"); chip.className="chip";
+    chip.innerHTML=`<span class="dot ${x.status}"></span>${x.ecke}: ${x.name} (${x.status})`;
+    el.appendChild(chip);
+  });
+}
+
+function renderKalibrierung(pl){
+  const el=document.getElementById("kalZeile"); el.innerHTML="";
+  const kal=(pl.panels&&pl.panels.kalibrierung)||{};
+  ["FL","FR","RL","RR"].forEach(ecke=>{
+    const k=kal[ecke]||{v1:0,mm1:0,v2:1,mm2:1,kalibriert:false,einheit:"V"};
+    const karte=document.createElement("div"); karte.className="karte kal-form";
+    karte.innerHTML=`
+      <h4>${ecke} ${k.kalibriert?'<span class="ok">(kalibriert)</span>':'<span class="warn">(unkalibriert, V)</span>'}</h4>
+      <div class="zeile2"><label>Punkt 1&nbsp;V=</label><input type="number" step="any" id="${ecke}_v1" value="${k.v1}">
+           <label>mm=</label><input type="number" step="any" id="${ecke}_mm1" value="${k.mm1}"></div>
+      <div class="zeile2"><label>Punkt 2&nbsp;V=</label><input type="number" step="any" id="${ecke}_v2" value="${k.v2}">
+           <label>mm=</label><input type="number" step="any" id="${ecke}_mm2" value="${k.mm2}"></div>
+      <button class="act" onclick="kalibrierungSenden('${ecke}')">Anwenden</button>
+    `;
+    el.appendChild(karte);
+  });
+}
+
+function kalibrierungSenden(ecke){
+  const g=id=>parseFloat(document.getElementById(ecke+"_"+id).value);
+  const payload={ecke:ecke,v1:g("v1"),mm1:g("mm1"),v2:g("v2"),mm2:g("mm2")};
+  if(window.sendToMatlab) window.sendToMatlab("poti_kalibrierung_geaendert",payload);
+}
+
+/* Rohsignale (V) und kalibrierte Signale (mm) als getrennte, synchronisierte Plots */
+function renderSignale(pl){
+  const hostRoh=document.getElementById("plotRoh"); hostRoh.innerHTML="";
+  const hostMm=document.getElementById("plotMm"); hostMm.innerHTML="";
+  const x=asArray(pl.x);
+  const sig=asArray(pl.signals);
+  const xlab=(pl.meta&&pl.meta.x_einheit==="m")?"Distanz [m]":"Zeit [s]";
+  const farben={FL:T.fl,FR:T.fr,RL:T.rl,RR:T.rr};
+
+  if(!x.length||!sig.length){
+    hostRoh.innerHTML=`<div class="leer">keine Signaldaten</div>`;
+    hostMm.innerHTML=`<div class="leer">keine Signaldaten</div>`;
+    return;
+  }
+
+  const bauen=(suffix,titel,ylabel)=>{
+    const data=[x]; const series=[{}]; let n=0;
+    sig.forEach(s=>{
+      if(!s||typeof s.name!=="string"||!s.name.endsWith(suffix)) return;
+      const ecke=s.name.split("_")[0];
+      const y=asArray(s.y);
+      if(!y.length) return;
+      data.push(y);
+      series.push({label:ecke,stroke:farben[ecke]||T.muted,width:1.6,points:{show:false}});
+      n++;
+    });
+    return {data,series,n,titel,ylabel};
+  };
+
+  const roh=bauen("_raw","Rohsignale","V");
+  const mm=bauen("_mm","Kalibrierte Signale","mm");
+
+  if(roh.n){
+    mk(optsSingle(null,W(hostRoh),220,roh.series,xlab,true),roh.data,hostRoh);
+  } else {
+    hostRoh.innerHTML=`<div class="leer">keine Rohsignale (*_raw) gefunden</div>`;
+  }
+  if(mm.n){
+    mk(optsSingle(null,W(hostMm),220,mm.series,xlab,true),mm.data,hostMm);
+  } else {
+    hostMm.innerHTML=`<div class="leer">keine kalibrierten Signale (*_mm) gefunden</div>`;
+  }
+}
+
+/* Histogramm auf Canvas, dark-theme-faehig */
+function histogrammZeichnen(canvas,kanten,counts,farbeFn){
+  if(!canvas) return;
+  const ctx=canvas.getContext("2d");
+  const w=canvas.width=canvas.clientWidth||200;
+  const h=canvas.height=canvas.clientHeight||90;
+  ctx.clearRect(0,0,w,h);
+  if(!counts||!counts.length) return;
+  const maxC=Math.max(...counts)||1;
+  const bw=w/counts.length;
+  counts.forEach((c,i)=>{
+    const bh=(c/maxC)*(h-4);
+    ctx.fillStyle=farbeFn?farbeFn(kanten?kanten[i]:0):T.fl;
+    ctx.fillRect(i*bw,h-bh,Math.max(bw-1,1),bh);
+  });
+}
+
+function renderFederweg(pl){
+  const el=document.getElementById("fedZeile"); el.innerHTML="";
+  const fed=asArray(pl.panels&&pl.panels.federweg);
+  const hist=asArray(pl.panels&&pl.panels.histogramm_federweg);
+  if(!fed.length){ el.innerHTML=`<div class="leer">nicht verfügbar</div>`; return; }
+  fed.forEach(f=>{
+    const h=hist.find(x=>x.ecke===f.ecke);
+    const karte=document.createElement("div"); karte.className="karte";
+    karte.innerHTML=`
+      <h4>${f.ecke} <span style="color:var(--muted);font-weight:400">(${f.einheit})</span></h4>
+      <div class="kpi-mini">Min <b>${fmt(f.min,2)}</b> &nbsp;/&nbsp; Max <b>${fmt(f.max,2)}</b></div>
+      <div class="kpi-mini">Range <b>${fmt(f.range,2)}</b> ${f.einheit}</div>
+      <div class="kpi-mini">P1–P99 <b>${fmt(f.p1,2)}</b> .. <b>${fmt(f.p99,2)}</b></div>
+      <canvas class="hist" id="hist_fw_${f.ecke}"></canvas>
+    `;
+    el.appendChild(karte);
+    if(h){
+      requestAnimationFrame(()=>{
+        histogrammZeichnen(document.getElementById("hist_fw_"+f.ecke),h.kanten,h.counts,()=>T.fl);
+      });
+    }
+  });
+}
+
+function renderDaempferv(pl){
+  const el=document.getElementById("dvZeile"); el.innerHTML="";
+  const dv=asArray(pl.panels&&pl.panels.damperv);
+  if(!dv.length){ el.innerHTML=`<div class="leer">nicht verfügbar</div>`; return; }
+  dv.forEach(d=>{
+    const karte=document.createElement("div"); karte.className="karte";
+    karte.innerHTML=`
+      <h4>${d.ecke} <span style="color:var(--muted);font-weight:400">(${d.einheit})</span></h4>
+      <div class="kpi-mini">Einfedern max <b>${fmt(d.bump_max,1)}</b></div>
+      <div class="kpi-mini">Ausfedern max <b>${fmt(d.rebound_max,1)}</b></div>
+      <div class="kpi-mini">RMS <b>${fmt(d.rms,1)}</b></div>
+      <canvas class="hist" id="hist_dv_${d.ecke}"></canvas>
+    `;
+    el.appendChild(karte);
+    requestAnimationFrame(()=>{
+      // gruen = Einfedern (positiv), blau = Ausfedern (negativ) - Vorzeichenannahme siehe Backend
+      histogrammZeichnen(document.getElementById("hist_dv_"+d.ecke),d.kanten,d.counts,
+        (kante)=>kante>=0?T.bump:T.rebound);
+    });
+  });
+}
+
+/* ECharts im Dark-Theme, analog zum Radar in fahrer.html */
+function streuplotOption(titel,xLabel,yLabel,panel){
+  const px=asArray(panel&&panel.x), py=asArray(panel&&panel.y);
+  const punkte=px.map((xv,i)=>[xv,py[i]]);
+  const linie=[];
+  if(px.length && isFinite(panel.steigung) && isFinite(panel.achsenabschnitt)){
+    const xmin=Math.min(...px), xmax=Math.max(...px);
+    linie.push([xmin,panel.steigung*xmin+panel.achsenabschnitt]);
+    linie.push([xmax,panel.steigung*xmax+panel.achsenabschnitt]);
+  }
+  return {
+    backgroundColor:"transparent",
+    title:{text:titel+"  (r="+(panel&&panel.r!=null?panel.r.toFixed(2):"n/a")+", n="+(panel&&panel.n!=null?panel.n:0)+")",
+      textStyle:{fontSize:12,color:T.text,fontWeight:600}},
+    grid:{left:48,right:16,top:36,bottom:34},
+    tooltip:{backgroundColor:"#1e1e1e",borderColor:T.line,textStyle:{color:T.text}},
+    xAxis:{name:xLabel,type:"value",nameTextStyle:{color:T.muted},axisLine:{lineStyle:{color:T.line}},
+      axisLabel:{color:T.muted},splitLine:{lineStyle:{color:T.line}}},
+    yAxis:{name:yLabel,type:"value",nameTextStyle:{color:T.muted},axisLine:{lineStyle:{color:T.line}},
+      axisLabel:{color:T.muted},splitLine:{lineStyle:{color:T.line}}},
+    series:[
+      {type:"scatter",data:punkte,symbolSize:4,itemStyle:{color:T.fl,opacity:.5}},
+      {type:"line",data:linie,showSymbol:false,lineStyle:{color:T.rot,width:2}}
+    ]
+  };
+}
+
+function renderKorrelation(pl){
+  const kor=pl.panels&&pl.panels.korrelation;
+  const elR=document.getElementById("korrRoll"), elD=document.getElementById("korrDive");
+  if(typeof echarts==="undefined"){
+    elR.innerHTML=elD.innerHTML=`<div class="leer">ECharts fehlt in ./lib — echarts.min.js dort ablegen.</div>`;
+    return;
+  }
+  if(!kor||!kor.roll||!kor.dive){
+    if(echartsRoll){ echartsRoll.dispose(); echartsRoll=null; }
+    if(echartsDive){ echartsDive.dispose(); echartsDive=null; }
+    elR.innerHTML=`<div class="leer">nicht verfügbar</div>`;
+    elD.innerHTML=`<div class="leer">nicht verfügbar</div>`;
+    return;
+  }
+  elR.innerHTML=""; elD.innerHTML="";
+  if(!echartsRoll) echartsRoll=echarts.init(elR,null,{renderer:"canvas"});
+  if(!echartsDive) echartsDive=echarts.init(elD,null,{renderer:"canvas"});
+  echartsRoll.setOption(streuplotOption("Rollen: (FL-FR) vs. ay","ay [m/s²]","FL-FR",kor.roll));
+  echartsDive.setOption(streuplotOption("Nicken: (FL+FR) vs. ax","ax [m/s²]","FL+FR",kor.dive));
+}
+
+/* ---------- Resize ---------- */
+let rt;
+function resizeAll(){
+  uplots.forEach(u=>{ const w=u.root.parentNode.clientWidth; if(w>0) u.setSize({width:w,height:u.height}); });
+  if(echartsRoll) echartsRoll.resize();
+  if(echartsDive) echartsDive.resize();
+}
+function planeResize(){ clearTimeout(rt); rt=setTimeout(resizeAll,120); }
+window.addEventListener("resize",planeResize);
+if(window.ResizeObserver) new ResizeObserver(planeResize).observe(document.body);
+</script>
+</body>
+</html>
